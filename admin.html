@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVOLVE EARTH · Admin Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#080814;color:#e8e0f0;font-family:'Georgia','Times New Roman',serif;min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
+.login-title{font-size:2em;background:linear-gradient(135deg,#bb66ff,#ff88cc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:3px}
+.login-sub{color:#7766aa;font-style:italic;font-size:.9em;margin-bottom:30px}
+.login-box{background:rgba(40,10,80,.8);border:1px solid rgba(140,80,255,.3);border-radius:18px;padding:36px 32px;width:100%;max-width:380px}
+.login-box input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:12px 16px;color:#e8e0f0;font-family:inherit;font-size:.95em;outline:none;margin-bottom:14px;transition:border-color .25s}
+.login-box input:focus{border-color:rgba(140,80,255,.6)}
+.login-box button{width:100%;padding:13px;background:linear-gradient(135deg,#7700cc,#cc00ff);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.95em;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s}
+.login-box button:hover{box-shadow:0 0 25px rgba(200,0,255,.4)}
+.login-err{color:#ff5555;font-size:.82em;margin-top:8px;text-align:center;min-height:1.2em}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;padding:0 0 60px}
+.dash-header{background:rgba(8,8,20,.97);border-bottom:1px solid rgba(255,255,255,.08);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.dash-logo{font-size:1.1em;letter-spacing:3px;background:linear-gradient(135deg,#bb66ff,#ff88cc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.dash-header-btns{display:flex;gap:10px}
+.hdr-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:#cc99ff;padding:7px 16px;cursor:pointer;font-family:inherit;font-size:.78em;letter-spacing:1px;transition:all .25s}
+.hdr-btn:hover{background:rgba(255,255,255,.14)}
+.hdr-btn.danger{color:#ff7777;border-color:rgba(255,80,80,.25)}
+
+.dash-body{max-width:1200px;margin:0 auto;padding:30px 20px}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+@media(max-width:700px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;text-align:center}
+.stat-card .sc-num{font-size:2.4em;font-weight:bold;line-height:1}
+.stat-card .sc-label{font-size:.72em;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-top:6px}
+.stat-trusted .sc-num{color:#44ff88}
+.stat-trusting .sc-num{color:#ffdd44}
+.stat-untrusted .sc-num{color:#ff6666}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.filter-tab{background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:20px;color:#9977cc;padding:7px 18px;cursor:pointer;font-family:inherit;font-size:.8em;letter-spacing:1px;transition:all .25s}
+.filter-tab.active{background:rgba(140,80,255,.25);border-color:rgba(140,80,255,.5);color:#cc99ff}
+.filter-tab:hover{background:rgba(255,255,255,.07)}
+.search-box{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:7px 16px;color:#e8e0f0;font-family:inherit;font-size:.8em;outline:none;min-width:200px}
+.search-box::placeholder{color:rgba(255,255,255,.25)}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid rgba(255,255,255,.07)}
+table{width:100%;border-collapse:collapse;font-size:.82em}
+thead tr{background:rgba(40,10,80,.6);border-bottom:1px solid rgba(255,255,255,.1)}
+th{padding:12px 14px;text-align:left;font-weight:normal;letter-spacing:1px;text-transform:uppercase;font-size:.75em;opacity:.65;white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.03)}
+td{padding:11px 14px;vertical-align:middle}
+.td-name{font-weight:bold;color:#e0d0ff}
+.td-email{color:#9988bb;font-size:.88em}
+.td-phone{color:#8877aa;font-size:.82em}
+.td-socials{font-size:.78em;color:#7766aa}
+.td-date{font-size:.75em;color:#665588;white-space:nowrap}
+
+/* Chakra dots */
+.chakra-dots{display:flex;gap:4px;align-items:center}
+.cdot{width:12px;height:12px;border-radius:50%;flex-shrink:0;position:relative;cursor:default}
+.cdot[title]:hover::after{content:attr(title);position:absolute;bottom:calc(100%+4px);left:50%;transform:translateX(-50%);background:#1a0a2e;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 8px;white-space:nowrap;font-size:.75em;color:#e0d0ff;pointer-events:none;z-index:100}
+.dot-open{background:#44ff88;box-shadow:0 0 5px #44ff88}
+.dot-partial{background:#ffdd44;box-shadow:0 0 5px #ffdd44}
+.dot-blocked{background:#ff6666;box-shadow:0 0 5px #ff6666}
+.dot-unanswered{background:#333;border:1px solid #555}
+
+/* Bucket dropdown */
+.bucket-sel{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e8e0f0;padding:5px 8px;font-family:inherit;font-size:.78em;cursor:pointer;outline:none}
+.bucket-trusted{color:#44ff88}
+.bucket-trusting{color:#ffdd44}
+.bucket-untrusted{color:#ff6666}
+
+/* Action buttons */
+.act-btn{background:transparent;border:none;cursor:pointer;font-size:1em;padding:4px 6px;border-radius:6px;transition:background .2s;opacity:.7}
+.act-btn:hover{background:rgba(255,255,255,.1);opacity:1}
+
+/* ── NOTES MODAL ── */
+#notes-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+#notes-modal.open{display:flex}
+.notes-box{background:#0e0820;border:1px solid rgba(140,80,255,.35);border-radius:18px;padding:28px;width:100%;max-width:460px}
+.notes-title{font-size:1em;color:#cc99ff;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.notes-textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px;color:#e8e0f0;font-family:inherit;font-size:.88em;min-height:120px;outline:none;resize:vertical}
+.notes-btns{display:flex;gap:10px;margin-top:14px;justify-content:flex-end}
+.notes-save{background:linear-gradient(135deg,#7700cc,#cc00ff);border:none;border-radius:10px;color:#fff;padding:9px 22px;font-family:inherit;font-size:.85em;cursor:pointer;letter-spacing:1px}
+.notes-cancel{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#cc99ff;padding:9px 22px;font-family:inherit;font-size:.85em;cursor:pointer}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;color:#554477;font-style:italic}
+.empty-state .es-icon{font-size:2.5em;margin-bottom:12px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:30px;right:30px;background:rgba(40,10,80,.95);border:1px solid rgba(140,80,255,.4);border-radius:12px;padding:12px 22px;color:#cc99ff;font-size:.85em;letter-spacing:1px;opacity:0;transform:translateY(12px);transition:all .3s;pointer-events:none;z-index:300}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-title">✦ EVOLVE EARTH</div>
+  <div class="login-sub">Admin Portal · Soul Map Dashboard</div>
+  <div class="login-box">
+    <input type="password" id="pw-input" placeholder="Admin Password" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button onclick="doLogin()">ENTER THE PORTAL ✦</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div class="dash-logo">✦ EVOLVE EARTH · SOUL MAP ADMIN</div>
+    <div class="dash-header-btns">
+      <button class="hdr-btn" onclick="exportCSV()">📊 Export CSV</button>
+      <button class="hdr-btn" onclick="refreshDash()">🔄 Refresh</button>
+      <button class="hdr-btn danger" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <!-- Stats -->
+    <div class="stat-row">
+      <div class="stat-card"><div class="sc-num" id="stat-total">0</div><div class="sc-label">Total Souls</div></div>
+      <div class="stat-card stat-trusted"><div class="sc-num" id="stat-trusted">0</div><div class="sc-label">🌟 Trusted</div></div>
+      <div class="stat-card stat-trusting"><div class="sc-num" id="stat-trusting">0</div><div class="sc-label">🌱 Trusting</div></div>
+      <div class="stat-card stat-untrusted"><div class="sc-num" id="stat-untrusted">0</div><div class="sc-label">🌑 Don't Trust Yet</div></div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-tab" onclick="setFilter('trusted',this)">🌟 Trusted</button>
+      <button class="filter-tab" onclick="setFilter('trusting',this)">🌱 Trusting</button>
+      <button class="filter-tab" onclick="setFilter('untrusted',this)">🌑 Don't Trust Yet</button>
+      <input class="search-box" type="text" id="search-input" placeholder="Search name or email…" oninput="renderTable()" />
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Socials</th>
+            <th>Date</th>
+            <th>Chakra Map</th>
+            <th>Bucket</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody"></tbody>
+      </table>
+      <div id="empty-state" class="empty-state" style="display:none">
+        <div class="es-icon">🌑</div>
+        <div>No souls in this bucket yet.<br>Share the quiz to start collecting readings.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notes Modal -->
+<div id="notes-modal">
+  <div class="notes-box">
+    <div class="notes-title">📝 Admin Notes</div>
+    <textarea class="notes-textarea" id="notes-ta" placeholder="Add notes about this person's journey, follow-up actions, referrals…"></textarea>
+    <div class="notes-btns">
+      <button class="notes-cancel" onclick="closeNotes()">Cancel</button>
+      <button class="notes-save" onclick="saveNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────
+const ADMIN_PASSWORD = 'EvolveAdmin2024';
+const SESSIONS_KEY   = 'chakra_sessions';
+const AUTH_KEY       = 'admin_auth_v1';
+const QUIZ_FILE      = 'chakra-destiny.html';
+
+const CHAKRA_NAMES = ['Root','Sacral','Solar','Heart','Throat','3rd Eye','Crown'];
+const CHAKRA_IDS   = ['root','sacral','solar','heart','throat','thirdeye','crown'];
+
+let _currentFilter = 'all';
+let _editingId = null;
+
+// ── BUCKET HELPERS ────────────────────────────────
+const BUCKET_LABEL = {
+  trusted:   '🌟 Trusted',
+  trusting:  '🌱 Trusting',
+  untrusted: '🌑 Don\'t Trust Yet'
+};
+const BUCKET_CLASS = {
+  trusted:'bucket-trusted', trusting:'bucket-trusting', untrusted:'bucket-untrusted'
+};
+
+// ── AUTH ──────────────────────────────────────────
+function doLogin() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw === ADMIN_PASSWORD) {
+    sessionStorage.setItem(AUTH_KEY, '1');
+    showDash();
+  } else {
+    document.getElementById('login-err').textContent = 'Incorrect password. Try again.';
+    document.getElementById('pw-input').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+function showDash() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  refreshDash();
+}
+
+// ── DATA ──────────────────────────────────────────
+function getSessions() {
+  return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]');
+}
+
+function saveSessions(sessions) {
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+}
+
+function getChakraStatus(session, chakraId, i) {
+  // Prefer stored chakraMap if available
+  if (session.chakraMap && session.chakraMap[chakraId]) return session.chakraMap[chakraId];
+  // Fallback: derive from mainAnswers + lsAnswers
+  const key = session.mainAnswers && session.mainAnswers[i];
+  const ls  = session.lsAnswers  && session.lsAnswers[i];
+  if (!key) return 'unanswered';
+  // healthy archetypes
+  const healthy = ['KING','WARRIOR','MAGICIAN'];
+  const isHealthy = healthy.includes(key);
+  if (isHealthy && (ls === 'open' || ls === 'neutral')) return 'open';
+  if (ls === 'partial' || ls === 'neutral') return 'partial';
+  return 'blocked';
+}
+
+function calcFlowPct(session) {
+  let open = 0, partial = 0;
+  CHAKRA_IDS.forEach((id, i) => {
+    const s = getChakraStatus(session, id, i);
+    if (s === 'open') open++;
+    else if (s === 'partial') partial++;
+  });
+  const pct = Math.round((open / 7) * 100) - (partial * 5);
+  return Math.max(5, Math.min(97, pct));
+}
+
+// ── RENDER ────────────────────────────────────────
+function refreshDash() {
+  const sessions = getSessions();
+  const trusted   = sessions.filter(s => s.bucket === 'trusted').length;
+  const trusting  = sessions.filter(s => s.bucket === 'trusting').length;
+  const untrusted = sessions.filter(s => s.bucket === 'untrusted').length;
+
+  document.getElementById('stat-total').textContent    = sessions.length;
+  document.getElementById('stat-trusted').textContent   = trusted;
+  document.getElementById('stat-trusting').textContent  = trusting;
+  document.getElementById('stat-untrusted').textContent = untrusted;
+
+  renderTable();
+}
+
+function setFilter(f, btn) {
+  _currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const sessions  = getSessions();
+  const search    = (document.getElementById('search-input').value || '').toLowerCase();
+  const tbody     = document.getElementById('user-tbody');
+  const emptyEl   = document.getElementById('empty-state');
+
+  let filtered = sessions.filter(s => {
+    if (_currentFilter !== 'all' && s.bucket !== _currentFilter) return false;
+    if (search) {
+      const hay = ((s.name || '') + ' ' + (s.email || '')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Newest first
+  filtered.sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  filtered.forEach((s, idx) => {
+    const tr = document.createElement('tr');
+    tr.dataset.id = s.id;
+
+    // Chakra dots
+    const dotsHtml = CHAKRA_IDS.map((id, i) => {
+      const status = getChakraStatus(s, id, i);
+      const cls = status === 'open' ? 'dot-open' : status === 'partial' ? 'dot-partial' : status === 'blocked' ? 'dot-blocked' : 'dot-unanswered';
+      return `<div class="cdot ${cls}" title="${CHAKRA_NAMES[i]}: ${status}"></div>`;
+    }).join('');
+
+    // Socials
+    const fb = s.fb ? `<div>fb: ${escHtml(s.fb)}</div>` : '';
+    const ig = s.ig ? `<div>ig: ${escHtml(s.ig)}</div>` : '';
+
+    // Date
+    const dateStr = s.completedAt ? new Date(s.completedAt).toLocaleDateString('en-AU',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+    // Bucket select
+    const bucketOpts = ['trusted','trusting','untrusted'].map(b =>
+      `<option value="${b}" ${s.bucket===b?'selected':''}>${BUCKET_LABEL[b]}</option>`
+    ).join('');
+
+    // Flow pct
+    const flow = calcFlowPct(s);
+
+    tr.innerHTML = `
+      <td style="color:#554477;font-size:.8em">${idx + 1}</td>
+      <td>
+        <div class="td-name">${escHtml(s.name || '—')}</div>
+        <div style="font-size:.7em;color:#554477;margin-top:2px">Flow: ${flow}%</div>
+      </td>
+      <td class="td-email">${escHtml(s.email || '—')}</td>
+      <td class="td-phone">${escHtml(s.phone || '—')}</td>
+      <td class="td-socials">${fb}${ig}${!fb&&!ig?'<span style="opacity:.3">—</span>':''}</td>
+      <td class="td-date">${dateStr}</td>
+      <td><div class="chakra-dots">${dotsHtml}</div></td>
+      <td>
+        <select class="bucket-sel ${BUCKET_CLASS[s.bucket]||''}" onchange="changeBucket('${s.id}',this)">
+          ${bucketOpts}
+        </select>
+      </td>
+      <td>
+        <button class="act-btn" title="View Reading" onclick="viewReading('${s.id}')">👁️</button>
+        <button class="act-btn" title="Notes" onclick="openNotes('${s.id}')">📝</button>
+        <button class="act-btn" title="Delete" onclick="deleteSession('${s.id}')">🗑️</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── ACTIONS ───────────────────────────────────────
+function changeBucket(id, sel) {
+  const sessions = getSessions();
+  const s = sessions.find(x => x.id === id);
+  if (!s) return;
+  s.bucket = sel.value;
+  s.bucketOverride = true;
+  sel.className = 'bucket-sel ' + (BUCKET_CLASS[sel.value] || '');
+  saveSessions(sessions);
+  refreshDash();
+  showToast('Bucket updated ✓');
+}
+
+function viewReading(id) {
+  window.open(QUIZ_FILE + '?s=' + id, '_blank');
+}
+
+function deleteSession(id) {
+  if (!confirm('Delete this soul\'s reading? This cannot be undone.')) return;
+  const sessions = getSessions().filter(s => s.id !== id);
+  saveSessions(sessions);
+  refreshDash();
+  showToast('Session deleted');
+}
+
+// ── NOTES ─────────────────────────────────────────
+function openNotes(id) {
+  _editingId = id;
+  const s = getSessions().find(x => x.id === id);
+  document.getElementById('notes-ta').value = s ? (s.notes || '') : '';
+  document.getElementById('notes-modal').classList.add('open');
+}
+
+function closeNotes() {
+  _editingId = null;
+  document.getElementById('notes-modal').classList.remove('open');
+}
+
+function saveNotes() {
+  if (!_editingId) return;
+  const sessions = getSessions();
+  const s = sessions.find(x => x.id === _editingId);
+  if (s) {
+    s.notes = document.getElementById('notes-ta').value.trim();
+    saveSessions(sessions);
+  }
+  closeNotes();
+  showToast('Notes saved ✓');
+}
+
+// Close modal on backdrop click
+document.getElementById('notes-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeNotes();
+});
+
+// ── CSV EXPORT ────────────────────────────────────
+function exportCSV() {
+  const sessions = getSessions();
+  if (sessions.length === 0) { showToast('No data to export'); return; }
+
+  const headers = ['Name','Email','Phone','Facebook','Instagram','Date','Bucket','FlowPct',
+    ...CHAKRA_NAMES.map(n => n + '_Status'), 'Notes'];
+
+  const rows = sessions.map(s => {
+    const flow = calcFlowPct(s);
+    const chakraCols = CHAKRA_IDS.map((id, i) => getChakraStatus(s, id, i));
+    const date = s.completedAt ? new Date(s.completedAt).toLocaleDateString('en-AU') : '';
+    return [
+      s.name  || '',
+      s.email || '',
+      s.phone || '',
+      s.fb    || '',
+      s.ig    || '',
+      date,
+      BUCKET_LABEL[s.bucket] || s.bucket || '',
+      flow + '%',
+      ...chakraCols,
+      (s.notes || '').replace(/\n/g,' ')
+    ].map(v => '"' + String(v).replace(/"/g,'""') + '"');
+  });
+
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'evolve-earth-soul-maps-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  showToast('CSV exported ✓');
+}
+
+// ── TOAST ─────────────────────────────────────────
+let _toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (sessionStorage.getItem(AUTH_KEY) === '1') {
+    showDash();
+  }
+  // Allow Enter on password field
+  document.getElementById('pw-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+</script>
+</body>
+</html>

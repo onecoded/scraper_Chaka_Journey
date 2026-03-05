@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python tools/run_social.py --list-posts)",
+      "Bash(python tools/run_social.py --check-config)",
+      "Bash(python -m py_compile tools/create_templates.py tools/import_buyers_excel.py tools/import_sellers_excel.py)"
+    ]
+  }
+}

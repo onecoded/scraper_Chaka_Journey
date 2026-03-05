@@ -1,0 +1,14 @@
+{
+  "timeZone": "America/Honolulu",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Maps",
+        "version": "v1",
+        "serviceId": "maps"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
+}

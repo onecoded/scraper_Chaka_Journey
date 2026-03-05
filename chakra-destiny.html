@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SEVEN SACRED GATES ✦ Choose Your Chakra Destiny</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#080814;color:#e8e0f0;font-family:'Georgia','Times New Roman',serif;min-height:100vh;overflow-x:hidden}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:var(--a,.2)}to{opacity:var(--b,.8)}}
+
+/* PROGRESS HEADER */
+#prog-header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,8,20,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);padding:8px 16px;display:none;align-items:center;justify-content:center;gap:4px}
+#prog-header.show{display:flex}
+.ph-node{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ph-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.65em;transition:all .4s}
+.ph-dot.open{border-color:var(--c);background:var(--c);box-shadow:0 0 10px var(--c);color:rgba(0,0,0,.7);font-size:.8em}
+.ph-dot.blocked{border-color:var(--c);background:rgba(0,0,0,.6);opacity:.5}
+.ph-dot.current{border-color:var(--c);box-shadow:0 0 8px var(--c);animation:phpulse 1.5s infinite}
+@keyframes phpulse{0%,100%{box-shadow:0 0 4px var(--c)}50%{box-shadow:0 0 14px var(--c)}}
+.ph-label{font-size:.5em;opacity:.5;letter-spacing:1px}
+.ph-line{width:10px;height:2px;background:rgba(255,255,255,.1);margin-top:-11px}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;padding:80px 18px 80px;max-width:800px;margin:0 auto;position:relative;z-index:1;flex-direction:column;align-items:center;justify-content:flex-start}
+.screen.active{display:flex;animation:fadeIn .5s ease}
+.no-top{padding-top:30px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* BUTTONS */
+.btn{padding:14px 36px;border:none;border-radius:50px;cursor:pointer;font-size:1em;font-family:inherit;transition:all .3s;letter-spacing:1px;text-transform:uppercase}
+.btn-start{background:linear-gradient(135deg,#5500bb,#bb00ff);color:#fff;box-shadow:0 0 25px rgba(140,0,255,.4)}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 0 45px rgba(140,0,255,.6)}
+.btn-sm{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#e0d8f0;padding:10px 26px;border-radius:40px;cursor:pointer;font-family:inherit;font-size:.82em;letter-spacing:1px;text-transform:uppercase;transition:all .25s}
+.btn-sm:hover{background:rgba(255,255,255,.14)}
+
+/* ── INTRO ── */
+#screen-intro{justify-content:center;min-height:100vh;padding:40px 18px}
+.intro-portal{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:680px;width:100%}
+.intro-eyebrow{font-size:.65em;letter-spacing:6px;text-transform:uppercase;color:#554477;margin-bottom:18px;animation:fadeIn 1.2s ease}
+.rainbow{font-size:clamp(2.2em,7vw,3.6em);background:linear-gradient(120deg,#cc2200,#ff6600,#ffd700,#00cc55,#0088cc,#6600cc,#cc00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:300%;animation:shimmer 6s linear infinite;line-height:1.15;margin-bottom:4px;font-weight:bold;letter-spacing:2px}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:300%}}
+.intro-tagline{font-size:1.05em;color:#aa88cc;font-style:italic;letter-spacing:2px;margin-bottom:36px;animation:fadeIn 1.8s ease}
+
+/* Chakra Spine on intro */
+.intro-spine{display:flex;flex-direction:column;align-items:center;margin:0 auto 36px;position:relative;gap:0}
+.intro-spine-line{width:2px;height:28px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.12),transparent)}
+.intro-orb{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5em;position:relative;cursor:default;animation:orbFloat var(--d,3s) ease-in-out infinite alternate}
+.intro-orb::before{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--c,#fff);opacity:.25;animation:orbRing var(--d,3s) ease-in-out infinite alternate}
+.intro-orb::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:1px solid var(--c,#fff);opacity:.1;animation:orbRing calc(var(--d,3s) * 1.4) ease-in-out infinite alternate}
+@keyframes orbFloat{from{transform:scale(.94);filter:brightness(.85)}to{transform:scale(1.06);filter:brightness(1.15)}}
+@keyframes orbRing{from{transform:scale(.9);opacity:.1}to{transform:scale(1.1);opacity:.3}}
+
+.intro-wisdom{font-size:.92em;color:#9988bb;line-height:2;max-width:480px;margin-bottom:32px;animation:fadeIn 2.4s ease}
+.intro-wisdom strong{color:#ccaaff;font-style:normal}
+.btn-enter{padding:16px 52px;background:linear-gradient(135deg,#5500bb,#bb00ff);color:#fff;border:none;border-radius:50px;cursor:pointer;font-size:1.05em;font-family:inherit;letter-spacing:3px;text-transform:uppercase;position:relative;overflow:hidden;animation:entrancePulse 2.5s ease-in-out infinite}
+.btn-enter::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 40%,rgba(255,255,255,.2) 50%,transparent 60%);background-size:200%;animation:shimmer 2s linear infinite}
+.btn-enter:hover{transform:scale(1.05);box-shadow:0 0 50px rgba(140,0,255,.7)}
+@keyframes entrancePulse{0%,100%{box-shadow:0 0 20px rgba(140,0,255,.4)}50%{box-shadow:0 0 50px rgba(140,0,255,.8),0 0 80px rgba(140,0,255,.3)}}
+
+/* ── GATE SCREEN BACKGROUNDS ── */
+.screen[data-chakra]{position:relative}
+.screen[data-chakra]::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% 100%,var(--ck-bg,transparent) 0%,transparent 70%);opacity:.55}
+.screen[data-chakra] .gate-top,.screen[data-chakra] .gate-card,.screen[data-chakra] .gate-q,.screen[data-chakra] .answers-wrap,.screen[data-chakra] .lifestyle-block{position:relative;z-index:1}
+.ck-particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ckp{position:absolute;border-radius:50%;animation:ckpFloat linear infinite;opacity:0}
+@keyframes ckpFloat{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.4}80%{opacity:.2}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+/* ── ANSWER BUTTON RESONANCE ── */
+.ans-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:15px 18px;cursor:pointer;text-align:left;font-family:inherit;font-size:.86em;color:#e0d8f0;display:flex;align-items:flex-start;gap:12px;width:100%;position:relative;overflow:hidden;transition:background .2s,border-color .2s,transform .1s}
+.ans-btn::after{content:'';position:absolute;inset:0;border-radius:14px;opacity:0;transition:opacity .3s;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),var(--ck-color,#ffffff22) 0%,transparent 60%)}
+.ans-btn:hover::after{opacity:1}
+.ans-btn.chosen{border-color:var(--ck-color,rgba(255,215,0,.55));background:var(--ck-bg-light,rgba(255,215,0,.08));animation:chosenPop .35s ease}
+@keyframes chosenPop{0%{transform:scale(.97)}50%{transform:scale(1.025)}100%{transform:scale(1)}}
+.ans-btn.locked{pointer-events:none;opacity:.65}
+.ans-dot{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--ck-color,#ffffff44);opacity:.2;transition:all .2s;box-shadow:0 0 0 0 var(--ck-color,#fff)}
+.ans-btn:hover .ans-dot{opacity:.9;box-shadow:0 0 12px 4px var(--ck-color,#fff);animation:dotPulse .6s ease-in-out infinite alternate}
+.ans-btn.chosen .ans-dot{opacity:1;box-shadow:0 0 20px 6px var(--ck-color,#fff);animation:none}
+@keyframes dotPulse{from{transform:translateY(-50%) scale(.8)}to{transform:translateY(-50%) scale(1.3)}}
+.ans-emoji{font-size:1.3em;flex-shrink:0;margin-top:2px}
+.ans-body{flex:1;padding-right:22px}
+.ans-text{line-height:1.55}
+.ans-hint{font-size:.7em;opacity:.4;font-style:italic;margin-top:3px}
+
+/* Gate card styling enhancement */
+.gate-card{background:rgba(10,5,25,.7);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:28px 24px;width:100%;max-width:740px;margin-top:14px;backdrop-filter:blur(8px)}
+
+/* ── DOT CHARGING / BURST ── */
+@keyframes dotCharge{0%{transform:translateY(-50%) scale(1)}100%{transform:translateY(-50%) scale(5);opacity:0.9}}
+@keyframes dotBurst{0%{transform:translateY(-50%) scale(5);opacity:1}100%{transform:translateY(-50%) scale(10);opacity:0}}
+@keyframes portalCharge{0%{transform:scale(1)}100%{transform:scale(3);opacity:0}}
+@keyframes portalBurst{0%{transform:scale(3);opacity:1}60%{transform:scale(6);opacity:0.3}100%{transform:scale(8);opacity:0}}
+.dot-charging .ans-dot{animation:dotCharge .16s linear forwards}
+.dot-burst    .ans-dot{animation:dotBurst  .28s ease-out forwards}
+.dot-charging .portal-dot{animation:portalCharge .16s linear forwards}
+.dot-burst    .portal-dot{animation:portalBurst  .32s ease-out forwards}
+
+/* ── PORTAL DOT (on large action buttons) ── */
+.portal-dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.6);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;transition:all .15s}
+.btn-enter{position:relative;overflow:visible}
+.btn-next-prox{position:relative;overflow:visible}
+
+/* ── CURSOR HINT ── */
+body{cursor:crosshair}
+
+/* GATE CARD */
+.gate-top{width:100%;max-width:740px;height:3px;border-radius:2px;margin-bottom:0}
+.gate-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:26px 24px;width:100%;max-width:740px;margin-top:14px}
+.gate-label{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#666;margin-bottom:4px;text-align:center}
+.gate-name{font-size:1.85em;font-weight:bold;text-align:center;margin-bottom:2px}
+.gate-sanskrit{font-style:italic;color:#998;font-size:.82em;text-align:center;margin-bottom:6px}
+.gate-theme{font-size:.75em;letter-spacing:2px;opacity:.55;text-transform:uppercase;text-align:center;margin-bottom:14px}
+.chakra-orb{width:68px;height:68px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:1.9em;animation:orbpulse 2.5s ease-in-out infinite}
+@keyframes orbpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.deep-q{font-size:.8em;color:#8877aa;text-align:center;font-style:italic;margin-bottom:12px;padding:10px 16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;line-height:1.7}
+.gate-intro{font-size:.85em;color:#b0a8c8;text-align:center;font-style:italic;margin-bottom:16px;line-height:1.8;max-width:560px;margin-left:auto;margin-right:auto}
+.gate-q{font-size:1.02em;text-align:center;color:#e4daf4;margin-bottom:20px;line-height:1.85;max-width:600px;margin-left:auto;margin-right:auto}
+
+
+/* ANSWERS */
+.answers-wrap{display:flex;flex-direction:column;gap:10px;width:100%}
+.ans-emoji{font-size:1.3em;flex-shrink:0;margin-top:2px}
+
+/* LIFESTYLE SECTION */
+.lifestyle-block{margin-top:22px;border-top:1px solid var(--ck-color,rgba(255,255,255,.08));border-top-width:1px;padding-top:20px;animation:fadeIn .4s ease}
+.ls-label{font-size:.7em;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;text-align:center}
+.ls-q{font-size:.88em;text-align:center;color:#e0d8f0;margin-bottom:14px;font-style:italic;line-height:1.7}
+.ls-opts{display:flex;flex-direction:column;gap:8px}
+.ls-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;font-family:inherit;font-size:.82em;color:#e0d8f0;transition:all .22s;display:flex;align-items:flex-start;gap:10px;width:100%}
+.ls-btn:hover{background:rgba(255,255,255,.09);border-color:var(--ck-color,rgba(255,255,255,.3))}
+.ls-btn.chosen{border-color:var(--ck-color,rgba(255,215,0,.5));background:rgba(255,255,255,.07)}
+.ls-btn.locked{pointer-events:none}
+
+/* NEXT BUTTON */
+.next-row{text-align:center;margin-top:16px}
+.btn-next{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#e0d8f0;padding:12px 30px;border-radius:40px;cursor:pointer;font-family:inherit;font-size:.85em;letter-spacing:1px;text-transform:uppercase;transition:all .25s;display:none}
+.btn-next.show{display:inline-block}
+.btn-next:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+
+/* ORACLE FLASH */
+#oracle-flash{display:none;position:fixed;inset:0;z-index:100;background:rgba(8,8,20,.97);align-items:center;justify-content:center;text-align:center;padding:40px;flex-direction:column}
+#oracle-flash.show{display:flex;animation:fadeIn .35s ease}
+.of-emoji{font-size:3.2em;margin-bottom:18px;animation:bounceIn .5s ease}
+@keyframes bounceIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.of-label{font-size:.7em;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;opacity:.7}
+.of-msg{font-size:1.2em;font-style:italic;max-width:520px;color:#e8d8ff;line-height:1.85;margin-bottom:24px}
+.of-continue{font-size:.78em;letter-spacing:2px;color:#9988bb;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,.18);padding:10px 26px;border-radius:30px;background:transparent;font-family:inherit;transition:all .25s}
+.of-continue:hover{background:rgba(255,255,255,.08)}
+
+
+/* CONTACT PANEL */
+.contact-panel{width:100%;max-width:700px;background:linear-gradient(135deg,rgba(40,10,80,.8),rgba(20,5,50,.9));border:1px solid rgba(140,80,255,.3);border-radius:18px;padding:28px 24px;margin-bottom:32px;box-shadow:0 0 40px rgba(140,0,255,.15)}
+.cp-title{font-size:1.3em;text-align:center;background:linear-gradient(135deg,#bb66ff,#ff88cc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;letter-spacing:2px}
+.cp-sub{text-align:center;color:#9977bb;font-size:.85em;margin-bottom:20px;font-style:italic}
+.cf-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.cf-row input{flex:1;min-width:160px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:11px 14px;color:#e8e0f0;font-family:inherit;font-size:.88em;outline:none;transition:border-color .25s}
+.cf-row input:focus{border-color:rgba(140,80,255,.6)}
+.cf-row input::placeholder{color:rgba(255,255,255,.3)}
+.btn-save{width:100%;padding:14px;background:linear-gradient(135deg,#7700cc,#cc00ff);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.95em;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-top:8px;transition:all .3s}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(200,0,255,.4)}
+.cp-saved{text-align:center;color:#bb99ff;font-size:.95em;padding:10px 0}
+.btn-return-link{background:rgba(140,80,255,.25);border:1px solid rgba(140,80,255,.4);border-radius:20px;color:#cc99ff;padding:7px 16px;cursor:pointer;font-family:inherit;font-size:.82em;margin-left:8px;transition:all .25s}
+.btn-return-link:hover{background:rgba(140,80,255,.4)}
+.cp-return-note{font-size:.72em;color:#7766aa;margin-top:8px;font-style:italic}
+
+/* RESULTS */
+.results-title{font-size:clamp(1.5em,5vw,2.3em);text-align:center;background:linear-gradient(135deg,#ffd700,#ff9900);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.results-sub{text-align:center;color:#9988bb;font-style:italic;margin-bottom:30px}
+
+/* SPINE MAP */
+.spine-map{display:flex;flex-direction:column;align-items:center;margin:8px auto 30px}
+.spine-line-v{width:2px;height:32px;background:rgba(255,255,255,.08)}
+.spine-row{display:flex;align-items:center;justify-content:center;width:100%;max-width:400px;position:relative}
+.spine-node{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0;transition:all .6s}
+.spine-node.open{animation:nodeGlow 2.5s ease-in-out infinite alternate}
+.spine-node.blocked{opacity:.35;filter:saturate(.15)}
+.spine-node.partial{opacity:.7;filter:saturate(.5)}
+@keyframes nodeGlow{from{box-shadow:0 0 12px var(--c)}to{box-shadow:0 0 30px var(--c),0 0 55px var(--c)}}
+.spine-lbl{position:absolute;font-size:.68em;white-space:nowrap;color:#c0b8d8}
+.spine-lbl.left{right:calc(50% + 36px);text-align:right}
+.spine-lbl.right{left:calc(50% + 36px);text-align:left}
+.spine-arch{opacity:.6;font-size:.88em;margin-top:1px}
+.spine-st{font-size:.75em;margin-top:1px;font-style:italic}
+.spine-st.open{color:#44dd88}
+.spine-st.blocked{color:#ff7777}
+.spine-st.partial{color:#ffaa44}
+
+/* SUMMARY */
+.summary-card{background:linear-gradient(135deg,rgba(80,0,180,.18),rgba(180,0,255,.12));border:1px solid rgba(180,0,255,.28);border-radius:18px;padding:26px;text-align:center;width:100%;max-width:700px;margin-bottom:26px}
+.sum-label{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#cc88ff;margin-bottom:10px}
+.sum-big{font-size:3.2em;margin-bottom:8px}
+.sum-name{font-size:1.8em;font-weight:bold;color:#fff;margin-bottom:4px}
+.sum-dosha{font-size:.82em;color:#cc88ff;margin-bottom:12px;letter-spacing:1px}
+.sum-stats{font-size:.78em;color:#88aa88;margin-bottom:14px}
+.sum-desc{font-size:.88em;color:#c0b4d8;line-height:1.8;max-width:520px;margin:0 auto}
+
+/* SCORE GRID */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:700px;margin-bottom:26px}
+.sc-card{background:rgba(255,255,255,.04);border-radius:11px;padding:13px;text-align:center;border:1px solid rgba(255,255,255,.07)}
+.sc-card.top{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.06)}
+.sc-emoji{font-size:1.5em;margin-bottom:3px}
+.sc-name{font-size:.78em;font-weight:bold}
+.sc-count{font-size:.7em;opacity:.55;margin-top:2px}
+.sc-bar{height:4px;border-radius:2px;margin-top:7px;background:rgba(255,255,255,.09)}
+.sc-fill{height:100%;border-radius:2px;transition:width 1.2s ease .5s}
+
+/* RESULT CARDS */
+.rc-section-title{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#9988bb;margin:10px 0 16px;text-align:center;width:100%;max-width:700px}
+.result-cards{width:100%;max-width:700px}
+.rc{background:rgba(255,255,255,.03);border-radius:13px;padding:20px;margin-bottom:14px;border-left:4px solid var(--c,#888);animation:slideUp .5s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.rc-hd{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.rc-badge{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1em;background:var(--c,#888);flex-shrink:0;opacity:.9}
+.rc-info{flex:1}
+.rc-chakra{font-size:.95em;font-weight:bold;color:var(--c,#888)}
+.rc-arch{font-size:.75em;opacity:.6;margin-top:1px}
+.rc-ls{font-size:.7em;opacity:.5;margin-top:1px;font-style:italic}
+.rc-status{padding:3px 9px;border-radius:14px;font-size:.68em;letter-spacing:1px;text-transform:uppercase;font-weight:bold;flex-shrink:0}
+.s-open{background:rgba(0,200,80,.13);color:#44dd88;border:1px solid rgba(0,200,80,.28)}
+.s-blocked{background:rgba(220,60,60,.13);color:#ff7777;border:1px solid rgba(220,60,60,.28)}
+.s-partial{background:rgba(255,170,68,.13);color:#ffaa44;border:1px solid rgba(255,170,68,.28)}
+.rc-body{font-size:.84em;color:#b8b0d0;margin-bottom:12px;line-height:1.75}
+.med-box{background:rgba(0,0,0,.28);border-radius:9px;padding:13px;border:1px solid rgba(255,215,0,.13);margin-bottom:10px}
+.med-title{font-size:.7em;letter-spacing:2px;text-transform:uppercase;color:#ffd700;margin-bottom:9px;display:flex;align-items:center;gap:5px}
+.med-list{list-style:none}
+.med-list li{font-size:.8em;color:#ccc4e4;padding:3px 0 3px 15px;position:relative;line-height:1.5}
+.med-list li::before{content:'✦';position:absolute;left:0;color:#ffd700;font-size:.62em;top:6px}
+.open-aff{background:rgba(0,200,80,.07);border:1px solid rgba(0,200,80,.18);border-radius:9px;padding:13px;font-style:italic;font-size:.84em;color:#88ffaa;text-align:center;line-height:1.7}
+
+/* SHADOW WORK */
+.sw-box{background:rgba(100,0,200,.08);border:1px solid rgba(150,0,255,.2);border-radius:10px;padding:14px;margin-top:10px}
+.sw-title{font-size:.7em;letter-spacing:2px;text-transform:uppercase;color:#aa66ff;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sw-prompt{background:rgba(0,0,0,.35);border-radius:8px;padding:10px 12px;margin-bottom:7px;font-size:.78em;color:#d0c4f0;line-height:1.6;border-left:3px solid rgba(150,0,255,.4);cursor:pointer;transition:all .2s;position:relative}
+.sw-prompt:hover{background:rgba(100,0,200,.18);border-left-color:rgba(200,100,255,.7)}
+.sw-copy{font-size:.65em;color:#9977cc;display:block;margin-top:5px;letter-spacing:1px}
+.sw-prompt.copied{border-left-color:#00cc44}
+.sw-prompt.copied .sw-copy{color:#44dd88}
+
+/* VIDEO */
+.vid-box{background:rgba(0,120,200,.08);border:1px solid rgba(0,150,255,.18);border-radius:10px;padding:14px;margin-top:10px}
+.vid-title{font-size:.7em;letter-spacing:2px;text-transform:uppercase;color:#44aaff;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.vid-link{display:flex;align-items:center;gap:9px;text-decoration:none;background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;color:#88ccff;font-size:.8em;border:1px solid rgba(0,150,255,.2);transition:all .2s;margin-bottom:6px}
+.vid-link:hover{background:rgba(0,120,200,.18);border-color:rgba(0,150,255,.4);color:#aaddff}
+.vid-thumb{width:32px;height:32px;background:rgba(255,0,0,.3);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1em}
+
+/* REFLECTION */
+.reflection-box{background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.15);border-radius:14px;padding:22px;text-align:center;width:100%;max-width:700px;margin:20px 0}
+.ref-title{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#ffd700;margin-bottom:16px}
+.ref-q{font-size:.9em;font-style:italic;color:#e8d8aa;line-height:1.85;margin-bottom:8px;padding:8px 0;border-bottom:1px solid rgba(255,215,0,.1)}
+.ref-q:last-child{border-bottom:none}
+
+.divider{width:50px;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.22),transparent);margin:16px auto}
+.closing-wisdom{text-align:center;padding:28px 20px;font-style:italic;color:#9988bb;line-height:1.9;font-size:.88em;max-width:600px;margin:0 auto}
+
+@media(max-width:600px){.ap-grid{grid-template-columns:repeat(2,1fr)}.score-grid{grid-template-columns:repeat(2,1fr)}.gate-card{padding:18px 14px}.spine-lbl{display:none}.ph-label{display:none}}
+
+/* ===================== CUSTOM GPT BLOCK ===================== */
+.gpt-master{width:100%;max-width:700px;background:linear-gradient(135deg,rgba(0,80,200,.12),rgba(100,0,255,.1));border:1px solid rgba(100,100,255,.25);border-radius:18px;padding:24px;margin-bottom:26px}
+.gpt-master-title{font-size:.72em;letter-spacing:3px;text-transform:uppercase;color:#8899ff;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.gpt-master-sub{font-size:.85em;color:#b0b8e8;line-height:1.7;margin-bottom:16px}
+.gpt-prompt-preview{background:rgba(0,0,0,.4);border-radius:10px;padding:14px;font-size:.78em;color:#c8c0f0;line-height:1.65;font-family:monospace;border:1px solid rgba(100,100,255,.2);max-height:120px;overflow:hidden;position:relative;margin-bottom:14px}
+.gpt-prompt-preview::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(8,8,20,.9))}
+.gpt-btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.gpt-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:30px;font-size:.8em;text-decoration:none;font-family:inherit;cursor:pointer;border:none;letter-spacing:.5px;transition:all .25s;text-transform:uppercase}
+.gpt-btn-claude{background:linear-gradient(135deg,#c45000,#ff6822);color:#fff;box-shadow:0 0 18px rgba(255,100,0,.3)}
+.gpt-btn-gpt{background:linear-gradient(135deg,#0e7a0d,#1ab31a);color:#fff;box-shadow:0 0 18px rgba(30,180,30,.3)}
+.gpt-btn-copy{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#e0d8f0}
+.gpt-btn:hover{transform:translateY(-2px);filter:brightness(1.15)}
+
+/* ===================== RESOURCES BLOCK ===================== */
+.res-box{background:rgba(0,150,255,.06);border:1px solid rgba(0,150,255,.15);border-radius:10px;padding:14px;margin-top:10px}
+.res-title{font-size:.7em;letter-spacing:2px;text-transform:uppercase;color:#44bbff;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.res-section{margin-bottom:12px}
+.res-section-label{font-size:.68em;letter-spacing:1px;text-transform:uppercase;color:#6699bb;margin-bottom:6px}
+.res-course-link{display:flex;flex-direction:column;background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;margin-bottom:6px;text-decoration:none;border:1px solid rgba(0,150,255,.15);transition:all .2s}
+.res-course-link:hover{background:rgba(0,100,200,.18);border-color:rgba(0,150,255,.35)}
+.res-course-title{font-size:.82em;color:#88ccff;font-weight:bold;margin-bottom:2px}
+.res-course-desc{font-size:.73em;color:#8899aa;line-height:1.45}
+.res-tags{display:flex;flex-wrap:wrap;gap:6px}
+.res-tag{background:rgba(0,150,255,.1);border:1px solid rgba(0,150,255,.2);border-radius:20px;padding:3px 10px;font-size:.7em;color:#77bbdd}
+.res-books{font-size:.78em;color:#aab8cc;line-height:1.7}
+.res-books li{padding-left:14px;position:relative}
+.res-books li::before{content:'📖';font-size:.75em;position:absolute;left:0;top:2px}
+
+/* ===================== TRANSITION SCREEN ===================== */
+#screen-transition{background:radial-gradient(ellipse at 50% 40%,#0d0820 0%,#080814 70%)}
+.trans-hero{text-align:center;margin-bottom:30px;width:100%}
+.trans-eyebrow{font-size:.72em;letter-spacing:4px;text-transform:uppercase;color:#9977cc;margin-bottom:12px;opacity:0;animation:tFadeUp .6s ease .2s both}
+.trans-title{font-size:clamp(1.6em,5vw,2.8em);background:linear-gradient(135deg,#cc00ff,#4488ff,#ff6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200%;animation:shimmer 4s linear infinite,tFadeUp .7s ease .4s both;opacity:0;line-height:1.2;margin-bottom:10px}
+.trans-sub{font-size:.9em;font-style:italic;color:#9988bb;opacity:0;animation:tFadeUp .6s ease .7s both}
+@keyframes tFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.trans-orb-grid{display:flex;flex-direction:column;align-items:center;gap:0;margin:24px auto;width:100%;max-width:680px}
+.trans-orb-row{display:flex;align-items:center;gap:12px;width:100%;justify-content:center;padding:5px 0;opacity:0;transform:translateX(-20px);transition:opacity .5s ease,transform .5s ease}
+.trans-orb-row.reveal{opacity:1;transform:translateX(0)}
+.trans-orb-row.right-entry{transform:translateX(20px)}
+.trans-orb-row.right-entry.reveal{transform:translateX(0)}
+.t-orb{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4em;flex-shrink:0;transition:box-shadow .4s}
+.t-orb.lit-open{animation:tOrbGlow 2s ease-in-out infinite alternate}
+.t-orb.lit-blocked{filter:saturate(.2);opacity:.5}
+.t-orb.lit-partial{filter:saturate(.55);opacity:.75}
+@keyframes tOrbGlow{from{box-shadow:0 0 12px var(--c)}to{box-shadow:0 0 30px var(--c),0 0 55px var(--c)}}
+.t-orb-info{flex:1;max-width:200px}
+.t-orb-name{font-size:.8em;font-weight:bold;color:var(--c)}
+.t-orb-arch{font-size:.75em;opacity:.65;margin-top:2px}
+.t-orb-bar-wrap{width:140px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;flex-shrink:0}
+.t-orb-bar{height:100%;border-radius:3px;width:0%;transition:width 1s ease .3s}
+.t-orb-status{font-size:.7em;min-width:90px;text-align:right;flex-shrink:0}
+.t-status-open{color:#44dd88}
+.t-status-blocked{color:#ff7777}
+.t-status-partial{color:#ffaa44}
+
+.trans-flow-score{text-align:center;margin:20px 0;opacity:0;transition:opacity .6s ease}
+.trans-flow-score.show{opacity:1}
+.tfs-label{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#9988bb;margin-bottom:8px}
+.tfs-number{font-size:3.5em;font-weight:bold;color:#fff;line-height:1}
+.tfs-pct{font-size:1em;color:#cc88ff}
+.tfs-bar-wrap{width:260px;height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin:10px auto 8px}
+.tfs-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#cc0000,#ff6600,#ffd700,#00cc44,#0099cc,#6600cc,#cc00ff);transition:width 1.5s ease .3s}
+.tfs-phrase{font-size:.85em;font-style:italic;color:#c0b4d8;margin-top:6px}
+.trans-cta{opacity:0;transition:opacity .5s ease;margin-top:16px}
+.trans-cta.show{opacity:1}
+
+/* ===================== ENHANCED DASHBOARD ===================== */
+.dash-panel{width:100%;max-width:700px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:22px;margin-bottom:26px;overflow:hidden}
+.dash-panel-title{font-size:.7em;letter-spacing:3px;text-transform:uppercase;color:#9988bb;margin-bottom:16px;text-align:center}
+.dash-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.dash-row:last-child{border-bottom:none}
+.dash-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1em;flex-shrink:0}
+.dash-name{font-size:.8em;width:90px;flex-shrink:0;font-weight:bold}
+.dash-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;position:relative}
+.dash-bar{height:100%;border-radius:4px;width:0%;transition:width 1.2s ease var(--delay,.1s)}
+.dash-arch{font-size:.75em;width:100px;flex-shrink:0;text-align:right;opacity:.75}
+.dash-status{font-size:.68em;width:80px;flex-shrink:0;text-align:right;font-weight:bold;letter-spacing:.5px}
+@media(max-width:600px){.dash-arch{display:none}.dash-status{width:60px;font-size:.6em}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<!-- PROGRESS HEADER -->
+<div id="prog-header"></div>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen no-top active">
+  <div class="intro-portal">
+    <div class="intro-eyebrow">✦ An Evolve Earth Experience ✦</div>
+    <div class="rainbow">THE SEVEN<br>SACRED GATES</div>
+    <div class="intro-tagline">A journey into your own field</div>
+
+    <!-- Animated chakra spine -->
+    <div class="intro-spine" id="intro-spine"></div>
+
+    <div class="intro-wisdom">
+      Seven energy centres.<br>
+      Seven gates of honest reckoning.<br><br>
+      <strong>Each gate asks you one question.</strong><br>
+      Answer from your gut — not your ideal self.<br>
+      The oracle reads what's true, not what's polished.<br><br>
+      At the end: your chakra map, shadow work prompts,<br>
+      healing frequencies, and medicine for where you're blocked.
+    </div>
+
+    <button class="btn-enter" id="btn-enter">ENTER THE GATES ✦<span class="portal-dot"></span></button>
+  </div>
+</div>
+
+<!-- ORACLE FLASH -->
+<div id="oracle-flash">
+  <div id="of-emoji" class="of-emoji"></div>
+  <div id="of-label" class="of-label"></div>
+  <div id="of-msg" class="of-msg"></div>
+  <button class="of-continue" id="of-continue-btn">CONTINUE THE JOURNEY →<span class="portal-dot"></span></button>
+</div>
+
+<!-- TRANSITION SCREEN -->
+<div id="screen-transition" class="screen no-top">
+  <div class="trans-hero">
+    <div class="trans-eyebrow">✦ Seven gates complete ✦</div>
+    <div class="trans-title">THE ORACLE<br>READS YOUR FIELD</div>
+    <div class="trans-sub">Hold still. Your energy centers are being mapped.</div>
+  </div>
+  <div id="trans-orb-grid" class="trans-orb-grid"></div>
+  <div id="trans-flow-score" class="trans-flow-score">
+    <div class="tfs-label">OVERALL ENERGY FLOW</div>
+    <div><span id="tfs-num" class="tfs-number">0</span><span class="tfs-pct">%</span></div>
+    <div class="tfs-bar-wrap"><div id="tfs-bar" class="tfs-bar" style="width:0%"></div></div>
+    <div id="tfs-phrase" class="tfs-phrase"></div>
+  </div>
+  <div id="trans-cta" class="trans-cta">
+    <button class="btn btn-start" id="trans-reveal-btn">REVEAL YOUR FULL READING ✦<span class="portal-dot"></span></button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="results-title">YOUR CHAKRA READING</div>
+  <div class="results-sub">Seven centers. Seven truths. One magnificent, messy, whole you.</div>
+
+  <!-- CONTACT / SAVE PANEL -->
+  <div class="contact-panel">
+    <div class="cp-title">💾 SAVE YOUR SOUL MAP</div>
+    <div class="cp-sub">Get your personal healing link so you can return to this reading anytime</div>
+    <form id="contact-form" onsubmit="submitContact(event)">
+      <div class="cf-row">
+        <input id="cf-name"  type="text"  placeholder="Your Name *" required />
+        <input id="cf-email" type="email" placeholder="Email Address *" required />
+      </div>
+      <div class="cf-row">
+        <input id="cf-phone" type="tel"  placeholder="Phone (optional)" />
+        <input id="cf-fb"    type="text" placeholder="Facebook (optional)" />
+        <input id="cf-ig"    type="text" placeholder="Instagram @handle (optional)" />
+      </div>
+      <button type="submit" class="btn-save">🔐 SAVE MY READING &amp; GET RETURN LINK</button>
+    </form>
+    <div id="contact-saved" style="display:none" class="cp-saved">
+      ✅ <span id="cp-saved-name">Your</span> reading is saved!
+      <button onclick="copyReturnLink(this)" class="btn-return-link">📋 Copy Return Link</button>
+      <div class="cp-return-note">Paste this link anywhere to return to your personal reading</div>
+    </div>
+  </div>
+
+  <div id="chakra-dashboard" class="dash-panel"></div>
+  <div id="gpt-master" class="gpt-master"></div>
+  <div id="spine-map" class="spine-map"></div>
+  <div id="summary-card" class="summary-card"></div>
+  <div id="score-grid" class="score-grid"></div>
+  <div class="reflection-box" id="reflection-box"></div>
+  <div class="rc-section-title">DEEP DIVE · PER CHAKRA MEDICINE · SHADOW WORK · RESOURCES · HEALING VIDEOS</div>
+  <div id="result-cards" class="result-cards"></div>
+  <div class="closing-wisdom">
+    <div class="divider"></div>
+    <p>"You are not broken. You are not behind.<br>You are a being of seven rivers, and some of them are dammed right now.<br>The dam is not the river.</p>
+    <p style="margin-top:12px">The medicine is always simpler than the story about why you don't deserve it."</p>
+    <div class="divider" style="margin-top:18px"></div>
+  </div>
+  <div style="text-align:center;margin:20px 0 10px">
+    <button class="btn btn-start" onclick="restart()">ENTER THE GATES AGAIN ✦</button>
+  </div>
+</div>
+
+<script>
+// =============================================
+// DATA
+// =============================================
+const ARC = {
+  KING:    {n:'THE KING',    d:'Healthy Kapha',   e:'👑',c:'#4488ff',h:true,
+    short:'Grounded sovereign — stable, generous, present, unshakeable',
+    desc:'You carry the earth in your bones. When you\'re in King energy you are the calm in every storm — the one people gather around not because you demand it, but because your presence is genuinely nourishing. You lead with patience, hold space without needing credit, and your love is a steady river, not a flash flood.'},
+  SLEEPER: {n:'THE SLEEPER', d:'Unhealthy Kapha', e:'😴',c:'#7799aa',h:false,
+    short:'Comfort zone champion — avoiding, numbing, postponing what matters',
+    desc:'Your Kapha has curdled into beautiful, cozy resistance. You know exactly how things should change. You will start on Monday. Or maybe the Monday after that. The couch knows your shape by heart. But something in you is whispering that you were born for more than this level of... horizontal.'},
+  WARRIOR: {n:'THE WARRIOR', d:'Healthy Pitta',   e:'⚔️',c:'#ff8822',h:true,
+    short:'Focused fire — disciplined, clear, brave, boundaried',
+    desc:'Your Pitta burns clean and bright. You have a mission and you\'re moving. You can hold a boundary, speak the hard truth with warmth, and back your convictions with action. People know where they stand with you. You are proof that intensity can be a gift when it\'s in service of something real.'},
+  EGO:     {n:'THE EGO',     d:'Unhealthy Pitta', e:'🔥',c:'#ff3333',h:false,
+    short:'Uncontrolled fire — controlling, critical, needing to win at all costs',
+    desc:'Your Pitta has jumped the banks and is scorching the neighbourhood. You are right. You are VERY right. Everyone else would see it too if they were paying attention. The fire is gorgeous — but it\'s supposed to cook the food, not burn the kitchen. Humility is the water. You know where to find it.'},
+  MAGICIAN:{n:'THE MAGICIAN',d:'Healthy Vata',    e:'🪄',c:'#aa44ff',h:true,
+    short:'Creative visionary — intuitive, expansive, sees what others miss',
+    desc:'Your Vata dances in the spaces between things. When balanced, you are a genuine oracle — pulling visions and connections from thin air that others couldn\'t imagine in a decade. You see the portal before anyone else notices the door.'},
+  AFRAID:  {n:'THE AFRAID',  d:'Unhealthy Vata',  e:'😰',c:'#aaaacc',h:false,
+    short:'Scattered & anxious — worried, ungrounded, frozen by what-ifs',
+    desc:'Your Vata has untethered from the earth and is orbiting somewhere near Jupiter. Everything is a potential catastrophe. Your nervous system is running continuous threat-detection. This is not weakness — this is Vata without ground. The medicine is surprisingly simple: root, warmth, rhythm, safety.'}
+};
+
+const CHAKRAS = [
+  {
+    id:'root',num:1,color:'#cc2222',glow:'#ff4444',freq:396,emoji:'🔴',
+    name:'Root Chakra',sanskrit:'Muladhara',
+    theme:'Safety · Body · Home · Survival · Money',
+    gateTitle:'THE FOUNDATION GATE',
+    deepQ:'"What are you waiting for? What\'s holding you back?" — The root knows.',
+    intro:'You arrive at the red threshold. The ground either holds you or swallows you. Everything you are is built on this.',
+    question:'You wake to an unexpected $500 bill AND a cracked phone screen. Same day. The universe is clearly testing you. You...',
+    answers:{
+      KING:    {e:'👑',t:'Take a slow breath, make tea, and handle it methodically. You\'ve navigated worse. You\'re still here.'},
+      SLEEPER: {e:'😴',t:'Order DoorDash, buy a phone case online, and schedule the bill for... sometime... eventually. Probably.'},
+      WARRIOR: {e:'⚔️',t:'Build an action plan: call repair shops, dispute the charge, resolve both by 3pm. LET\'S GO.'},
+      EGO:     {e:'🔥',t:'Text everyone about how unfair this is. This ALWAYS happens to you specifically. Someone needs to be held accountable.'},
+      MAGICIAN:{e:'🪄',t:'Get a brilliant creative solution, then spend 3 hours researching minimalism and capsule wardrobes instead.'},
+      AFRAID:  {e:'😰',t:'Spiral into full existential dread about your entire financial future. Cannot eat. Cannot sleep. Cannot stop.'}
+    },
+    oracle:{
+      KING:{e:'🌳',m:'"Your roots run deep. The tree that bends in the storm doesn\'t fear it — it already knows it will not fall."'},
+      SLEEPER:{e:'🛋️',m:'"Your root chakra sent a message. It\'s under the couch cushions. It\'s been there for three months. It wants you to MOVE."'},
+      WARRIOR:{e:'📋',m:'"Your action plan is magnificent and mildly terrifying. Your root burns more fire than earth — but the fire is pointing somewhere real."'},
+      EGO:{e:'📬',m:'"The universe has filed your complaint under \'still has lessons to learn\' — with genuine love and zero sympathy."'},
+      MAGICIAN:{e:'🧦',m:'"You reorganised your sock drawer at 2am and called it progress. Your root chakra would like you back in your actual body."'},
+      AFRAID:{e:'🌱',m:'"The spiral has a beginning. Your root chakra is the exit door. We are going to find it — slowly, with warm soup."'}
+    },
+    lifestyle:{
+      label:'🌿 REAL TALK: Body, Food & Substances',
+      q:'Honestly — what does your relationship with food, alcohol, or substances look like right now?',
+      opts:[
+        {e:'🥗',t:'Mostly whole food, minimal alcohol, no regular substance use. You feel the difference in your body.', score:'open'},
+        {e:'🍕',t:'Junk food creeps in, a drink or two most weekends. Functional but you know your body could be better.', score:'neutral'},
+        {e:'🍺',t:'Regular drinking or comfort eating as a stress default. Weed or other substances a few times a week. You notice it numbs things.', score:'partial'},
+        {e:'🌫️',t:'Daily alcohol, substances, or bingeing on junk food to stay functional. The idea of stopping feels genuinely frightening.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your foundation is solid. The world is safer because you walk in it. Share this steadiness with someone who needs it.'},
+      SLEEPER:{title:'Wake the Root',items:['Walk barefoot on grass or soil for 5 minutes every single morning — no phone','Cold shower: just 30 seconds. Set the alarm. Do it before you think.','Declutter ONE drawer or shelf today. Movement is medicine.','Dance alone to a song you loved at 16. Your body remembers joy.','Commit to one physical challenge that makes you slightly uncomfortable — this week.']},
+      WARRIOR:{type:'open',affirm:'Your root is fierce and functional. Use that energy to build something that outlasts the urgency.'},
+      EGO:{title:'Earth the Fire',items:['Volunteer anonymously — no posting, no credit, just service','Spend 20 minutes in nature with absolutely no agenda','Practice saying "I was wrong about that" to someone you trust today','Lie on the ground (literally) and let the earth hold you for once','Plant something and tend it daily. Watch what humility grows.']},
+      MAGICIAN:{type:'open',affirm:'Your root is creative and flexible — keep it tethered by returning to your body daily through movement or breath.'},
+      AFRAID:{title:'Ground the Storm',items:['Eat warm, heavy root vegetables daily: sweet potato, beetroot, lentils, bone broth','Create one simple morning routine and protect it like a sacred law','5 minutes barefoot on earth, morning or evening — non-negotiable','Bodywork: massage, acupuncture, long baths, or weighted blanket — weekly','Repeat slowly: "I am safe in this body, in this moment, right now."']}
+    },
+    shadowWork:{
+      SLEEPER:['I keep choosing comfort over growth. Help me explore what I\'m protecting when I resist change. Ask me hard questions and don\'t let me off the hook.','Let\'s examine my relationship with procrastination. What\'s the difference between genuine rest and avoidance disguised as self-care? Help me get honest.','I\'ve been saying "when x happens I\'ll start y" for a long time. Help me understand the fear underneath the postponement. What would I have to face if I started today?'],
+      EGO:['I notice I often externalise blame when things go wrong. Help me explore what I\'d have to take responsibility for if I stopped doing that.','Help me explore my relationship with control in my daily life and finances. What am I afraid would happen if things were out of my control?','I often feel specially targeted by life\'s difficulties. Help me understand this story and what I\'d lose if I let it go.'],
+      AFRAID:['Help me map the origins of my anxiety around safety and survival. Be specific — ask me about early experiences that created these patterns.','I carry fear in my body. Help me explore what specific fears live in my physical experience and where they originated. Go slowly.','Let\'s work with my relationship with money and security. When I imagine feeling completely safe, what comes up? What makes that image feel impossible?']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=_RQ9S1u7ag4&list=PL5KNhrwZCuCqiJFY24RwzLOZRT3HUg7fr',title:'Root Chakra Healing Playlist'}
+  },
+  {
+    id:'sacral',num:2,color:'#ff6600',glow:'#ff9944',freq:417,emoji:'🟠',
+    name:'Sacral Chakra',sanskrit:'Svadhisthana',
+    theme:'Pleasure · Creativity · Flow · Desire · Emotion',
+    gateTitle:'THE PLEASURE PALACE GATE',
+    deepQ:'"When were you last truly happy? What were you doing?" — The sacral remembers.',
+    intro:'Orange waters rise to your hips. Creativity lives here. The part of you that knows how to WANT things lives here. How alive is that part?',
+    question:'Free Saturday afternoon. No obligations. Pure freedom. A gift from the universe. You...',
+    answers:{
+      KING:    {e:'👑',t:'Cook something gorgeous and invite people over — pleasure shared is pleasure doubled. Fill the house with warmth and noise.'},
+      SLEEPER: {e:'😴',t:'Watch a show you\'ve already seen four times. Familiar. Safe. No surprises. You know what happens. Perfect.'},
+      WARRIOR: {e:'⚔️',t:'Use the time to learn a new skill or productive hobby. Fun should have measurable outcomes. Wasted time is wasted time.'},
+      EGO:     {e:'🔥',t:'Go to a social event and spend the whole time mentally calculating where you rank in the room.'},
+      MAGICIAN:{e:'🪄',t:'Start three creative projects, write half a poem, redecorate one shelf, begin a vision board, and feel completely alive.'},
+      AFRAID:  {e:'😰',t:'Feel guilty for not being productive. Anxious about enjoying yourself. It\'s basically the opposite of a Saturday.'}
+    },
+    oracle:{
+      KING:{e:'🍷',m:'"You know pleasure is a verb, not a reward. Your sacral flows like a river that knows it belongs to the sea."'},
+      SLEEPER:{e:'📺',m:'"The same show. Again. Your sacral chakra is asking: what do YOU actually want? Not what\'s safe. What do you genuinely WANT?"'},
+      WARRIOR:{e:'📊',m:'"You gamified your Saturday. Impressive and slightly concerning. Life is not a productivity hack. Make something USELESS this week."'},
+      EGO:{e:'👀',m:'"You turned a free afternoon into a ranking exercise. The medal is hollow. Your sacral knows this too."'},
+      MAGICIAN:{e:'🎨',m:'"Three projects and a vision board by sunset. Your sacral is gloriously alive. Maybe finish one thing occasionally."'},
+      AFRAID:{e:'⏰',m:'"Anxious about pleasure. Your sacral is sending joy and your nervous system keeps returning it to sender. Let\'s change that."'}
+    },
+    lifestyle:{
+      label:'🍷 REAL TALK: Pleasure, Substances & Real Joy',
+      q:'When you want to feel something — joy, connection, or relief — what do you actually reach for?',
+      opts:[
+        {e:'🎨',t:'Creative expression, real intimacy, movement, nature. Your pleasure doesn\'t need a substance to exist.', score:'open'},
+        {e:'🍷',t:'Food, wine, social media, a bit of weed — harmless most of the time but it\'s become your default mode.', score:'neutral'},
+        {e:'🌊',t:'Alcohol or substances (weed, pills, occasional harder stuff) fill the gap where authentic desire used to live. You notice this.', score:'partial'},
+        {e:'💊',t:'Hard drugs, daily bingeing, or total numbness. You\'ve stopped expecting to feel real joy and are just managing the absence of it.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your sacral flows with generous pleasure. Keep sharing your creations — your joy genuinely feeds others around you.'},
+      SLEEPER:{title:'Awaken the Flow',items:['Do something creative with zero goal: paint badly, cook without a recipe, dance alone in your kitchen','Jump in natural water if possible — your sacral literally responds to water on a physiological level','Say YES to one completely new sensory experience this week. Not optional.','Cook a recipe using three ingredients you\'ve never tried. Eat it with your full undivided attention.','Write a list of 10 things that bring you pure pleasure. Then actually do one today.']},
+      WARRIOR:{type:'open',affirm:'Your sacral is channelled and purposeful. Let it play without producing sometimes — pure creativity is sacred too.'},
+      EGO:{title:'Receive Without Earning',items:['Let yourself be genuinely bad at something creative and stay in the room without fixing it','Take a long bath with no purpose except the bath. No phone. No podcast.','Receive pleasure without having earned it — it is your birthright, not your reward','Cry at a film. Let your emotions move without commentary or analysis.','Ask someone what THEY desire today. Listen. Really listen. For once, don\'t redirect to yourself.']},
+      MAGICIAN:{type:'open',affirm:'Your sacral dances between worlds. Channel it — commit to finishing one thing this week as an offering to your own creativity.'},
+      AFRAID:{title:'Melt the Freeze',items:['Warm baths with Epsom salts — minimum 20 minutes, phone in another room','Hip-opening yoga daily: pigeon pose, butterfly, figure-four — 10 minutes minimum','Journal your desires without censoring: "I want..." — let it be uncensored','Warm herbal tea (orange peel, cinnamon, cardamom) while sitting in actual sunlight','Ask yourself: what would I do today if I wasn\'t afraid to want things?']}
+    },
+    shadowWork:{
+      SLEEPER:['I\'ve lost touch with what genuinely brings me pleasure. Help me explore what numbing behaviours I\'ve adopted and what they\'re keeping me from feeling.','Help me understand why I repeatedly choose familiar comfort over new experiences. What am I afraid aliveness or creativity might demand of me?','When was the last time I felt truly alive and present? Help me explore what changed since then and what I\'ve given up.'],
+      EGO:['I compare myself to others in social situations compulsively. Help me trace this competitive energy back to its source. What am I trying to prove?','I notice I use pleasure and social situations to establish status rather than connection. Help me explore what genuine connection would feel like.','Ask me hard questions about what I\'m really seeking when I seek attention, recognition, or the approval of people I find attractive.'],
+      AFRAID:['I feel guilty when I rest or enjoy myself without earning it first. Help me trace where I learned that pleasure had to be deserved.','Anxiety often lives in my body. Help me explore what emotional content might be stored in my hips, lower belly, or lower back.','Help me articulate what I genuinely desire — not what I think I should want, but what my actual authentic self longs for. No censoring.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=orklnRP7R84&list=PL5KNhrwZCuCrhwRDOVYDECRAu8O1eutNl',title:'Sacral Chakra Healing Playlist'}
+  },
+  {
+    id:'solar',num:3,color:'#ddaa00',glow:'#ffdd00',freq:528,emoji:'🟡',
+    name:'Solar Plexus',sanskrit:'Manipura',
+    theme:'Power · Will · Identity · Boundaries · Confidence',
+    gateTitle:'THE POWER STATION GATE',
+    deepQ:'"Are you doing your best now? Are you living up to your highest ideals?" — Your solar knows the truth.',
+    intro:'Yellow fire at your core. The seat of your self. Your "no." Your "hell yes." Your ability to act on what you believe. Is this fire cooking your food or burning everything?',
+    question:'Someone close to you — boss, friend, partner — asks you to do something that genuinely feels wrong. You...',
+    answers:{
+      KING:    {e:'👑',t:'Speak your truth clearly, calmly, with full eye contact. You know your worth. The relationship can handle honesty.'},
+      SLEEPER: {e:'😴',t:'Say yes while internally dying a little, then go home and eat your feelings. You\'ll say something eventually. You won\'t.'},
+      WARRIOR: {e:'⚔️',t:'Push back with clear reasoning and hold the line. You\'ve prepared for exactly this and your self-respect is non-negotiable.'},
+      EGO:     {e:'🔥',t:'Turn it into a full power struggle. You need to WIN this, not just make the right call. Winning is the point now.'},
+      MAGICIAN:{e:'🪄',t:'Propose a brilliant creative third option no one thought of that somehow solves everything while making you look like a genius.'},
+      AFRAID:  {e:'😰',t:'Say yes immediately out of pure fear, then replay the conversation obsessively for three days at 2am.'}
+    },
+    oracle:{
+      KING:{e:'🌟',m:'"You spoke truth and the world didn\'t end. It rarely does. Your solar plexus is a lantern — steady, warm, reliable."'},
+      SLEEPER:{e:'😮‍💨',m:'"You said yes. Again. Your solar plexus is in the back of the cupboard with your gym membership. It hasn\'t given up on you yet."'},
+      WARRIOR:{e:'🔑',m:'"You held the line. That took actual courage. This is what healthy fire looks like when it\'s in service of something real."'},
+      EGO:{e:'🏆',m:'"You won the battle and complicated everything that matters. The ego needs to win. The self only needs to be true. Different games."'},
+      MAGICIAN:{e:'💡',m:'"The third option! Classic Magician. Your power dances sideways where others go straight. Just make sure you\'re not avoiding the direct path."'},
+      AFRAID:{e:'🪞',m:'"You replayed it 47 times. Your solar plexus is there — it needs oxygen. We\'re going to fan that flame, slowly but consistently."'}
+    },
+    lifestyle:{
+      label:'🔥 REAL TALK: Stimulants, Control & Power',
+      q:'What\'s your honest relationship with stimulants, substances used to perform, or work addiction?',
+      opts:[
+        {e:'💪',t:'Clean energy — decent sleep, food, exercise. You have natural drive and don\'t need chemical ignition to function.', score:'open'},
+        {e:'☕',t:'Heavy caffeine, a line occasionally at parties, or alcohol for social confidence. Functional and self-aware.', score:'neutral'},
+        {e:'⚡',t:'Stimulants (Adderall, cocaine, pre-workout cocktails) are part of how you stay productive. Work addiction runs hot and the crash is real.', score:'partial'},
+        {e:'💀',t:'Uppers, extreme control over food or substances, or performance drugs daily. The need to be on top is becoming harder to maintain without them.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your fire burns clean. You hold power without grasping for it. This is genuinely rare. Keep using it in service of others.'},
+      SLEEPER:{title:'Light the Fire',items:['Practise saying "No" out loud right now to nobody. Feel that? That\'s you.','Commit to one thing this week that requires you to be seen — publicly, vulnerably','Vigorous exercise: anything that makes you breathless, 4 days a week. Not optional.','Take on a physical challenge (cold plunge, difficult hike, new sport) this week','Write down 3 things you need to stop tolerating. Then stop tolerating them. Today.']},
+      WARRIOR:{type:'open',affirm:'Your will is sharp and fair. Your fire serves your truth. The world needs more people who act on what they believe.'},
+      EGO:{title:'Cool the Burn',items:['Sheetali pranayama daily: breathe in through a curled tongue, out through nose — 10 rounds','Moon gazing: sit outside at night with no agenda, just receive the cool light','Eat cooling foods this week: cucumber, coconut, mint, coriander, sweet fruits','Before speaking in any conflict: three full breaths. Then speak. Non-negotiable.','For one week: let someone else be right without correcting them. Even if they\'re wrong.']},
+      MAGICIAN:{type:'open',affirm:'Your power is creative and lateral. Trust the direct path sometimes too — not every situation needs a magic trick.'},
+      AFRAID:{title:'Build the Flame',items:['Ginger tea every morning — it literally fires up Agni (your digestive and vital fire)','Sunrise or sunset watching daily: let the sun remind you of your own light','Write "I am proud of myself for..." — 5 things, every evening for 2 weeks','Build ONE small daily win into your routine and celebrate it genuinely','One cold shower this week: 30 seconds. If you survive that, you can survive the hard conversation.']}
+    },
+    shadowWork:{
+      SLEEPER:['I often say yes when I mean no. Help me explore the specific fear that drives me to betray myself repeatedly in order to keep the peace.','My personal power feels like something I can\'t reach. Help me explore when I gave it away and why I haven\'t reclaimed it.','I want to understand the relationship between my physical energy levels and my sense of agency. Why do I feel \'too tired\' to claim my own life?'],
+      EGO:['I need to win arguments. Help me explore what losing feels like in my body and where that threat response originated.','Help me understand the difference between healthy confidence and the need to dominate others. When did my fire become about control?','Ask me hard questions about who I\'ve burned with my intensity. What relationships have been damaged by my need to always be right?'],
+      AFRAID:['I make myself small to avoid conflict. Help me trace the specific experiences that taught me it wasn\'t safe to take up space.','I rehearse what I want to say and then say nothing. Help me understand the gap between my inner fire and my actual external action.','What am I angry about that I\'ve never been able to say out loud? Help me articulate it completely. Let\'s go there.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=DGfrJu-Ck8o&list=PL5KNhrwZCuCpcoSTdLoDQ00fjqt_wbHNn',title:'Solar Plexus Healing Playlist'}
+  },
+  {
+    id:'heart',num:4,color:'#00bb44',glow:'#00ff66',freq:639,emoji:'💚',
+    name:'Heart Chakra',sanskrit:'Anahata',
+    theme:'Love · Compassion · Grief · Forgiveness · Connection',
+    gateTitle:'THE SACRED GARDEN GATE',
+    deepQ:'"What would love do? Who do you most want to connect with that you haven\'t shown the real you?" — The heart asks.',
+    intro:'The green door opens to the centre of everything. Four chakras below, three above. This is the bridge between earth and sky, body and spirit. Love lives here — including the grief.',
+    question:'An old friend reaches out after years of silence with a heartfelt, vulnerable apology. You...',
+    answers:{
+      KING:    {e:'👑',t:'Welcome them back with open arms. Love always finds a way home, and you\'re big enough to hold space for their return.'},
+      SLEEPER: {e:'😴',t:'Appreciate the message, save it, mean to respond... but it\'s kind of a lot of emotional effort right now, honestly.'},
+      WARRIOR: {e:'⚔️',t:'Accept the apology graciously but make your expectations going forward crystal clear. Love with boundaries is still love.'},
+      EGO:     {e:'🔥',t:'Make them work a little harder first. They should understand the full weight of what they put you through before you forgive.'},
+      MAGICIAN:{e:'🪄',t:'Forgive them instantly and immediately imagine the beautiful profound new chapter you\'re going to co-write together.'},
+      AFRAID:  {e:'😰',t:'Want desperately to forgive but freeze — because what if it happens again? Fear of being hurt is louder than the love.'}
+    },
+    oracle:{
+      KING:{e:'🌹',m:'"You opened the door without losing yourself. That is the art of the heart that has healed — love without dissolution."'},
+      SLEEPER:{e:'📱',m:'"Their message is still unread in your heart. Your heart chakra hasn\'t given up on them — or on you. It\'s patient. You have time. But not unlimited."'},
+      WARRIOR:{e:'🤝',m:'"Clear terms, open heart. You refused to choose between love and self-respect. That is the Warrior heart at its finest."'},
+      EGO:{e:'⚖️',m:'"You\'re running debt collection for old pain. The interest compounds against YOU. Forgiveness isn\'t absolution — it\'s your freedom."'},
+      MAGICIAN:{e:'✨',m:'"You forgave so fast you nearly levitated. Beautiful. Just make sure your heart is healing at the speed of your imagination."'},
+      AFRAID:{e:'🫂',m:'"The fear is an old scar pretending to be wisdom. Your heart knows the difference between discernment and hiding. It\'s asking you to try again."'}
+    },
+    lifestyle:{
+      label:'💚 REAL TALK: Emotional Numbing & Mental Health',
+      q:'After a heartbreak, deep rejection, or emotional wound — what does your numbing honestly look like?',
+      opts:[
+        {e:'🌱',t:'You let yourself grieve. Cry it, journal it, therapy it, feel it. Messy and real and you come back to yourself.', score:'open'},
+        {e:'🌧️',t:'Food, wine, isolation, and Netflix for a week. You come back to yourself eventually. You know it\'s not a long-term solution.', score:'neutral'},
+        {e:'🍺',t:'Extended drinking, emotional bingeing on junk food, or hooking up to avoid feeling. It works temporarily. You know it makes things worse.', score:'partial'},
+        {e:'🏰',t:'You go completely dark. Substances, self-harm in some form, or a complete emotional shutdown. The pain goes somewhere it shouldn\'t.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your heart is a home. People feel safe inside it. Keep loving with this fierce, grounded openness — it genuinely changes people.'},
+      SLEEPER:{title:'Open the Heart',items:['Write a letter of appreciation to someone who won\'t expect it — no occasion, just love','Go volunteer: serve food, read to children, listen to the elderly, pick up litter','Pet an animal for 10 minutes. Let something need you without complication.','Hug someone for 21 full seconds. Count. Most hugs end at 4.','Ask one person today: "How are you really doing?" Then stay for the actual answer.']},
+      WARRIOR:{type:'open',affirm:'Your heart is boundaried and brave. Your love is honest. Keep teaching others that love doesn\'t require self-erasure.'},
+      EGO:{title:'Soften the Armour',items:['Forgiveness meditation: not for them, for you. Imagine releasing the weight you carry.','Rose quartz by your bed — laugh if you want, but genuinely try it for a week','Practice receiving a compliment with only: "Thank you." No deflection, no self-deprecation.','Write down who you\'re still punishing with your closed heart. Ask: who is actually suffering?','Loving-kindness meditation (Metta) daily for 10 minutes — start with yourself. Yes, yourself.']},
+      MAGICIAN:{type:'open',affirm:'Your heart forgives like water flows — naturally, generously. Ground that grace with discernment so it sustains you long-term.'},
+      AFRAID:{title:'Safety to Love',items:['Self-compassion practice daily: "May I be safe. May I be healthy. May I be loved. May I be at peace."','Write yourself a genuine love letter — no irony, no disclaimers, no conditions','21-second hugs when possible — this is where oxytocin actually kicks in','Identify the original wound: when did love first feel dangerous? Journal it very gently.','You are worthy of love as you are, right now, without changing first. Repeat until it lands.']}
+    },
+    shadowWork:{
+      SLEEPER:['My heart feels closed right now. Help me explore what happened the last time I truly opened up and what I concluded from that experience.','I know I should reach out to people, show more love, reconnect — and I don\'t. Help me explore the energy underneath my emotional withdrawal.','What would happen if I showed people how much I actually care? Help me explore the vulnerability that\'s stopping me.'],
+      EGO:['I withhold forgiveness as a form of power. Help me explore what I\'m holding onto and who is actually being punished by my withholding.','I make people work to earn my love. Help me trace where I learned that love was conditional and something to be rationed.','Is my heart truly open, or have I built a very convincing performance of openness while remaining fundamentally protected? Ask me hard questions.'],
+      AFRAID:['I want to love and be loved but I\'m terrified of being hurt. Help me map the specific experiences that closed my heart and what I concluded about love from them.','I freeze when love is available to me. Help me explore the specific fear that makes intimacy feel more threatening than loneliness.','Help me understand the difference between healthy discernment and self-protection that has become a prison I can\'t leave.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=6JgHR84lOZc&list=PL5KNhrwZCuCope97J540v3j1V4arYVlC9',title:'Heart Chakra Healing Playlist'}
+  },
+  {
+    id:'throat',num:5,color:'#0099cc',glow:'#00ccff',freq:741,emoji:'🔵',
+    name:'Throat Chakra',sanskrit:'Vishuddha',
+    theme:'Truth · Expression · Communication · Authenticity · Voice',
+    gateTitle:'THE ORACLE\'S CHAMBER GATE',
+    deepQ:'"On those occasions when you are completely truthful — what usually keeps you from telling the whole truth?" — The throat waits.',
+    intro:'The blue chamber hums with everything ever said and unsaid. Your truth lives here — not the polished version, the raw one. The one that comes out when you stop curating.',
+    question:'You\'re at a dinner party. Someone confidently states something you fundamentally disagree with. You...',
+    answers:{
+      KING:    {e:'👑',t:'Offer your perspective clearly and warmly — you can hold your truth without needing them to surrender theirs.'},
+      SLEEPER: {e:'😴',t:'Think "not my battle" and immediately redirect the table to something lighter. Life is too short for dinner conflict.'},
+      WARRIOR: {e:'⚔️',t:'Respectfully and firmly lay out the facts, your reasoning, your position. Truth-telling is non-negotiable.'},
+      EGO:     {e:'🔥',t:'Enter a full debate until they admit you\'re right — because you ARE right and someone at this table will know it.'},
+      MAGICIAN:{e:'🪄',t:'Turn it into a philosophical Socratic dialogue that makes everyone reconsider their entire worldview. You leave feeling like a podcast.'},
+      AFRAID:  {e:'😰',t:'Stay completely silent, stew in private outrage, and craft the perfect devastating response alone at 2am in your head.'}
+    },
+    oracle:{
+      KING:{e:'🎤',m:'"You spoke truth with love still in your hands. This is the gift of the healed throat — it knows the difference between honesty and cruelty."'},
+      SLEEPER:{e:'🤐',m:'"Your throat chakra has been on permanent vacation. It packed its bags the third time you swallowed a truth that deserved air."'},
+      WARRIOR:{e:'📣',m:'"You spoke clearly and held the line without needing to win. That\'s not argumentation — that\'s integrity with a voice."'},
+      EGO:{e:'🎙️',m:'"You won the argument. You may have also won a reputation as the person who cannot let things go. Your throat wants truth, not scorekeeping."'},
+      MAGICIAN:{e:'🌀',m:'"You turned dinner into a philosophy seminar and everyone left slightly changed. Your throat is a portal. Just make sure it goes both ways."'},
+      AFRAID:{e:'💬',m:'"The 2am comeback was perfect. A shame the table was empty. Your voice has been punished before. It survived. It\'s ready when you are."'}
+    },
+    lifestyle:{
+      label:'🔵 REAL TALK: Truth-Telling About Your Habits',
+      q:'What does it actually take for you to tell the full truth — about your habits, your use, your pain?',
+      opts:[
+        {e:'🎯',t:'Courage and a safe person. You can say the hard thing when it matters. You\'ve told the truth about your habits, even the ugly parts.', score:'open'},
+        {e:'🍷',t:'A few drinks first. Or a lot of emotional pressure. You get there eventually but never totally sober and totally comfortable.', score:'neutral'},
+        {e:'🤐',t:'You haven\'t told the full truth to anyone. Not even close. Parts of your life — your drinking, your drug use, your mental state — are sealed.', score:'partial'},
+        {e:'🎭',t:'You don\'t know how. The full truth has never left your body. Not once. You\'re not sure you could survive what would happen if it did.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your voice carries truth without violence. Keep speaking — the world needs more tongues that can tell the truth with compassion intact.'},
+      SLEEPER:{title:'Find Your Voice',items:['Sing daily. Shower, car, alone — anywhere. Humming counts as a start.','Write one true thing you\'ve been swallowing and say it aloud, alone first','Next time you disagree with anyone: "I see it differently." Just those four words.','Record yourself speaking about something you care about. Listen back with genuine kindness.','Chanting or toning: sit quietly and let your voice resonate through your chest. Feel it.']},
+      WARRIOR:{type:'open',affirm:'Your voice is sharp and fair. You speak truth without needing the room to agree. This is genuinely rare. Keep going.'},
+      EGO:{title:'Learn to Listen',items:['For one full day: ask only questions in conversations. No statements. No opinions. Zero.','Before speaking: three full breaths. Does it still need to be said? Then say it.','Notice how often you\'re formulating your response while someone else is still speaking. Stop.','Write down the last three important things someone told you. Can you actually remember what they said?','The wisest thing your throat can do sometimes is produce complete silence.']},
+      MAGICIAN:{type:'open',affirm:'Your voice opens portals. Keep speaking — and keep leaving space for others to speak into the portals you create.'},
+      AFRAID:{title:'Reclaim Your Voice',items:['Hum to yourself for 5 minutes daily — it is physiologically calming and gently opens the throat','Write the unsent letter. The full, uncensored version. Decide later whether to send it.','Read poetry aloud when you\'re alone — let someone else\'s words warm your voice up','Ask yourself: whose voice taught you that speaking was dangerous? Write them an unsent letter.','Your voice was silenced for understandable reasons. It survived. It is patient. It is ready.']}
+    },
+    shadowWork:{
+      SLEEPER:['I swallow truths constantly. Help me explore the specific consequences I\'m afraid of if I speak up, and whether those fears are still relevant today.','I stay silent when I should speak. Help me map the history of when my voice was met with punishment and how that shaped me.','What is the most important thing I need to say to someone in my life right now? Help me prepare to actually say it.'],
+      EGO:['I talk over people and need to win conversations. Help me explore what genuine listening would feel like, and what would happen if I let someone else be right.','My communication hurts people sometimes. Help me explore the actual difference between honesty and aggression in how I speak.','When I\'m with someone, am I truly present or waiting for my turn? Be direct with me. Don\'t let me off the hook.'],
+      AFRAID:['I rehearse what I want to say and then say nothing. Help me explore the specific fear that keeps my real voice locked inside.','I often feel like what I have to say doesn\'t matter or will be received badly. Help me trace where I learned that my voice was dangerous or unimportant.','What do I most want someone in my life to hear from me? Help me articulate it completely, as if I knew I couldn\'t be punished for it.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=WV8EKJP0DgQ&list=PL5KNhrwZCuCqy0wlG3axQ2UblsCRecGOz',title:'Throat Chakra Healing Playlist'}
+  },
+  {
+    id:'thirdeye',num:6,color:'#6622cc',glow:'#9955ff',freq:852,emoji:'🔮',
+    name:'Third Eye',sanskrit:'Ajna',
+    theme:'Intuition · Clarity · Wisdom · Vision · Pattern Recognition',
+    gateTitle:'THE VISION TEMPLE GATE',
+    deepQ:'"What have you yet to show yourself? What are you not seeing? What is hiding in the shadows of your imagination?" — The third eye asks.',
+    intro:'You arrive at the indigo temple between your brows. This is where you SEE — not with eyes but with the part that has always known. Do you trust what it shows you?',
+    question:'Something goes significantly wrong in your life. Your first honest internal response is...',
+    answers:{
+      KING:    {e:'👑',t:'"What\'s the lesson? What is this showing me?" You look for the pattern and trust the process.'},
+      SLEEPER: {e:'😴',t:'"This is fine. I\'ll think about it later." You deflect and distract and wait for it to resolve itself.'},
+      WARRIOR: {e:'⚔️',t:'Research the cause, analyse what happened, build a better system. This won\'t happen again.'},
+      EGO:     {e:'🔥',t:'Immediately identify who is responsible. This is not your fault. You are very clear on that.'},
+      MAGICIAN:{e:'🪄',t:'See the synchronicity in it — this clearly happened for a reason, and you\'re already sensing the bigger pattern.'},
+      AFRAID:  {e:'😰',t:'Catastrophise immediately. This is the beginning of the end. What if everything falls apart? What if it already has?'}
+    },
+    oracle:{
+      KING:{e:'🌕',m:'"Your inner knowing has been forged over years. This is not arrogance — this is earned. Trust the quiet that knows."'},
+      SLEEPER:{e:'🛤️',m:'"The path of least resistance has taken you somewhere comfortable. Your third eye is asking: is comfortable what you came here for?"'},
+      WARRIOR:{e:'🔍',m:'"The research is done, the analysis is complete. Now: what does the still quiet voice underneath all that data say? That one matters too."'},
+      EGO:{e:'👁️',m:'"Your third eye only shows you evidence that confirms what you already believe. That\'s not vision — that\'s a hall of mirrors."'},
+      MAGICIAN:{e:'🌙',m:'"The synchronicities are real. Your third eye is genuinely calibrated. Just make sure you\'re reading the signs, not projecting the wish."'},
+      AFRAID:{e:'🔮',m:'"You don\'t trust your own mind. That is a wound, not a fact. Your intuition has been right far more often than anxiety allows. Start keeping score."'}
+    },
+    lifestyle:{
+      label:'🔮 REAL TALK: Substances, Screens & Clarity',
+      q:'What are you actively using to avoid seeing yourself clearly — and how deep does it go?',
+      opts:[
+        {e:'💡',t:'Meditation, intentional limits on screens and substances, honest self-inquiry. You choose clarity even when it\'s uncomfortable.', score:'open'},
+        {e:'📱',t:'Screens, social media, and the occasional substance. You\'re aware you use them to avoid thoughts. Some days better than others.', score:'neutral'},
+        {e:'🌿',t:'Alcohol, weed, or other substances are regular tools for checking out. The inner voice gets quieter when you use. That\'s partly the point.', score:'partial'},
+        {e:'🌑',t:'Daily or near-daily substance use to stay functional. You genuinely can\'t imagine being sober AND fully present with your own mind. That gap is the work.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your inner vision is clear and earned. Trust it. Act from it. And remain humble enough to know it can always deepen.'},
+      SLEEPER:{title:'Awaken the Vision',items:['Meditation: 10 minutes minimum, daily. Same time. Non-negotiable. Set the alarm now.','Dream journal by the bed — write immediately on waking, before the dream dissolves','Reduce numbing (screens, substances, noise) for 48 hours and see what surfaces in the quiet','Ask yourself before sleep: "What am I not seeing?" Write whatever comes without editing.','Spend time in total silence once this week. Your inner vision needs quiet to work.']},
+      WARRIOR:{type:'open',affirm:'Your vision is clear and rigorous. Listen for the quiet knowing underneath the analysis too — that\'s the third eye with data your spreadsheet doesn\'t have.'},
+      EGO:{title:'Expand the Vision',items:['"I might be wrong about this." Say it out loud. Feel how that lands.','Actively seek one perspective this week from someone completely unlike you. Stay with the discomfort.','Write three beliefs you hold with certainty. Ask: what would have to be true for the opposite to be real?','Read a book by someone whose worldview challenges yours. Don\'t skim. Stay.','Your third eye opens fully only when the ego loosens its grip. Curiosity is the actual key.']},
+      MAGICIAN:{type:'open',affirm:'Your vision is a genuine gift. Keep discerning between true intuition and the desire to believe something beautiful. They\'re not always the same.'},
+      AFRAID:{title:'Learn to Trust Yourself',items:['Gratitude practice before bed: 3 specific things, in writing, nightly. Watch your nervous system change.','Begin keeping a record of when your instincts were right. Evidence matters for rebuilding trust.','Nature walks with no destination and no phone — let your intuition navigate for 30 minutes','When anxious about a decision: "What would I advise a dear friend?" Then do exactly that.','Your intuition has been whispering the right answer all along. The anxiety was just louder. For now.']}
+    },
+    shadowWork:{
+      SLEEPER:['I choose the path of least resistance rather than trusting my intuition. Help me explore what I\'m afraid my deeper knowing might be asking of me.','My inner guidance feels quiet or absent. Help me explore whether I\'ve numbed it with distraction and what might surface if I got genuinely quiet.','What am I not willing to see about my life right now? Ask me probing questions. Don\'t let me deflect.'],
+      EGO:['I believe I\'m usually right and genuinely struggle to consider other perspectives. Help me explore what it would mean — deep down — to be fundamentally wrong about something important.','Help me understand how my ego filters my perception. What might I be systematically missing because it doesn\'t fit my existing narrative?','Play devil\'s advocate about something I\'m certain about. Ask hard questions. Help me develop genuine curiosity about the opposing view.'],
+      AFRAID:['I don\'t trust my own mind. Help me explore specific moments when I knew something and overrode it with anxiety. What happened each time?','My thinking becomes circular and catastrophic. Help me understand the difference between genuine intuition and anxious storytelling.','What does my deepest, quietest inner knowing actually say about my life right now — not the anxious chatter, but the still small voice? Help me access it.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=cknepREzUzI&list=PL5KNhrwZCuCqEY1Yz9sViwgNbSeVTbl77',title:'Third Eye Healing Playlist'}
+  },
+  {
+    id:'crown',num:7,color:'#bb00ff',glow:'#dd66ff',freq:963,emoji:'👁️',
+    name:'Crown Chakra',sanskrit:'Sahasrara',
+    theme:'Purpose · Spirituality · Meaning · Cosmic Connection',
+    gateTitle:'THE COSMIC PORTAL GATE',
+    deepQ:'"What is the goal of life? What is my destiny? Who am I?" — The crown holds the question and the answer.',
+    intro:'The final gate. The violet door at the top of everything. The part of you that knows it belongs to something larger. What do you do with that knowing?',
+    question:'When you sit quietly and think about your deepest purpose in this lifetime, you honestly feel...',
+    answers:{
+      KING:    {e:'👑',t:'A quiet, grounded certainty. You may not know every detail, but you know the direction. You\'re exactly where you need to be.'},
+      SLEEPER: {e:'😴',t:'Kind of sleepy, honestly. You\'ll figure it out after some rest. Maybe after the next season of that show. Purpose sounds exhausting.'},
+      WARRIOR: {e:'⚔️',t:'Lit up and focused. You have a mission and you\'re charging toward it with everything you\'ve got. Please get out of the way.'},
+      EGO:     {e:'🔥',t:'Obviously destined for greatness — IF other people would stop getting in the way and appreciate what you\'re trying to build.'},
+      MAGICIAN:{e:'🪄',t:'Like you are a portal. Something vast and luminous is trying to move through you. You are less a person and more a frequency on a good day.'},
+      AFRAID:  {e:'😰',t:'Deeply, chronically anxious. What if you miss it? What if you\'ve already missed it? What if you were never meant for anything significant?'}
+    },
+    oracle:{
+      KING:{e:'👑',m:'"You arrived. You are here. You are doing it. Purpose is not a destination you reach — it\'s the quality of presence you bring to what\'s already in front of you."'},
+      SLEEPER:{e:'💤',m:'"Something enormous wants to move through you. It\'s been waiting very patiently. It can wait a little longer. But you cannot."'},
+      WARRIOR:{e:'⚡',m:'"Your crown is open and your mission is real. Charge toward it. Just remember: the mission ultimately serves something beyond your personal glory. Stay connected to that."'},
+      EGO:{e:'🌞',m:'"The greatness is real. So is the feeling that others are in the way. Your crown opens fully only when you realise purpose is IN SERVICE, not achievement. That\'s the portal."'},
+      MAGICIAN:{e:'🌌',m:'"A portal. Yes. You feel it. It\'s real. Your crown is blown wide open. Stay grounded — portals need anchors or they become beautiful, useless chaos."'},
+      AFRAID:{e:'🌅',m:'"You haven\'t missed it. You couldn\'t. Your purpose is woven into your existence — not something you do, but something you ARE. The anxiety is the last veil. Lift it gently."'}
+    },
+    lifestyle:{
+      label:'🌟 REAL TALK: Altered States, Substances & Spirit',
+      q:'Your honest relationship with altered states — substances, spiritual bypassing, or disconnection from your body...',
+      opts:[
+        {e:'✨',t:'Expanded states come through meditation, breathwork, art, or awe. You don\'t need chemicals to access depth. Your body is your temple.', score:'open'},
+        {e:'🍄',t:'You\'ve experimented with psychedelics or cannabis and still do occasionally. Curious and relatively conscious. You know the difference between medicine and escape.', score:'neutral'},
+        {e:'🌀',t:'Psychedelics, cannabis, or alcohol are regular tools for spiritual experience or emotional relief. The line between medicine and escapism has gotten genuinely blurry.', score:'partial'},
+        {e:'💀',t:'Daily substances to stay numb or feel spiritual. Or full spiritual bypass — using ideas, workshops, or mysticism to avoid your body and the actual healing work on the ground.', score:'blocked'}
+      ]
+    },
+    medicine:{
+      KING:{type:'open',affirm:'Your crown is open and grounded. You serve what is real. You bring presence to the ordinary and make it sacred. This is the highest calling.'},
+      SLEEPER:{title:'Open the Channel',items:['Meditation or prayer: 15 minutes daily, same time, same place. Routine is the scaffolding for the divine.','Ask yourself weekly: "What would I do if I knew I was fully supported?" Then do one thing from the answer.','Reduce stimulation before bed — what might be heard if things got truly quiet for once?','Read something that stretches your idea of what life can be for','What gift have you been withholding from the world? Start giving it. Start very small. Start today.']},
+      WARRIOR:{type:'open',affirm:'Your crown channels purpose into action. Keep charging — and remember to receive as fiercely as you give. The crown needs both directions.'},
+      EGO:{title:'Serve Something Larger',items:['Seva practice: regular anonymous service — help without recognition for 30 consecutive days','Bhakti yoga: sing to something larger than yourself. Whether that\'s God, the cosmos, or just a great song.','Write: "My purpose is to serve ___" and genuinely let the answer surprise you','Whenever you catch yourself needing to be seen: would I do this if no one would ever know? Then do it that way.','The crown opens not when you become great, but when your greatness becomes an offering.']},
+      MAGICIAN:{type:'open',affirm:'Your crown is a genuine portal. Keep yourself anchored — root work, daily rhythm, embodiment — so the vast can move through you sustainably.'},
+      AFRAID:{title:'Return to Belonging',items:['Morning ritual: before any device, sit for 3 minutes and breathe. You belong to this day.','Nature at dawn or dusk: watch the sky change and remember you are part of all of this','Gentle spiritual practice: candle gazing, gratitude prayer, walking meditation — nothing forceful','Write: "I am already enough because..." and let the truths come without editing','Your purpose is not a task to complete. It is a quality of aliveness. You already have it.']}
+    },
+    shadowWork:{
+      SLEEPER:['I sense there\'s a deeper purpose for my life but I\'m not living it. Help me explore what specific obstacles — internal and external — keep me from it.','I\'ve been spiritually dormant. Help me explore what I\'ve been numbing myself against and what might emerge if I got genuinely still for long enough.','If I imagine the version of me that\'s fully awake to my purpose — what are they doing differently? What is actually stopping me from being that person?'],
+      EGO:['I believe I\'m destined for greatness but feel blocked by other people. Help me explore the possibility that my purpose is about service rather than achievement.','Help me understand the difference between spiritual ambition and genuine calling. Do I want to help the world, or be seen helping it? Be direct.','What would I do with my gifts if no one would ever know? Help me explore what that question reveals about my actual motivations.'],
+      AFRAID:['I\'m terrified I\'ve missed my purpose or will miss it. Help me explore the specific beliefs driving this anxiety — what does "missing it" actually mean?','Help me connect to something larger than my daily life. I feel disconnected from meaning and spirituality and I don\'t fully know why.','What is the still, quiet voice underneath my anxiety trying to tell me about my purpose? Help me access it — slowly, gently, precisely.']
+    },
+    playlist:{url:'https://www.youtube.com/watch?v=_RQ9S1u7ag4&list=PL5KNhrwZCuCqiJFY24RwzLOZRT3HUg7fr',title:'Crown Chakra Healing Playlist'}
+  }
+];
+
+const REFLECTION_QUESTIONS = [
+  '"What would you do if you knew you would not fail?"',
+  '"Are you living your truth? Where are you pointing your arrows?"',
+  '"What are you willing to let go of in order to evolve faster than you were?"',
+  '"When were you the happiest in your life? What were you doing?"',
+  '"What do you want to give this world in this lifetime? What would love do?"',
+  '"What is the next step you\'d like to see yourself take — not humanity, YOU?"',
+  '"Who are you? Where does all of this go when you close your eyes?"',
+  '"Are you living in harmony with your highest ideals, or are you waiting for conditions to improve?"'
+];
+
+// =============================================
+// RESOURCES PER CHAKRA (customise these URLs)
+// =============================================
+const RESOURCES = {
+  root: {
+    gptFocus: 'grounding, safety, survival anxiety, and financial blocks',
+    courses: [
+      {title:'Ayurveda Foundations: Balance Your Doshas',url:'https://www.udemy.com/course/ayurveda/',desc:'Master Kapha/Vata/Pitta balance through food, rhythm & lifestyle'},
+      {title:'Somatic Healing for Anxiety & Trauma',url:'https://www.udemy.com/course/somatic-therapy/',desc:'Body-based techniques for nervous system regulation & grounding'}
+    ],
+    apps:['Insight Timer — Grounding Meditations','Wim Hof Method App — Breathwork & Cold Exposure','Calm — Body Scan & Sleep Series'],
+    books:['"The Body Keeps the Score" — Bessel van der Kolk','"Ayurveda: A Life of Balance" — Maya Tiwari','"Burnout" — Emily & Amelia Nagoski']
+  },
+  sacral: {
+    gptFocus: 'creative blocks, pleasure guilt, emotional numbness, and substance use patterns',
+    courses: [
+      {title:'The Artist\'s Way: Unleashing Creativity',url:'https://www.udemy.com/course/the-artists-way/',desc:'Julia Cameron\'s 12-week program to unblock your creative self'},
+      {title:'Somatic Dance & Movement Therapy',url:'https://www.youtube.com/playlist?list=PLfake',desc:'Hip-opening flow work for sacral chakra activation'}
+    ],
+    apps:['Daylio — Mood & Emotion Tracking','Insight Timer — Sacral Healing Meditations','Flo Health — Cycle & Body Awareness'],
+    books:['"Big Magic" — Elizabeth Gilbert','"The Artist\'s Way" — Julia Cameron','"In the Realm of Hungry Ghosts" — Gabor Maté (addiction & desire)']
+  },
+  solar: {
+    gptFocus: 'personal power, anger, people-pleasing, self-worth, and boundary-setting',
+    courses: [
+      {title:'Boundaries: The Art of Saying No',url:'https://www.udemy.com/course/boundaries/',desc:'Practical boundary-setting for relationships & workplace'},
+      {title:'Anger as Medicine: Pitta Healing',url:'https://www.youtube.com/playlist?list=PLfake2',desc:'Transform Pitta fire from destructive to directed'}
+    ],
+    apps:['Reflectly — Self-Reflection Journal','Headspace — Stress & Anger Management','Habitica — Build Healthy Power Routines'],
+    books:['"Boundaries" — Henry Cloud & John Townsend','"The Disease to Please" — Harriet B. Braiker','"The Will to Change" — bell hooks']
+  },
+  heart: {
+    gptFocus: 'grief, forgiveness, love patterns, emotional armour, and self-compassion',
+    courses: [
+      {title:'The Mindful Self-Compassion Program',url:'https://centerformsc.org/',desc:'Evidence-based 8-week self-compassion training by Kristin Neff'},
+      {title:'Grief & Loss: Healing the Heart',url:'https://www.udemy.com/course/grief/',desc:'Guided processing of grief, loss, and heartbreak'}
+    ],
+    apps:['Calm — Loving-Kindness Meditations','BetterHelp — Online Therapy','Insight Timer — Heart Opening Series'],
+    books:['"The Gifts of Imperfection" — Brené Brown','"When Things Fall Apart" — Pema Chödrön','"Attached" — Amir Levine & Rachel Heller']
+  },
+  throat: {
+    gptFocus: 'self-expression, truth-telling, communication blocks, and voice reclamation',
+    courses: [
+      {title:'Non-Violent Communication (NVC)',url:'https://www.udemy.com/course/nvc/',desc:'Marshall Rosenberg\'s method for honest, compassionate communication'},
+      {title:'Public Speaking & Authentic Expression',url:'https://www.udemy.com/course/speaking/',desc:'Find and use your real voice — in all contexts'}
+    ],
+    apps:['Day One — Private Journaling','Anchor — Create Your Own Podcast','Otter.ai — Voice Journal & Transcription'],
+    books:['"Nonviolent Communication" — Marshall Rosenberg','"Daring Greatly" — Brené Brown','"The Artist\'s Way" — Julia Cameron (morning pages)']
+  },
+  thirdeye: {
+    gptFocus: 'intuition, overthinking, clarity, pattern recognition, and addiction to distraction',
+    courses: [
+      {title:'Mindfulness-Based Stress Reduction (MBSR)',url:'https://www.mindfulnesscds.com/',desc:'Jon Kabat-Zinn\'s gold-standard mindfulness program'},
+      {title:'Digital Minimalism & Clarity',url:'https://www.udemy.com/course/digital-minimalism/',desc:'Reclaim mental clarity from screen addiction'}
+    ],
+    apps:['Waking Up — Sam Harris Meditation','Forest — Focus & Screen Time','Oura Ring — Sleep & Recovery Tracking'],
+    books:['"Thinking, Fast and Slow" — Daniel Kahneman','"Digital Minimalism" — Cal Newport','"The Untethered Soul" — Michael A. Singer']
+  },
+  crown: {
+    gptFocus: 'purpose, spiritual connection, meaning-making, and living your calling',
+    courses: [
+      {title:'The Science of Well-Being (Yale)',url:'https://www.coursera.org/learn/the-science-of-well-being',desc:'Free Yale course on lasting happiness & flourishing'},
+      {title:'Finding Your Purpose & Calling',url:'https://www.udemy.com/course/life-purpose/',desc:'Ikigai-based framework for discovering your life purpose'}
+    ],
+    apps:['Insight Timer — Transpersonal Meditations','Five Minute Journal — Gratitude & Intention','Waking Up — Consciousness & Meaning'],
+    books:['"Man\'s Search for Meaning" — Viktor Frankl','"The Power of Now" — Eckhart Tolle','"The Alchemist" — Paulo Coelho']
+  }
+};
+
+// =============================================
+// STATE
+// =============================================
+let currentGate = 0;
+let mainAnswers = {};   // gateIndex -> archetypeKey
+let lsAnswers = {};     // gateIndex -> score ('open','neutral','partial','blocked')
+let pendingGate = null;
+
+// =============================================
+// HEALING AUDIO SYSTEM (Web Audio API)
+// =============================================
+let _audioCtx = null;
+let _ambientOsc = null, _ambientGain = null;
+let _audioUnlocked = false;
+
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+
+function unlockAudio() {
+  if (_audioUnlocked) return;
+  try {
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+    _audioUnlocked = true;
+  } catch(e) {}
+}
+
+// Play a chakra healing tone: short bell-like burst
+function playHealingTone(freq, vol = 0.25, dur = 1.2) {
+  try {
+    unlockAudio();
+    const ctx = getAudioCtx();
+    const osc  = ctx.createOscillator();
+    const osc2 = ctx.createOscillator(); // harmonic overtone
+    const gain = ctx.createGain();
+    const master = ctx.createGain();
+    osc.connect(gain); osc2.connect(gain); gain.connect(master); master.connect(ctx.destination);
+    osc.type  = 'sine'; osc.frequency.value  = freq;
+    osc2.type = 'sine'; osc2.frequency.value = freq * 2; // octave overtone
+    gain.gain.value = 0.7;
+    master.gain.setValueAtTime(0, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.04);
+    master.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + dur);
+    osc2.start(ctx.currentTime); osc2.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+// Soft resonance click when answer is selected
+function playSelectTone(freq) {
+  try {
+    unlockAudio();
+    const ctx = getAudioCtx();
+    const osc  = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
+    osc.type  = 'sine';     osc.frequency.value  = freq;
+    osc2.type = 'triangle'; osc2.frequency.value = freq * 1.5;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 0.02);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 1.8);
+    osc2.start(ctx.currentTime); osc2.stop(ctx.currentTime + 0.8);
+  } catch(e) {}
+}
+
+// Gentle ambient drone — plays softly while on a gate
+function startAmbientTone(freq) {
+  stopAmbientTone();
+  try {
+    unlockAudio();
+    const ctx = getAudioCtx();
+    _ambientOsc  = ctx.createOscillator();
+    const osc2   = ctx.createOscillator();
+    _ambientGain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = freq * 3;
+    _ambientOsc.connect(filter); osc2.connect(filter);
+    filter.connect(_ambientGain); _ambientGain.connect(ctx.destination);
+    _ambientOsc.type = 'sine';     _ambientOsc.frequency.value = freq;
+    osc2.type        = 'sine';     osc2.frequency.value        = freq * 0.5; // sub-octave
+    _ambientGain.gain.setValueAtTime(0, ctx.currentTime);
+    _ambientGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 2.5);
+    _ambientOsc.start(); osc2.start();
+    // Store ref to stop osc2 later
+    _ambientOsc._osc2 = osc2;
+  } catch(e) {}
+}
+
+function stopAmbientTone(fadeSecs = 1.5) {
+  if (!_ambientOsc) return;
+  try {
+    const ctx = getAudioCtx();
+    _ambientGain.gain.setValueAtTime(_ambientGain.gain.value, ctx.currentTime);
+    _ambientGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + fadeSecs);
+    const osc = _ambientOsc, osc2 = _ambientOsc._osc2;
+    setTimeout(() => { try { osc.stop(); if(osc2) osc2.stop(); } catch(e){} }, fadeSecs * 1000 + 100);
+  } catch(e) {}
+  _ambientOsc = null; _ambientGain = null;
+}
+
+// =============================================
+// PROXIMITY AUDIO  — continuous sine that grows
+// louder as mouse nears any interactive target
+// =============================================
+let _proxOsc = null, _proxGain = null;
+
+function startProxTone(freq) {
+  stopProxTone();
+  try {
+    const ctx = getAudioCtx();
+    _proxOsc   = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    _proxGain  = ctx.createGain();
+    _proxOsc.connect(_proxGain); osc2.connect(_proxGain);
+    _proxGain.connect(ctx.destination);
+    _proxOsc.type = 'sine'; _proxOsc.frequency.value = freq;
+    osc2.type     = 'sine'; osc2.frequency.value     = freq * 1.0025; // slight beating
+    _proxGain.gain.value = 0;
+    _proxOsc.start(); osc2.start();
+    _proxOsc._osc2 = osc2;
+  } catch(e) {}
+}
+
+function setProxVol(v) {
+  if (!_proxGain) return;
+  try { _proxGain.gain.setTargetAtTime(Math.min(v * 0.26, 0.26), getAudioCtx().currentTime, 0.06); } catch(e) {}
+}
+
+function stopProxTone() {
+  if (!_proxOsc) return;
+  const o = _proxOsc, o2 = _proxOsc._osc2;
+  try { if (_proxGain) _proxGain.gain.setTargetAtTime(0, getAudioCtx().currentTime, 0.1); } catch(e) {}
+  setTimeout(() => { try { o.stop(); if (o2) o2.stop(); } catch(e) {} }, 250);
+  _proxOsc = null; _proxGain = null;
+}
+
+// =============================================
+// PROXIMITY SELECT — no clicking, ever
+// Move mouse near dot → vibration + sound grow
+// Dwell inside dot → auto-select + tone burst
+// =============================================
+function addProximitySelect(btn, color, freq, onSelect, opts = {}) {
+  const DOT_R    = opts.dotR    || 24;
+  const DWELL_MS = opts.dwellMs || 160;
+  const isPortal = opts.isPortal || false;
+  let dwellTimer = null, triggered = false, charging = false;
+
+  function dotCenter() {
+    if (isPortal) {
+      const r = btn.getBoundingClientRect();
+      return { x: r.left + r.width/2, y: r.top + r.height/2, r: opts.dotR || Math.min(r.width, r.height) * 0.42 };
+    }
+    const d = btn.querySelector('.ans-dot');
+    if (d) { const r = d.getBoundingClientRect(); return { x: r.left + r.width/2, y: r.top + r.height/2, r: DOT_R }; }
+    const r = btn.getBoundingClientRect();
+    return { x: r.right - 18, y: r.top + r.height/2, r: DOT_R };
+  }
+
+  btn.addEventListener('mousemove', e => {
+    if (triggered) return;
+    const dc   = dotCenter();
+    const dx   = e.clientX - dc.x, dy = e.clientY - dc.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const maxRange = isPortal ? 270 : 190;
+    const prox = Math.max(0, 1 - dist / maxRange);
+
+    setProxVol(prox);
+
+    const br = btn.getBoundingClientRect();
+    btn.style.setProperty('--mx', ((e.clientX - br.left) / br.width  * 100).toFixed(1) + '%');
+    btn.style.setProperty('--my', ((e.clientY - br.top)  / br.height * 100).toFixed(1) + '%');
+
+    // Vibration — micro-jitter scales with proximity
+    if (!isPortal) {
+      const v = prox * 4.5;
+      btn.style.transform = `translate(${(Math.random()-.5)*v}px,${(Math.random()-.5)*v*.4}px) scale(${1+prox*.03})`;
+    } else {
+      btn.style.transform = `scale(${1 + prox * 0.07})`;
+    }
+    btn.style.boxShadow   = `0 0 ${prox*55}px ${color}88, 0 0 ${prox*100}px ${color}33`;
+    btn.style.borderColor = `${color}`;
+    btn.style.opacity     = (0.72 + prox * 0.28).toString();
+
+    // Dot orb grows as mouse nears center
+    const dotEl = btn.querySelector('.ans-dot, .portal-dot');
+    if (dotEl) {
+      const dp = Math.max(0, 1 - dist / 85);
+      dotEl.style.transform = isPortal
+        ? `scale(${1 + dp * 2.8})`
+        : `translateY(-50%) scale(${1 + dp * 3.8})`;
+      dotEl.style.opacity   = (0.2 + dp * 0.8).toString();
+      dotEl.style.boxShadow = `0 0 ${dp*35}px ${dp*12}px ${color}`;
+    }
+
+    // Dwell trigger
+    if (dist < dc.r * 1.25) {
+      if (!dwellTimer && !charging) {
+        charging = true;
+        btn.classList.add('dot-charging');
+        dwellTimer = setTimeout(() => {
+          if (!triggered) {
+            triggered = true;
+            setProxVol(0);
+            playSelectTone(freq);
+            btn.classList.remove('dot-charging');
+            btn.classList.add('dot-burst');
+            setTimeout(onSelect, 90);
+          }
+        }, DWELL_MS);
+      }
+    } else if (dwellTimer) {
+      clearTimeout(dwellTimer); dwellTimer = null; charging = false;
+      btn.classList.remove('dot-charging');
+    }
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    setProxVol(0);
+    if (dwellTimer) { clearTimeout(dwellTimer); dwellTimer = null; }
+    charging = false;
+    if (!triggered) {
+      btn.classList.remove('dot-charging');
+      btn.style.transform = btn.style.boxShadow = btn.style.borderColor = btn.style.opacity = '';
+      const dotEl = btn.querySelector('.ans-dot, .portal-dot');
+      if (dotEl) { dotEl.style.transform = dotEl.style.opacity = dotEl.style.boxShadow = ''; }
+    }
+  });
+}
+
+// Session persistence
+let _sessionId = null;
+let _sessionSaved = false;
+
+// =============================================
+// SESSION MANAGEMENT
+// =============================================
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+function calcBucket(ma, la) {
+  let openCount = 0;
+  for (let i = 0; i < 7; i++) {
+    const key = ma[i], ls = la[i];
+    if (ARC[key] && ARC[key].h && (ls === 'open' || ls === 'neutral')) openCount++;
+  }
+  if (openCount >= 5) return 'trusted';
+  if (openCount >= 2) return 'trusting';
+  return 'untrusted';
+}
+
+function getChakraStatusForSession(i) {
+  const key = mainAnswers[i], ls = lsAnswers[i];
+  if (!key) return 'unanswered';
+  if (ARC[key] && ARC[key].h && (ls === 'open' || ls === 'neutral')) return 'open';
+  if (ls === 'partial' || ls === 'neutral') return 'partial';
+  return 'blocked';
+}
+
+function saveSession(contactData) {
+  _sessionId = _sessionId || generateUUID();
+  const sessions = JSON.parse(localStorage.getItem('chakra_sessions') || '[]');
+  const idx = sessions.findIndex(s => s.id === _sessionId);
+  const bucket = calcBucket(mainAnswers, lsAnswers);
+  const chakraMap = {};
+  CHAKRAS.forEach((ch, i) => { chakraMap[ch.id] = getChakraStatusForSession(i); });
+  const session = {
+    id: _sessionId,
+    name: contactData.name || '',
+    email: contactData.email || '',
+    phone: contactData.phone || '',
+    fb: contactData.fb || '',
+    ig: contactData.ig || '',
+    mainAnswers: {...mainAnswers},
+    lsAnswers: {...lsAnswers},
+    chakraMap,
+    bucket,
+    bucketOverride: false,
+    notes: '',
+    startedAt: contactData.startedAt || new Date().toISOString(),
+    completedAt: new Date().toISOString()
+  };
+  if (idx >= 0) {
+    session.bucket = sessions[idx].bucketOverride ? sessions[idx].bucket : bucket;
+    session.bucketOverride = sessions[idx].bucketOverride || false;
+    session.notes = sessions[idx].notes || '';
+    sessions[idx] = session;
+  } else {
+    sessions.push(session);
+  }
+  localStorage.setItem('chakra_sessions', JSON.stringify(sessions));
+  _sessionSaved = true;
+  return _sessionId;
+}
+
+function loadSession(id) {
+  const sessions = JSON.parse(localStorage.getItem('chakra_sessions') || '[]');
+  const session = sessions.find(s => s.id === id);
+  if (!session) return false;
+  _sessionId = session.id;
+  mainAnswers = {...(session.mainAnswers || {})};
+  lsAnswers = {...(session.lsAnswers || {})};
+  _sessionSaved = true;
+  return session;
+}
+
+function getReturnUrl() {
+  return window.location.href.split('?')[0] + '?s=' + (_sessionId || '');
+}
+
+function copyReturnLink(btn) {
+  const url = getReturnUrl();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  }
+}
+
+function submitContact(e) {
+  e.preventDefault();
+  const name  = document.getElementById('cf-name').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  const fb    = document.getElementById('cf-fb').value.trim();
+  const ig    = document.getElementById('cf-ig').value.trim();
+  saveSession({name, email, phone, fb, ig});
+  document.getElementById('contact-form').style.display = 'none';
+  document.getElementById('contact-saved').style.display = 'block';
+  // Personalise the saved note
+  const nameEl = document.getElementById('cp-saved-name');
+  if (nameEl && name) nameEl.textContent = name + ', your';
+}
+
+// =============================================
+// VISUAL HELPERS: SPINE + PARTICLES
+// =============================================
+function buildIntroSpine() {
+  const container = document.getElementById('intro-spine');
+  if (!container) return;
+  container.innerHTML = '';
+  CHAKRAS.forEach((ch, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'intro-spine-line';
+      container.appendChild(line);
+    }
+    const orb = document.createElement('div');
+    orb.className = 'intro-orb';
+    orb.style.setProperty('--c', ch.color);
+    orb.style.setProperty('--d', (2 + i * 0.4) + 's');
+    orb.style.background = ch.color + '22';
+    orb.style.border = `2px solid ${ch.color}66`;
+    orb.style.color = ch.color;
+    orb.style.boxShadow = `0 0 18px ${ch.color}55, inset 0 0 12px ${ch.color}22`;
+    orb.textContent = ch.emoji;
+    orb.title = ch.name + ' · ' + ch.freq + ' Hz';
+    orb.addEventListener('click', () => { unlockAudio(); playHealingTone(ch.freq, 0.2, 1.5); });
+    container.appendChild(orb);
+  });
+}
+
+function spawnParticles(gateIdx) {
+  const ch = CHAKRAS[gateIdx];
+  const container = document.getElementById(`ckp-${gateIdx}`);
+  if (!container || container._spawned) return;
+  container._spawned = true;
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'ckp';
+    const sz = Math.random() * 6 + 2;
+    const dur = (Math.random() * 8 + 6).toFixed(1);
+    const delay = (Math.random() * 5).toFixed(1);
+    const left = (Math.random() * 100).toFixed(1);
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${left}%;background:${ch.color};box-shadow:0 0 ${sz*2}px ${ch.color};animation-duration:${dur}s;animation-delay:${delay}s`;
+    container.appendChild(p);
+  }
+}
+
+// =============================================
+// INIT
+// =============================================
+function init() {
+  createStars();
+  buildProgressHeader();
+  buildGateScreens();
+  buildIntroSpine();
+
+  // Start intro ambient tone + wire Enter button proximity
+  // (audio starts on first user gesture — mousemove over page)
+  let introAudioStarted = false;
+  document.addEventListener('mousemove', function onFirstMove() {
+    if (introAudioStarted) return;
+    introAudioStarted = true;
+    unlockAudio();
+    startAmbientTone(432); // Verdi's A — grounding/welcoming
+    startProxTone(528);    // Heart of the solfeggio scale for intro
+    document.removeEventListener('mousemove', onFirstMove);
+  }, { passive: true });
+
+  const enterBtn = document.getElementById('btn-enter');
+  if (enterBtn) {
+    addProximitySelect(enterBtn, '#bb44ff', 528, startJourney,
+      { dotR: 62, isPortal: true, dwellMs: 300 });
+  }
+  // Check for returning user via ?s= URL param
+  const sid = new URLSearchParams(window.location.search).get('s');
+  if (sid) {
+    const session = loadSession(sid);
+    if (session) {
+      try { buildResults(); } catch(e) { console.error('Session restore error:', e); }
+      showScreen('screen-results');
+      // Pre-fill contact form as already saved
+      document.getElementById('contact-form').style.display = 'none';
+      document.getElementById('contact-saved').style.display = 'block';
+      const nameEl = document.getElementById('cp-saved-name');
+      if (nameEl && session.name) nameEl.textContent = session.name + ', your';
+    }
+  }
+}
+
+function createStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 130; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.5 + .5;
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--a:${(Math.random()*.3+.1).toFixed(2)};--b:${(Math.random()*.5+.4).toFixed(2)};animation-delay:${(Math.random()*5).toFixed(1)}s`;
+    c.appendChild(s);
+  }
+}
+
+function buildProgressHeader() {
+  const h = document.getElementById('prog-header');
+  CHAKRAS.forEach((ch, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'ph-line';
+      h.appendChild(line);
+    }
+    const node = document.createElement('div');
+    node.className = 'ph-node';
+    node.innerHTML = `<div class="ph-dot" id="phd-${i}" style="--c:${ch.color}">${ch.emoji}</div><div class="ph-label">${ch.name.split(' ')[0]}</div>`;
+    h.appendChild(node);
+  });
+}
+
+function updateProgressHeader(answeredIdx) {
+  document.getElementById('prog-header').classList.add('show');
+  CHAKRAS.forEach((ch, i) => {
+    const dot = document.getElementById(`phd-${i}`);
+    dot.className = 'ph-dot';
+    dot.style.setProperty('--c', ch.color);
+    if (mainAnswers[i] !== undefined) {
+      dot.classList.add(ARC[mainAnswers[i]].h ? 'open' : 'blocked');
+      dot.textContent = ARC[mainAnswers[i]].e;
+    } else if (i === answeredIdx + 1) {
+      dot.classList.add('current');
+    }
+  });
+}
+
+function buildGateScreens() {
+  CHAKRAS.forEach((ch, i) => {
+    const sc = document.createElement('div');
+    sc.id = `screen-gate-${i}`;
+    sc.className = 'screen';
+    sc.dataset.chakra = ch.id;
+    sc.style.setProperty('--ck-bg', ch.color + '33');
+    sc.style.setProperty('--ck-color', ch.color);
+
+    // Answer buttons — proximity-select, no onclick
+    const ans = Object.entries(ch.answers).map(([key, a]) =>
+      `<button class="ans-btn" id="ans-${i}-${key}"
+               style="--ck-color:${ch.color};--ck-bg-light:${ch.color}18">
+        <span class="ans-emoji">${a.e}</span>
+        <span class="ans-body"><div class="ans-text">${a.t}</div></span>
+        <span class="ans-dot"></span>
+      </button>`
+    ).join('');
+
+    const lsOpts = ch.lifestyle.opts.map((o, oi) =>
+      `<button class="ls-btn" id="ls-${i}-${oi}" style="--ck-color:${ch.color}">
+        <span class="ans-emoji">${o.e}</span>
+        <span class="ans-text">${o.t}</span>
+        <span class="ans-dot" style="right:10px"></span>
+      </button>`
+    ).join('');
+
+    // Floating particles container
+    const particles = `<div class="ck-particles" id="ckp-${i}"></div>`;
+
+    sc.innerHTML = `
+      ${particles}
+      <div class="gate-top" style="background:linear-gradient(90deg,transparent,${ch.color},transparent);height:2px;box-shadow:0 0 30px ${ch.color}88;width:100%;max-width:740px"></div>
+      <div class="gate-card">
+        <div class="gate-label" style="color:${ch.color}99">GATE ${ch.num} OF 7 · ${ch.gateTitle}</div>
+        <div class="gate-name" style="color:${ch.color};text-shadow:0 0 30px ${ch.color}66">${ch.name}</div>
+        <div class="gate-sanskrit">${ch.sanskrit}</div>
+        <div class="gate-theme">${ch.theme}</div>
+        <div class="chakra-orb" style="background:${ch.color}20;border:2px solid ${ch.color}66;color:${ch.color};box-shadow:0 0 30px ${ch.color}44,inset 0 0 20px ${ch.color}11">${ch.emoji}</div>
+        <div class="deep-q" style="border-color:${ch.color}22;color:${ch.color}cc">${ch.deepQ}</div>
+        <div class="gate-intro">${ch.intro}</div>
+        <div class="gate-q">${ch.question}</div>
+        <div class="answers-wrap" id="answers-${i}">${ans}</div>
+        <div id="ls-block-${i}" class="lifestyle-block" style="display:none;border-color:${ch.color}22">
+          <div class="ls-label" style="color:${ch.color}cc">${ch.lifestyle.label}</div>
+          <div class="ls-q">${ch.lifestyle.q}</div>
+          <div class="ls-opts" id="ls-opts-${i}">${lsOpts}</div>
+        </div>
+        <div class="next-row">
+          <button class="btn-next btn-next-prox" id="next-${i}"
+                  style="border-color:${ch.color}44;color:${ch.color}cc;position:relative">
+            RECEIVE THE ORACLE'S READING →<span class="portal-dot" style="background:${ch.color}aa"></span>
+          </button>
+        </div>
+      </div>`;
+
+    document.body.insertBefore(sc, document.getElementById('oracle-flash'));
+
+    // Attach proximity-select to all interactive buttons (no onclick)
+    requestAnimationFrame(() => {
+      // Main answer buttons
+      sc.querySelectorAll('.ans-btn').forEach(btn => {
+        const key = btn.id.split('-').pop();
+        addProximitySelect(btn, ch.color, ch.freq, () => selectMain(i, key, btn));
+      });
+      // Lifestyle buttons (attached when they become visible — see showLSQuestion)
+      // btn-next (oracle reading) — re-attached in showNextButton
+    });
+  });
+}
+
+// =============================================
+// NAVIGATION
+// =============================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const sc = document.getElementById(id);
+  if (sc) sc.classList.add('active');
+  window.scrollTo(0, 0);
+  // Start ambient + prox tones for gate screens
+  if (id.startsWith('screen-gate-')) {
+    const idx = parseInt(id.split('-').pop(), 10);
+    if (!isNaN(idx) && CHAKRAS[idx]) {
+      spawnParticles(idx);
+      startAmbientTone(CHAKRAS[idx].freq);
+      startProxTone(CHAKRAS[idx].freq);
+    }
+  } else if (id !== 'oracle-flash') {
+    stopAmbientTone();
+    stopProxTone();
+  }
+}
+
+function startJourney() {
+  unlockAudio(); // must happen from user gesture
+  showScreen('screen-gate-0');
+  currentGate = 0;
+}
+
+function restart() {
+  mainAnswers = {};
+  lsAnswers = {};
+  currentGate = 0;
+  document.getElementById('prog-header').classList.remove('show');
+  document.querySelectorAll('.ans-btn').forEach(b => { b.classList.remove('chosen','locked'); });
+  document.querySelectorAll('.ls-btn').forEach(b => { b.classList.remove('chosen','locked'); });
+  document.querySelectorAll('.btn-next').forEach(b => b.classList.remove('show'));
+  document.querySelectorAll('.lifestyle-block').forEach(b => b.style.display = 'none');
+  // Reset transition screen
+  document.getElementById('trans-orb-grid').innerHTML = '';
+  document.getElementById('trans-flow-score').classList.remove('show');
+  document.getElementById('trans-cta').classList.remove('show');
+  document.getElementById('tfs-num').textContent = '0';
+  document.getElementById('tfs-bar').style.width = '0%';
+  document.getElementById('tfs-phrase').textContent = '';
+  showScreen('screen-intro');
+}
+
+// =============================================
+// ANSWER SELECTION
+// =============================================
+function selectMain(gateIdx, key, btn) {
+  if (mainAnswers[gateIdx] !== undefined) return;
+  unlockAudio();
+  mainAnswers[gateIdx] = key;
+  lockMainAnswers(gateIdx);
+  btn.classList.add('chosen');
+  // Play the chakra's healing tone on selection
+  playSelectTone(CHAKRAS[gateIdx].freq);
+  updateProgressHeader(gateIdx);
+  setTimeout(() => showLSQuestion(gateIdx), 300);
+}
+
+function lockMainAnswers(gateIdx) {
+  document.querySelectorAll(`#answers-${gateIdx} .ans-btn`).forEach(b => b.classList.add('locked'));
+}
+
+function showLSQuestion(gateIdx) {
+  const block = document.getElementById(`ls-block-${gateIdx}`);
+  block.style.display = 'block';
+  block.scrollIntoView({behavior:'smooth', block:'center'});
+  // Attach proximity to lifestyle buttons now that they're visible
+  const ch = CHAKRAS[gateIdx];
+  requestAnimationFrame(() => {
+    block.querySelectorAll('.ls-btn').forEach((btn, oi) => {
+      const score = ch.lifestyle.opts[oi] ? ch.lifestyle.opts[oi].score : 'neutral';
+      addProximitySelect(btn, ch.color, ch.freq, () => selectLS(gateIdx, oi, score, btn));
+    });
+  });
+}
+
+function selectLS(gateIdx, optIdx, score, btn) {
+  if (lsAnswers[gateIdx] !== undefined) return;
+  lsAnswers[gateIdx] = score;
+  lockLSAnswers(gateIdx);
+  btn.classList.add('chosen');
+  // Softer tone at half pitch for lifestyle answer
+  playHealingTone(CHAKRAS[gateIdx].freq * 0.5, 0.15, 0.9);
+  showNextButton(gateIdx);
+}
+
+function lockLSAnswers(gateIdx) {
+  document.querySelectorAll(`#ls-opts-${gateIdx} .ls-btn`).forEach(b => b.classList.add('locked'));
+}
+
+function showNextButton(gateIdx) {
+  const btn = document.getElementById(`next-${gateIdx}`);
+  btn.classList.add('show');
+  btn.scrollIntoView({behavior:'smooth', block:'center'});
+  // Attach proximity — dwell on button triggers oracle reading
+  const ch = CHAKRAS[gateIdx];
+  addProximitySelect(btn, ch.color, ch.freq, () => showOracle(gateIdx),
+    { dotR: 40, isPortal: true, dwellMs: 220 });
+}
+
+// =============================================
+// ORACLE
+// =============================================
+function showOracle(gateIdx) {
+  const ch = CHAKRAS[gateIdx];
+  const key = mainAnswers[gateIdx];
+  const arc = ARC[key];
+  const od = ch.oracle[key];
+  document.getElementById('of-emoji').textContent = od.e;
+  document.getElementById('of-label').textContent = `${arc.n} · ${arc.d}`;
+  document.getElementById('of-label').style.color = arc.c;
+  document.getElementById('of-msg').innerHTML = od.m;
+  const fl = document.getElementById('oracle-flash');
+  fl.classList.add('show');
+  fl.style.display = 'flex';
+  currentGate = gateIdx;
+  // Attach proximity to Continue button — dwell auto-advances
+  const btn = document.getElementById('of-continue-btn');
+  startProxTone(ch.freq);
+  addProximitySelect(btn, ch.color, ch.freq, advanceGate,
+    { dotR: 55, isPortal: true, dwellMs: 250 });
+}
+
+function advanceGate() {
+  const fl = document.getElementById('oracle-flash');
+  fl.classList.remove('show');
+  fl.style.display = 'none';
+  const next = currentGate + 1;
+  if (next < CHAKRAS.length) {
+    showScreen(`screen-gate-${next}`);
+  } else {
+    // All 7 gates done → dramatic transition screen
+    showScreen('screen-transition');
+    runTransitionReveal();
+  }
+}
+
+// =============================================
+// TRANSITION REVEAL SEQUENCE
+// =============================================
+function getChakraStatus(i) {
+  const key = mainAnswers[i];
+  if (!key) return {cls:'', pct:0, label:'?', statusCls:''};
+  const arc = ARC[key];
+  const ls = lsAnswers[i];
+  let combined = arc.h ? 'open' : 'blocked';
+  if (arc.h && (ls === 'partial' || ls === 'blocked')) combined = 'partial';
+  const pct = combined === 'open' ? 88 : combined === 'partial' ? 52 : 18;
+  const label = combined === 'open' ? '✓ FLOWING' : combined === 'partial' ? '~ PARTLY OPEN' : '⚠ BLOCKED';
+  const statusCls = `t-status-${combined}`;
+  return {cls:`lit-${combined}`, pct, label, statusCls, arc};
+}
+
+function runTransitionReveal() {
+  const grid = document.getElementById('trans-orb-grid');
+  grid.innerHTML = '';
+
+  // Build all orb rows (hidden initially)
+  CHAKRAS.forEach((ch, i) => {
+    const st = getChakraStatus(i);
+    const arc = st.arc || {e:'?', n:'—', d:'—'};
+    const isRight = i % 2 !== 0;
+    const row = document.createElement('div');
+    row.className = `trans-orb-row${isRight ? ' right-entry' : ''}`;
+    row.id = `torb-${i}`;
+    row.innerHTML = `
+      <div class="t-orb ${st.cls}" style="--c:${ch.color};background:${ch.color}30;border:2px solid ${ch.color}55">${ch.emoji}</div>
+      <div class="t-orb-info">
+        <div class="t-orb-name" style="--c:${ch.color}">${ch.name}</div>
+        <div class="t-orb-arch">${arc.e} ${arc.n}</div>
+      </div>
+      <div class="t-orb-bar-wrap">
+        <div class="t-orb-bar" id="tbar-${i}" style="background:${ch.color};width:0%"></div>
+      </div>
+      <div class="t-orb-status ${st.statusCls}">${st.label}</div>`;
+    grid.appendChild(row);
+  });
+
+  // Sequential reveal
+  CHAKRAS.forEach((_, i) => {
+    setTimeout(() => {
+      const row = document.getElementById(`torb-${i}`);
+      if (row) row.classList.add('reveal');
+      setTimeout(() => {
+        const bar = document.getElementById(`tbar-${i}`);
+        const st = getChakraStatus(i);
+        if (bar) bar.style.width = `${st.pct}%`;
+      }, 200);
+    }, 400 + i * 600);
+  });
+
+  // Flow score reveal
+  const delay = 400 + CHAKRAS.length * 600 + 300;
+  setTimeout(() => {
+    const openCount = Object.values(mainAnswers).filter(k => ARC[k] && ARC[k].h).length;
+    const partialCount = Object.values(lsAnswers).filter(v => v === 'partial' || v === 'blocked').length;
+    const flowPct = Math.round(((openCount / 7) * 100) - (partialCount * 5));
+    const clamped = Math.max(5, Math.min(97, flowPct));
+
+    const scoreEl = document.getElementById('trans-flow-score');
+    scoreEl.classList.add('show');
+
+    // Animate number
+    let n = 0;
+    const numEl = document.getElementById('tfs-num');
+    const numTimer = setInterval(() => {
+      n = Math.min(n + 3, clamped);
+      numEl.textContent = n;
+      if (n >= clamped) clearInterval(numTimer);
+    }, 30);
+
+    document.getElementById('tfs-bar').style.width = `${clamped}%`;
+
+    const phrases = {
+      high: '"Your field is largely open. The oracle sees a soul doing real work."',
+      mid:  '"Your field is mixed — some rivers flowing, some dammed. This is the most honest reading of all."',
+      low:  '"Your field is calling for medicine. This is not failure — this is the beginning of the work."'
+    };
+    const phrase = clamped >= 65 ? phrases.high : clamped >= 35 ? phrases.mid : phrases.low;
+    setTimeout(() => { document.getElementById('tfs-phrase').textContent = phrase; }, 800);
+
+    setTimeout(() => {
+      const cta = document.getElementById('trans-cta');
+      cta.classList.add('show');
+      // Attach proximity to Reveal button
+      const btn = document.getElementById('trans-reveal-btn');
+      startProxTone(963); // Crown frequency — end of journey
+      addProximitySelect(btn, '#bb00ff', 963, launchResults,
+        { dotR: 60, isPortal: true, dwellMs: 300 });
+    }, 1200);
+  }, delay);
+}
+
+function launchResults() {
+  try { buildResults(); } catch(e) { console.error('buildResults error:', e); }
+  showScreen('screen-results');
+}
+
+// =============================================
+// =============================================
+// RESULTS
+// =============================================
+
+// --- Generate personalised shadow-work prompt ---
+function buildPersonalisedPrompt() {
+  const lines = CHAKRAS.map((ch, i) => {
+    const key = mainAnswers[i];
+    if (!key) return null;
+    const arc = ARC[key];
+    const ls = lsAnswers[i];
+    let st = arc.h ? 'FLOWING' : 'BLOCKED';
+    if (arc.h && (ls === 'partial' || ls === 'blocked')) st = 'PARTLY OPEN';
+    return `  • ${ch.name} (${ch.sanskrit}): ${arc.n} [${arc.d}] — ${st}`;
+  }).filter(Boolean).join('\n');
+
+  const blocked = CHAKRAS.filter((ch, i) => mainAnswers[i] && !ARC[mainAnswers[i]].h)
+    .map((ch, i) => {
+      const key = mainAnswers[CHAKRAS.indexOf(ch)];
+      const res = RESOURCES[ch.id];
+      return `${ch.name} (focus: ${res ? res.gptFocus : 'healing and integration'})`;
+    }).join('; ');
+
+  return `You are a compassionate and direct shadow work guide with deep knowledge of Ayurvedic psychology (Vata, Pitta, Kapha doshas) and chakra energy systems.
+
+My personal energy field reading:
+${lines}
+
+Centers most needing attention: ${blocked || 'All centers are flowing — support integration'}
+
+Please begin a deep, personalised shadow work session with me. Follow these guidelines:
+1. Start with my most blocked or challenged center
+2. Ask ONE powerful, specific question at a time — don't rush
+3. After I respond, reflect what you heard back to me, then go one layer deeper
+4. Help me understand: what is the ROOT CAUSE of this blockage? What is it protecting me from? When did this pattern begin?
+5. Offer specific medicine: practices, mindset shifts, lifestyle changes aligned with my dosha
+6. Be warm but direct — don't let me intellectualise or deflect
+7. End each session segment with an integration practice I can do today
+
+Begin now. I'm ready to go deep.`;
+}
+
+// Cached prompts — avoids embedding long encoded URLs in DOM attributes
+let _masterPrompt = '';
+let _chPrompts = {};
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildGPTSection() {
+  _masterPrompt = buildPersonalisedPrompt();
+  const panel = document.getElementById('gpt-master');
+  if (!panel) return;
+  // HTML-escape the preview so bullet points / dashes / brackets render as text
+  const preview = escHtml(_masterPrompt).replace(/\n/g,'<br>');
+  panel.innerHTML = `
+    <div class="gpt-master-title">🤖 YOUR PERSONAL SHADOW WORK AI SESSION</div>
+    <div class="gpt-master-sub">Your reading has generated a personalised shadow work prompt tuned to your exact chakra profile, blocked centers, and dosha archetypes. Open it directly in Claude or ChatGPT — or copy it to use anywhere.</div>
+    <div class="gpt-prompt-preview">${preview}</div>
+    <div class="gpt-btn-row">
+      <button class="gpt-btn gpt-btn-claude" onclick="openMasterPrompt('claude')">🟠 Open in Claude</button>
+      <button class="gpt-btn gpt-btn-gpt"    onclick="openMasterPrompt('gpt')">🟢 Open in ChatGPT</button>
+      <button class="gpt-btn gpt-btn-copy"   onclick="copyMasterPrompt(this)">📋 Copy Prompt</button>
+    </div>`;
+}
+
+function openMasterPrompt(service) {
+  const base = service === 'claude' ? 'https://claude.ai/new?q=' : 'https://chat.openai.com/?q=';
+  window.open(base + encodeURIComponent(_masterPrompt), '_blank');
+}
+
+function openChPrompt(idx, service) {
+  const p = _chPrompts[idx] || '';
+  const base = service === 'claude' ? 'https://claude.ai/new?q=' : 'https://chat.openai.com/?q=';
+  window.open(base + encodeURIComponent(p), '_blank');
+}
+
+function copyMasterPrompt(btn) {
+  copyText(_masterPrompt, btn, '📋 Copy Prompt');
+}
+
+function copyText(text, btn, resetLabel) {
+  const finish = () => { setTimeout(() => { btn.textContent = resetLabel; }, 2500); };
+  navigator.clipboard.writeText(text).then(() => { btn.textContent = '✓ Copied!'; finish(); })
+  .catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.textContent = '✓ Copied!'; finish();
+  });
+}
+
+function buildResourcesHtml(chakraId, archetypeKey) {
+  const res = RESOURCES[chakraId];
+  if (!res) return '';
+  const arc = ARC[archetypeKey];
+  const isBlocked = !arc.h;
+
+  const courseLinks = res.courses.map(c =>
+    `<a class="res-course-link" href="${c.url}" target="_blank" rel="noopener">
+      <span class="res-course-title">🎓 ${c.title}</span>
+      <span class="res-course-desc">${c.desc}</span>
+    </a>`).join('');
+
+  const appTags = res.apps.map(a => `<div class="res-tag">📱 ${a}</div>`).join('');
+  const bookItems = res.books.map(b => `<li>${b}</li>`).join('');
+
+  return `<div class="res-box">
+    <div class="res-title">📚 HEALING RESOURCES${isBlocked ? ' FOR THIS BLOCKAGE' : ' TO DEEPEN THIS GIFT'}</div>
+    <div class="res-section">
+      <div class="res-section-label">Courses & Programs</div>
+      ${courseLinks}
+    </div>
+    <div class="res-section">
+      <div class="res-section-label">Recommended Apps</div>
+      <div class="res-tags">${appTags}</div>
+    </div>
+    <div class="res-section">
+      <div class="res-section-label">Books</div>
+      <ul class="res-books" style="list-style:none;padding:0">${bookItems}</ul>
+    </div>
+  </div>`;
+}
+
+function buildResults(partial = false) {
+  buildChakraDashboard(partial);
+  buildGPTSection();
+  buildSpineMap(partial);
+  buildSummary(partial);
+  buildScoreGrid();
+  buildReflectionBox();
+  buildResultCards(partial);
+  // Trigger bar animations after paint
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.dash-bar').forEach(b => {
+      const w = b.style.width;
+      b.style.width = '0%';
+      requestAnimationFrame(() => { b.style.width = w; });
+    });
+    document.querySelectorAll('.sc-fill').forEach(b => {
+      const w = b.style.width;
+      b.style.width = '0%';
+      requestAnimationFrame(() => { b.style.width = w; });
+    });
+  }));
+}
+
+function buildChakraDashboard(partial) {
+  const panel = document.getElementById('chakra-dashboard');
+  const openCount = Object.values(mainAnswers).filter(k => ARC[k] && ARC[k].h).length;
+  const answered = Object.keys(mainAnswers).length;
+  const flowPct = answered ? Math.round((openCount / answered) * 100) : 0;
+
+  let rows = CHAKRAS.map((ch, i) => {
+    const key = mainAnswers[i];
+    if (!key) {
+      return `<div class="dash-row">
+        <div class="dash-icon" style="background:${ch.color}18;border:1px solid ${ch.color}33;opacity:.4">${ch.emoji}</div>
+        <div class="dash-name" style="color:${ch.color};opacity:.4">${ch.name.split(' ')[0]}</div>
+        <div class="dash-bar-wrap"><div class="dash-bar" style="width:0%;background:${ch.color};--delay:${i*0.12}s"></div></div>
+        <div class="dash-arch" style="opacity:.3">—</div>
+        <div class="dash-status" style="color:#666">? PENDING</div>
+      </div>`;
+    }
+    const arc = ARC[key];
+    const ls = lsAnswers[i];
+    let combined = arc.h ? 'open' : 'blocked';
+    if (arc.h && (ls === 'partial' || ls === 'blocked')) combined = 'partial';
+    const pct = combined === 'open' ? 88 : combined === 'partial' ? 50 : 16;
+    const statusColor = combined === 'open' ? '#44dd88' : combined === 'partial' ? '#ffaa44' : '#ff7777';
+    const statusText = combined === 'open' ? '✓ FLOWING' : combined === 'partial' ? '~ PARTIAL' : '⚠ BLOCKED';
+    const barOpacity = combined === 'blocked' ? '55' : 'dd';
+    return `<div class="dash-row">
+      <div class="dash-icon" style="background:${ch.color}30;border:1px solid ${ch.color}66">${ch.emoji}</div>
+      <div class="dash-name" style="color:${ch.color}">${ch.name.split(' ')[0]}</div>
+      <div class="dash-bar-wrap">
+        <div class="dash-bar" style="width:${pct}%;background:${ch.color}${barOpacity};--delay:${i*0.12}s"></div>
+      </div>
+      <div class="dash-arch">${arc.e} ${arc.n}</div>
+      <div class="dash-status" style="color:${statusColor}">${statusText}</div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="dash-panel-title">YOUR ENERGY FIELD · ${answered} of 7 CENTERS READ · ${flowPct}% FLOWING</div>
+    ${rows}`;
+}
+
+function buildSpineMap(partial) {
+  const c = document.getElementById('spine-map');
+  c.innerHTML = '';
+  CHAKRAS.forEach((ch, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'spine-line-v';
+      c.appendChild(line);
+    }
+    const row = document.createElement('div');
+    row.className = 'spine-row';
+    const key = mainAnswers[i];
+    let cls = '', statusText = '', archLabel = '';
+    if (key !== undefined) {
+      const arc = ARC[key];
+      const ls = lsAnswers[i];
+      let combined = arc.h ? 'open' : 'blocked';
+      if (arc.h && (ls === 'partial' || ls === 'blocked')) combined = 'partial';
+      cls = combined;
+      statusText = combined === 'open' ? '✓ FLOWING' : combined === 'partial' ? '~ PARTLY OPEN' : '⚠ BLOCKED';
+      archLabel = `${arc.e} ${arc.n}`;
+    } else {
+      cls = '';
+      statusText = '? UNANSWERED';
+      archLabel = '— —';
+    }
+    const side = i % 2 === 0 ? 'right' : 'left';
+    row.innerHTML = `
+      <div class="spine-node ${cls}" style="--c:${ch.color};background:${ch.color}${key?'44':'15'};border:2px solid ${ch.color}${key?'77':'22'}">
+        ${ch.emoji}
+        <div class="spine-lbl ${side}">
+          <div style="font-weight:bold;color:${ch.color};font-size:.95em">${ch.name}</div>
+          <div class="spine-arch">${archLabel}</div>
+          <div class="spine-st ${cls}">${statusText}</div>
+        </div>
+      </div>`;
+    c.appendChild(row);
+  });
+}
+
+function buildSummary(partial) {
+  const counts = {};
+  Object.values(mainAnswers).forEach(k => { counts[k] = (counts[k]||0)+1; });
+  if (!Object.keys(counts).length) {
+    document.getElementById('summary-card').innerHTML = '<div style="text-align:center;opacity:.5">Complete more gates to see your summary.</div>';
+    return;
+  }
+  const dominant = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
+  const arc = ARC[dominant];
+  const answered = Object.keys(mainAnswers).length;
+  const openCount = Object.values(mainAnswers).filter(k=>ARC[k].h).length;
+  document.getElementById('summary-card').innerHTML = `
+    <div class="sum-label">YOUR DOMINANT ENERGY ${partial?'(PARTIAL READING)':''}</div>
+    <div class="sum-big">${arc.e}</div>
+    <div class="sum-name">${arc.n}</div>
+    <div class="sum-dosha">${arc.d}</div>
+    <div class="sum-stats">${openCount} of ${answered} answered gates flowing · ${answered-openCount} calling for medicine</div>
+    <div class="sum-desc">${arc.desc}</div>`;
+}
+
+function buildScoreGrid() {
+  const counts = {};
+  Object.values(mainAnswers).forEach(k => { counts[k] = (counts[k]||0)+1; });
+  const maxC = Math.max(...Object.values(counts), 1);
+  const c = document.getElementById('score-grid');
+  c.innerHTML = Object.entries(ARC).map(([key, arc]) => {
+    const ct = counts[key]||0;
+    const pct = Math.round((ct/7)*100);
+    const top = ct===maxC && ct>0;
+    return `<div class="sc-card ${top?'top':''}">
+      <div class="sc-emoji">${arc.e}</div>
+      <div class="sc-name">${arc.n}</div>
+      <div class="sc-count">${ct} of 7 gates</div>
+      <div class="sc-bar"><div class="sc-fill" style="width:${pct}%;background:${arc.c}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function buildReflectionBox() {
+  const box = document.getElementById('reflection-box');
+  // pick 4 random questions
+  const picked = [...REFLECTION_QUESTIONS].sort(()=>Math.random()-.5).slice(0,4);
+  box.innerHTML = `<div class="ref-title">✦ QUESTIONS TO SIT WITH ✦</div>` +
+    picked.map(q => `<div class="ref-q">${q}</div>`).join('');
+}
+
+function buildResultCards(partial) {
+  const c = document.getElementById('result-cards');
+  c.innerHTML = '';
+
+  CHAKRAS.forEach((ch, i) => {
+    const key = mainAnswers[i];
+    const card = document.createElement('div');
+    card.className = 'rc';
+    card.style.cssText = `--c:${ch.color};animation-delay:${i*.08}s`;
+
+    if (!key) {
+      card.innerHTML = `
+        <div class="rc-hd">
+          <div class="rc-badge">${ch.emoji}</div>
+          <div class="rc-info"><div class="rc-chakra">${ch.name} · ${ch.sanskrit}</div><div class="rc-arch">— not yet answered —</div></div>
+          <div class="rc-status" style="background:rgba(100,100,100,.15);color:#888;border:1px solid rgba(100,100,100,.3)">? PENDING</div>
+        </div>
+        <div class="rc-body" style="font-style:italic;opacity:.5">Complete this gate to unlock your reading.</div>`;
+      c.appendChild(card);
+      return;
+    }
+
+    const arc = ARC[key];
+    const med = ch.medicine[key];
+    const ls = lsAnswers[i];
+    const isOpen = arc.h;
+    const isPartial = arc.h && (ls==='partial'||ls==='blocked');
+    const statusCls = isPartial ? 's-partial' : isOpen ? 's-open' : 's-blocked';
+    const statusTxt = isPartial ? '~ PARTLY OPEN' : isOpen ? '✓ FLOWING' : '⚠ BLOCKED';
+
+    let lsNote = '';
+    if (ls && ls !== 'open') {
+      const lsMap = {neutral:'Your lifestyle patterns are adding some friction here.',partial:'Your daily habits are creating meaningful interference at this gate.',blocked:'Your lifestyle choices are significantly amplifying the blockage here.'};
+      lsNote = lsMap[ls]||'';
+    }
+
+    let bodyHtml = '';
+    if (isOpen && !isPartial) {
+      bodyHtml = `<div class="open-aff">✦ ${med.affirm}</div>`;
+      if (lsNote) bodyHtml += `<div class="rc-body" style="margin-top:10px;font-style:italic;font-size:.8em;opacity:.7">${lsNote}</div>`;
+    } else {
+      bodyHtml = `<div class="rc-body">${arc.short}${lsNote ? ' · '+lsNote : ''}</div>
+        <div class="med-box">
+          <div class="med-title">🌿 MEDICINE FOR ${ch.name.toUpperCase()}</div>
+          <ul class="med-list">${med.items.map(it=>`<li>${it}</li>`).join('')}</ul>
+        </div>`;
+    }
+
+    // Shadow work (only for blocked/partial)
+    let swHtml = '';
+    const swKey = !arc.h ? key : null;
+    if (swKey && ch.shadowWork[swKey]) {
+      const prompts = ch.shadowWork[swKey];
+      swHtml = `<div class="sw-box">
+        <div class="sw-title">🤖 SHADOW WORK CHATBOT PROMPTS</div>
+        <div style="font-size:.72em;color:#9977cc;margin-bottom:10px;font-style:italic">Copy these into any AI chatbot (Claude, ChatGPT, etc.) for deep shadow work:</div>
+        ${prompts.map((p,pi) => `<div class="sw-prompt" onclick="copyPrompt(this,'${escQ(p)}')">
+          <span style="font-size:.68em;color:#9977cc;text-transform:uppercase;letter-spacing:1px">Prompt ${pi+1}</span><br>${p}
+          <span class="sw-copy">📋 click to copy</span>
+        </div>`).join('')}
+      </div>`;
+    }
+
+    // Video playlist
+    const vidHtml = `<div class="vid-box">
+      <div class="vid-title">🎬 HEALING PLAYLIST · ${ch.name.toUpperCase()}</div>
+      <a class="vid-link" href="${ch.playlist.url}" target="_blank" rel="noopener">
+        <div class="vid-thumb" style="background:${ch.color}44">▶</div>
+        <span style="color:${ch.color}">${ch.playlist.title}</span>
+      </a>
+    </div>`;
+
+    // Resources (courses, apps, books)
+    const resHtml = buildResourcesHtml(ch.id, key);
+
+    // Individual GPT prompt for this chakra
+    const chPrompt = ch.shadowWork && ch.shadowWork[key] ? ch.shadowWork[key][0] : '';
+    if (chPrompt) _chPrompts[i] = 'You are a shadow work guide specialising in Ayurvedic psychology and chakra healing. Begin a focused session with me on this specific issue: ' + chPrompt;
+    const chGptRow = chPrompt ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="gpt-btn gpt-btn-claude" style="font-size:.72em;padding:8px 14px" onclick="openChPrompt(${i},'claude')">🟠 Claude · This Center</button>
+      <button class="gpt-btn gpt-btn-gpt"    style="font-size:.72em;padding:8px 14px" onclick="openChPrompt(${i},'gpt')">🟢 ChatGPT · This Center</button>
+    </div>` : '';
+
+    card.innerHTML = `
+      <div class="rc-hd">
+        <div class="rc-badge">${ch.emoji}</div>
+        <div class="rc-info">
+          <div class="rc-chakra">${ch.name} · ${ch.sanskrit}</div>
+          <div class="rc-arch">${arc.e} ${arc.n} · ${arc.d}</div>
+          ${ls && ls !== 'open' ? `<div class="rc-ls">Lifestyle signal: ${ls}</div>` : ''}
+        </div>
+        <div class="rc-status ${statusCls}">${statusTxt}</div>
+      </div>
+      ${bodyHtml}
+      ${swHtml}
+      ${chGptRow}
+      ${resHtml}
+      ${vidHtml}`;
+
+    c.appendChild(card);
+  });
+
+  // All playlists section
+  const allVids = document.createElement('div');
+  allVids.style.cssText = 'width:100%;margin-top:10px';
+  allVids.innerHTML = `<div class="vid-box" style="border-color:rgba(255,215,0,.25)">
+    <div class="vid-title" style="color:#ffd700">🎬 ALL HEALING PLAYLISTS</div>
+    ${CHAKRAS.map(ch=>`<a class="vid-link" href="${ch.playlist.url}" target="_blank" rel="noopener">
+      <div class="vid-thumb" style="background:${ch.color}44">${ch.emoji}</div>
+      <span style="color:${ch.color}">${ch.name}</span>
+    </a>`).join('')}
+  </div>`;
+  c.appendChild(allVids);
+}
+
+function escQ(s) { return s.replace(/'/g,"\\'").replace(/\n/g,' '); }
+
+function copyPrompt(el, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    el.classList.add('copied');
+    const span = el.querySelector('.sw-copy');
+    if (span) span.textContent = '✓ Copied!';
+    setTimeout(() => {
+      el.classList.remove('copied');
+      if (span) span.textContent = '📋 click to copy';
+    }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const span = el.querySelector('.sw-copy');
+    if (span) { span.textContent = '✓ Copied!'; setTimeout(()=>span.textContent='📋 click to copy',2000); }
+  });
+}
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

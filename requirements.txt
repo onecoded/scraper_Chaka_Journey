@@ -1,0 +1,36 @@
+# Deal Flow & Matching App — Dependencies
+# Install with: pip install -r requirements.txt
+
+# HTTP + Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.3
+lxml>=5.1.0
+
+# Browser automation (bypasses Akamai/Cloudflare bot detection)
+playwright>=1.40.0
+playwright-stealth>=1.0.0
+# After install, also run: python -m playwright install chromium
+
+# PDF Parsing
+pdfplumber>=0.11.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.26.0
+
+# Claude API
+anthropic>=0.25.0
+
+# Google Integration
+google-api-python-client>=2.118.0
+google-auth-httplib2>=0.2.0
+google-auth-oauthlib>=1.2.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Social Media Cross-Poster
+pytrends>=4.9.2          # Google Trends (free, no API key)
+praw>=7.7.1              # Reddit trending posts (read-only, free)
+feedparser>=6.0.11       # RSS feed reader (free)
+Pillow>=10.0.0           # Image processing (resize/compress before upload)
