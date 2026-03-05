@@ -256,6 +256,51 @@ body{cursor:crosshair}
 
 @media(max-width:600px){.ap-grid{grid-template-columns:repeat(2,1fr)}.score-grid{grid-template-columns:repeat(2,1fr)}.gate-card{padding:18px 14px}.spine-lbl{display:none}.ph-label{display:none}}
 
+/* CONTACT GATE SCREEN */
+#screen-contact{justify-content:center;min-height:100vh;padding:40px 18px}
+.cp-privacy{font-size:.7em;color:#554477;margin-top:14px;font-style:italic;letter-spacing:1px}
+
+/* ORACLE LINK BUTTON */
+.oracle-link-btn{background:linear-gradient(135deg,#5500bb,#bb00ff);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:30px;font-size:.88em;letter-spacing:1px;text-transform:uppercase;border:none;cursor:pointer;font-family:inherit;transition:all .25s;box-shadow:0 0 18px rgba(140,0,255,.3)}
+.oracle-link-btn:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(140,0,255,.6);filter:brightness(1.1)}
+
+/* YOUTUBE EMBED */
+.vid-embed-wrap{border-radius:10px;overflow:hidden;margin:8px 0;background:#000;position:relative;aspect-ratio:16/9}
+.vid-embed-wrap iframe{width:100%;height:100%;display:block;border:0;position:absolute;inset:0}
+.vid-note{font-size:.75em;color:#8899aa;font-style:italic;margin-top:6px;text-align:center}
+
+/* SURPRISE GIFT */
+.gift-reveal-box{width:100%;max-width:700px;margin:20px 0}
+.gift-lock{background:linear-gradient(135deg,rgba(180,140,0,.15),rgba(255,215,0,.08));border:1px solid rgba(255,215,0,.28);border-radius:18px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .3s;animation:giftGlow 3s ease-in-out infinite}
+.gift-lock:hover{background:linear-gradient(135deg,rgba(180,140,0,.25),rgba(255,215,0,.15));border-color:rgba(255,215,0,.55);transform:scale(1.01)}
+@keyframes giftGlow{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.12)}50%{box-shadow:0 0 45px rgba(255,215,0,.3)}}
+.gift-lock-emoji{font-size:3em;display:block;margin-bottom:12px;animation:giftFloat 2s ease-in-out infinite alternate}
+@keyframes giftFloat{from{transform:translateY(-5px)}to{transform:translateY(5px)}}
+.gift-lock-text{font-size:.78em;letter-spacing:3px;text-transform:uppercase;color:#ffd700;margin-bottom:8px}
+.gift-lock-sub{font-size:.88em;color:#aa9955;font-style:italic;line-height:1.65}
+.gift-content{background:linear-gradient(135deg,rgba(0,50,20,.5),rgba(0,120,60,.2));border:1px solid rgba(0,200,80,.3);border-radius:18px;padding:32px 24px;text-align:center;animation:fadeIn .6s ease}
+.gift-title{font-size:1.5em;color:#44ff88;letter-spacing:2px;margin-bottom:16px;text-shadow:0 0 20px rgba(0,255,100,.4)}
+.gift-body{font-size:.9em;color:#c0e8cc;line-height:1.9;max-width:520px;margin:0 auto}
+.gift-body p{margin-bottom:10px}
+.gift-body strong{color:#88ffaa;font-style:normal}
+.gift-body em{color:#aaddcc}
+
+/* MOBILE TOUCH + RESPONSIVE */
+@media(max-width:768px){
+  .ans-btn,.ls-btn{touch-action:none;-webkit-tap-highlight-color:transparent;min-height:52px}
+  .btn-enter,.of-continue,.btn-next,.btn-save{touch-action:manipulation}
+  .cf-row{flex-direction:column}
+  .cf-row input{min-width:100%;flex:none}
+  .gpt-btn-row{flex-direction:column}
+  .oracle-link-btn{justify-content:center;width:100%;box-sizing:border-box}
+  .vid-embed-wrap{margin:6px 0}
+  .intro-wisdom{font-size:.84em}
+  .gift-lock,.gift-content{padding:24px 16px}
+  .trans-orb-grid{padding:0 10px}
+  .t-orb-bar-wrap{width:90px}
+  .t-orb-info{max-width:130px}
+}
+
 /* ===================== CUSTOM GPT BLOCK ===================== */
 .gpt-master{width:100%;max-width:700px;background:linear-gradient(135deg,rgba(0,80,200,.12),rgba(100,0,255,.1));border:1px solid rgba(100,100,255,.25);border-radius:18px;padding:24px;margin-bottom:26px}
 .gpt-master-title{font-size:.72em;letter-spacing:3px;text-transform:uppercase;color:#8899ff;margin-bottom:6px;display:flex;align-items:center;gap:8px}
@@ -394,32 +439,41 @@ body{cursor:crosshair}
   </div>
 </div>
 
+<!-- CONTACT GATE (required before results) -->
+<div id="screen-contact" class="screen no-top">
+  <div class="intro-portal" style="max-width:600px">
+    <div class="intro-eyebrow">✦ Your reading awaits ✦</div>
+    <div class="rainbow" style="font-size:clamp(1.8em,5vw,2.8em)">UNLOCK<br>YOUR SOUL MAP</div>
+    <div class="intro-tagline">Enter your details to claim your full chakra reading</div>
+    <div class="contact-panel" style="margin-top:24px">
+      <div class="cp-title">🔮 CLAIM YOUR READING</div>
+      <div class="cp-sub">Your unique soul map is ready — enter your details to access it now and receive a personal link to return anytime</div>
+      <form id="contact-form" onsubmit="submitContact(event)">
+        <div class="cf-row">
+          <input id="cf-name"  type="text"  placeholder="Your Name *" required autocomplete="name" />
+          <input id="cf-email" type="email" placeholder="Email Address *" required autocomplete="email" />
+        </div>
+        <div class="cf-row">
+          <input id="cf-phone" type="tel"  placeholder="Phone (optional)" autocomplete="tel" />
+          <input id="cf-fb"    type="text" placeholder="Facebook (optional)" />
+          <input id="cf-ig"    type="text" placeholder="Instagram @handle (optional)" />
+        </div>
+        <button type="submit" class="btn-save">🔮 ACCESS MY SOUL MAP</button>
+      </form>
+    </div>
+    <div class="cp-privacy">🔒 Your information is private and never shared. Used only to save your personal reading.</div>
+  </div>
+</div>
+
 <!-- RESULTS -->
 <div id="screen-results" class="screen">
   <div class="results-title">YOUR CHAKRA READING</div>
   <div class="results-sub">Seven centers. Seven truths. One magnificent, messy, whole you.</div>
 
-  <!-- CONTACT / SAVE PANEL -->
-  <div class="contact-panel">
-    <div class="cp-title">💾 SAVE YOUR SOUL MAP</div>
-    <div class="cp-sub">Get your personal healing link so you can return to this reading anytime</div>
-    <form id="contact-form" onsubmit="submitContact(event)">
-      <div class="cf-row">
-        <input id="cf-name"  type="text"  placeholder="Your Name *" required />
-        <input id="cf-email" type="email" placeholder="Email Address *" required />
-      </div>
-      <div class="cf-row">
-        <input id="cf-phone" type="tel"  placeholder="Phone (optional)" />
-        <input id="cf-fb"    type="text" placeholder="Facebook (optional)" />
-        <input id="cf-ig"    type="text" placeholder="Instagram @handle (optional)" />
-      </div>
-      <button type="submit" class="btn-save">🔐 SAVE MY READING &amp; GET RETURN LINK</button>
-    </form>
-    <div id="contact-saved" style="display:none" class="cp-saved">
-      ✅ <span id="cp-saved-name">Your</span> reading is saved!
-      <button onclick="copyReturnLink(this)" class="btn-return-link">📋 Copy Return Link</button>
-      <div class="cp-return-note">Paste this link anywhere to return to your personal reading</div>
-    </div>
+  <!-- Return link (only shown for returning users / after save) -->
+  <div id="return-link-panel" style="display:none;text-align:center;margin-bottom:16px">
+    <button onclick="copyReturnLink(this)" class="btn-return-link">📋 Copy Return Link</button>
+    <div class="cp-return-note">Bookmark this link to return to your reading anytime</div>
   </div>
 
   <div id="chakra-dashboard" class="dash-panel"></div>
@@ -812,6 +866,54 @@ const CHAKRAS = [
   }
 ];
 
+// =============================================
+// CURATED HEALING VIDEOS (per chakra, open vs blocked)
+// Admin can override video IDs via localStorage['chakra_videos']
+// Format: { root: { open: {id, title, note}, blocked: {id, title, note} }, ... }
+// =============================================
+const CURATED_VIDEOS = {
+  root: {
+    open:    { id: '_RQ9S1u7ag4', title: 'Root Chakra 396Hz — Grounding & Stability',  note: 'Strengthen what\'s already flowing in your foundation' },
+    blocked: { id: '_RQ9S1u7ag4', title: 'Root Chakra Healing — Release Fear & Find Safety', note: 'Return to the ground beneath you' }
+  },
+  sacral: {
+    open:    { id: 'orklnRP7R84', title: 'Sacral Chakra 417Hz — Creative Flow Activation', note: 'Amplify your creative and sensual aliveness' },
+    blocked: { id: 'orklnRP7R84', title: 'Sacral Chakra Healing — Restore Joy & Desire',  note: 'Thaw what\'s been frozen and invite feeling back' }
+  },
+  solar: {
+    open:    { id: 'DGfrJu-Ck8o', title: 'Solar Plexus 528Hz — Power & Confidence', note: 'Feed the clean fire of your will' },
+    blocked: { id: 'DGfrJu-Ck8o', title: 'Solar Plexus Healing — Reclaim Your Power',    note: 'Transform scattered fire into directed strength' }
+  },
+  heart: {
+    open:    { id: '6JgHR84lOZc', title: 'Heart Chakra 639Hz — Love & Connection',  note: 'Deepen the love that already flows through you' },
+    blocked: { id: '6JgHR84lOZc', title: 'Heart Chakra Healing — Open to Love Again', note: 'Gently unseal what heartbreak has protected' }
+  },
+  throat: {
+    open:    { id: 'WV8EKJP0DgQ', title: 'Throat Chakra 741Hz — Authentic Expression', note: 'Speak more of what you already know to be true' },
+    blocked: { id: 'WV8EKJP0DgQ', title: 'Throat Chakra Healing — Find Your True Voice', note: 'Let what has been swallowed finally rise and be heard' }
+  },
+  thirdeye: {
+    open:    { id: 'cknepREzUzI', title: 'Third Eye 852Hz — Intuition & Clarity',   note: 'Trust and sharpen the inner knowing you carry' },
+    blocked: { id: 'cknepREzUzI', title: 'Third Eye Healing — See Clearly Again',    note: 'Clear the fog and return to your own sight' }
+  },
+  crown: {
+    open:    { id: '_RQ9S1u7ag4', title: 'Crown Chakra 963Hz — Connection & Purpose', note: 'Deepen your relationship with what is vast and true' },
+    blocked: { id: '_RQ9S1u7ag4', title: 'Crown Chakra Healing — Reconnect to Meaning', note: 'Come back to the belonging you never actually lost' }
+  }
+};
+
+function getCuratedVideo(chakraId, isOpen) {
+  // Admin override via localStorage
+  const overrides = JSON.parse(localStorage.getItem('chakra_videos') || '{}');
+  if (overrides[chakraId]) {
+    const ov = overrides[chakraId];
+    return { id: ov, title: CURATED_VIDEOS[chakraId][(isOpen?'open':'blocked')].title, note: '' };
+  }
+  const vids = CURATED_VIDEOS[chakraId];
+  if (!vids) return null;
+  return isOpen ? vids.open : vids.blocked;
+}
+
 const REFLECTION_QUESTIONS = [
   '"What would you do if you knew you would not fail?"',
   '"Are you living your truth? Where are you pointing your arrows?"',
@@ -1124,6 +1226,80 @@ function addProximitySelect(btn, color, freq, onSelect, opts = {}) {
       if (dotEl) { dotEl.style.transform = dotEl.style.opacity = dotEl.style.boxShadow = ''; }
     }
   });
+
+  // ── TOUCH SUPPORT ──────────────────────────────────
+  function handleTouchMove(e) {
+    if (triggered) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    if (!t) return;
+    const dc   = dotCenter();
+    const dx   = t.clientX - dc.x, dy = t.clientY - dc.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const maxRange = isPortal ? 270 : 190;
+    const prox = Math.max(0, 1 - dist / maxRange);
+
+    setProxVol(prox);
+
+    const br = btn.getBoundingClientRect();
+    btn.style.setProperty('--mx', ((t.clientX - br.left) / br.width  * 100).toFixed(1) + '%');
+    btn.style.setProperty('--my', ((t.clientY - br.top)  / br.height * 100).toFixed(1) + '%');
+
+    if (!isPortal) {
+      btn.style.transform = `scale(${1 + prox * 0.04})`;
+    } else {
+      btn.style.transform = `scale(${1 + prox * 0.07})`;
+    }
+    btn.style.boxShadow   = `0 0 ${prox*55}px ${color}88, 0 0 ${prox*100}px ${color}33`;
+    btn.style.borderColor = `${color}`;
+    btn.style.opacity     = (0.72 + prox * 0.28).toString();
+
+    const dotEl = btn.querySelector('.ans-dot, .portal-dot');
+    if (dotEl) {
+      const dp = Math.max(0, 1 - dist / 85);
+      dotEl.style.transform = isPortal
+        ? `scale(${1 + dp * 2.8})`
+        : `translateY(-50%) scale(${1 + dp * 3.8})`;
+      dotEl.style.opacity   = (0.2 + dp * 0.8).toString();
+      dotEl.style.boxShadow = `0 0 ${dp*35}px ${dp*12}px ${color}`;
+    }
+
+    if (dist < dc.r * 1.4) {
+      if (!dwellTimer && !charging) {
+        charging = true;
+        btn.classList.add('dot-charging');
+        dwellTimer = setTimeout(() => {
+          if (!triggered) {
+            triggered = true;
+            setProxVol(0);
+            playSelectTone(freq);
+            btn.classList.remove('dot-charging');
+            btn.classList.add('dot-burst');
+            setTimeout(onSelect, 90);
+          }
+        }, DWELL_MS + 80); // slightly longer dwell for touch accuracy
+      }
+    } else if (dwellTimer) {
+      clearTimeout(dwellTimer); dwellTimer = null; charging = false;
+      btn.classList.remove('dot-charging');
+    }
+  }
+
+  function handleTouchEnd() {
+    setProxVol(0);
+    if (dwellTimer) { clearTimeout(dwellTimer); dwellTimer = null; }
+    charging = false;
+    if (!triggered) {
+      btn.classList.remove('dot-charging');
+      btn.style.transform = btn.style.boxShadow = btn.style.borderColor = btn.style.opacity = '';
+      const dotEl = btn.querySelector('.ans-dot, .portal-dot');
+      if (dotEl) { dotEl.style.transform = dotEl.style.opacity = dotEl.style.boxShadow = ''; }
+    }
+  }
+
+  btn.addEventListener('touchmove',  handleTouchMove, { passive: false });
+  btn.addEventListener('touchend',   handleTouchEnd,  { passive: true  });
+  btn.addEventListener('touchcancel',handleTouchEnd,  { passive: true  });
 }
 
 // Session persistence
@@ -1239,11 +1415,12 @@ function submitContact(e) {
   const fb    = document.getElementById('cf-fb').value.trim();
   const ig    = document.getElementById('cf-ig').value.trim();
   saveSession({name, email, phone, fb, ig});
-  document.getElementById('contact-form').style.display = 'none';
-  document.getElementById('contact-saved').style.display = 'block';
-  // Personalise the saved note
-  const nameEl = document.getElementById('cp-saved-name');
-  if (nameEl && name) nameEl.textContent = name + ', your';
+  // Show return link panel on results page
+  const rlPanel = document.getElementById('return-link-panel');
+  if (rlPanel) rlPanel.style.display = 'block';
+  // Advance to results
+  try { buildResults(); } catch(ex) { console.error('buildResults error:', ex); }
+  showScreen('screen-results');
 }
 
 // =============================================
@@ -1324,11 +1501,9 @@ function init() {
     if (session) {
       try { buildResults(); } catch(e) { console.error('Session restore error:', e); }
       showScreen('screen-results');
-      // Pre-fill contact form as already saved
-      document.getElementById('contact-form').style.display = 'none';
-      document.getElementById('contact-saved').style.display = 'block';
-      const nameEl = document.getElementById('cp-saved-name');
-      if (nameEl && session.name) nameEl.textContent = session.name + ', your';
+      // Returning user — show return link panel instead of contact gate
+      const rlPanel = document.getElementById('return-link-panel');
+      if (rlPanel) rlPanel.style.display = 'block';
     }
   }
 }
@@ -1683,6 +1858,11 @@ function runTransitionReveal() {
 }
 
 function launchResults() {
+  if (!_sessionSaved) {
+    // Route through required contact gate first
+    showScreen('screen-contact');
+    return;
+  }
   try { buildResults(); } catch(e) { console.error('buildResults error:', e); }
   showScreen('screen-results');
 }
@@ -1742,28 +1922,31 @@ function buildGPTSection() {
   _masterPrompt = buildPersonalisedPrompt();
   const panel = document.getElementById('gpt-master');
   if (!panel) return;
-  // HTML-escape the preview so bullet points / dashes / brackets render as text
   const preview = escHtml(_masterPrompt).replace(/\n/g,'<br>');
   panel.innerHTML = `
-    <div class="gpt-master-title">🤖 YOUR PERSONAL SHADOW WORK AI SESSION</div>
-    <div class="gpt-master-sub">Your reading has generated a personalised shadow work prompt tuned to your exact chakra profile, blocked centers, and dosha archetypes. Open it directly in Claude or ChatGPT — or copy it to use anywhere.</div>
+    <div class="gpt-master-title">🔮 YOUR PERSONAL SHADOW WORK ORACLE</div>
+    <div class="gpt-master-sub">Your reading has generated a personalised shadow work session tuned to your exact chakra profile, blocked centers, and dosha archetypes. Open it in Claude and begin your session now.</div>
     <div class="gpt-prompt-preview">${preview}</div>
     <div class="gpt-btn-row">
-      <button class="gpt-btn gpt-btn-claude" onclick="openMasterPrompt('claude')">🟠 Open in Claude</button>
-      <button class="gpt-btn gpt-btn-gpt"    onclick="openMasterPrompt('gpt')">🟢 Open in ChatGPT</button>
-      <button class="gpt-btn gpt-btn-copy"   onclick="copyMasterPrompt(this)">📋 Copy Prompt</button>
+      <button class="oracle-link-btn" onclick="openMasterPrompt('claude')">🔮 Open Your Custom Oracle</button>
     </div>`;
 }
 
 function openMasterPrompt(service) {
-  const base = service === 'claude' ? 'https://claude.ai/new?q=' : 'https://chat.openai.com/?q=';
-  window.open(base + encodeURIComponent(_masterPrompt), '_blank');
+  window.open('https://claude.ai/new?q=' + encodeURIComponent(_masterPrompt), '_blank');
 }
 
-function openChPrompt(idx, service) {
+function openChPrompt(idx) {
   const p = _chPrompts[idx] || '';
-  const base = service === 'claude' ? 'https://claude.ai/new?q=' : 'https://chat.openai.com/?q=';
-  window.open(base + encodeURIComponent(p), '_blank');
+  if (!p) return;
+  window.open('https://claude.ai/new?q=' + encodeURIComponent(p), '_blank');
+}
+
+let _swPrompts = {};
+function openSwPrompt(gateIdx, promptIdx) {
+  const p = _swPrompts[gateIdx] && _swPrompts[gateIdx][promptIdx];
+  if (!p) return;
+  window.open('https://claude.ai/new?q=' + encodeURIComponent(p), '_blank');
 }
 
 function copyMasterPrompt(btn) {
@@ -1821,6 +2004,7 @@ function buildResults(partial = false) {
   buildScoreGrid();
   buildReflectionBox();
   buildResultCards(partial);
+  buildSurpriseGift();
   // Trigger bar animations after paint
   requestAnimationFrame(() => requestAnimationFrame(() => {
     document.querySelectorAll('.dash-bar').forEach(b => {
@@ -2011,23 +2195,40 @@ function buildResultCards(partial) {
         </div>`;
     }
 
-    // Shadow work (only for blocked/partial)
+    // Shadow work (only for blocked/partial) — direct Claude links
     let swHtml = '';
     const swKey = !arc.h ? key : null;
     if (swKey && ch.shadowWork[swKey]) {
       const prompts = ch.shadowWork[swKey];
+      if (!_swPrompts[i]) _swPrompts[i] = [];
+      prompts.forEach((p, pi) => { _swPrompts[i][pi] = p; });
       swHtml = `<div class="sw-box">
-        <div class="sw-title">🤖 SHADOW WORK CHATBOT PROMPTS</div>
-        <div style="font-size:.72em;color:#9977cc;margin-bottom:10px;font-style:italic">Copy these into any AI chatbot (Claude, ChatGPT, etc.) for deep shadow work:</div>
-        ${prompts.map((p,pi) => `<div class="sw-prompt" onclick="copyPrompt(this,'${escQ(p)}')">
-          <span style="font-size:.68em;color:#9977cc;text-transform:uppercase;letter-spacing:1px">Prompt ${pi+1}</span><br>${p}
-          <span class="sw-copy">📋 click to copy</span>
-        </div>`).join('')}
+        <div class="sw-title">🔮 SHADOW WORK ORACLE PROMPTS</div>
+        <div style="font-size:.72em;color:#9977cc;margin-bottom:10px;font-style:italic">Click any prompt to open a personal Oracle session in Claude:</div>
+        ${prompts.map((p,pi) => `<button class="sw-prompt" style="width:100%;background:none;text-align:left;font-family:inherit" onclick="openSwPrompt(${i},${pi})">
+          <span style="font-size:.68em;color:#9977cc;text-transform:uppercase;letter-spacing:1px">Prompt ${pi+1}</span><br>${escHtml(p)}
+          <span class="sw-copy">🔮 Open in Oracle →</span>
+        </button>`).join('')}
       </div>`;
     }
 
-    // Video playlist
-    const vidHtml = `<div class="vid-box">
+    // Curated YouTube embed
+    const vid = getCuratedVideo(ch.id, isOpen && !isPartial);
+    const vidHtml = vid ? `<div class="vid-box">
+      <div class="vid-title">🎬 HEALING VIDEO · ${ch.name.toUpperCase()}</div>
+      <div class="vid-embed-wrap">
+        <iframe src="https://www.youtube.com/embed/${vid.id}?rel=0&modestbranding=1"
+                title="${escHtml(vid.title)}"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen loading="lazy"></iframe>
+      </div>
+      ${vid.note ? `<div class="vid-note">${escHtml(vid.note)}</div>` : ''}
+      <a class="vid-link" style="margin-top:8px" href="${ch.playlist.url}" target="_blank" rel="noopener">
+        <div class="vid-thumb" style="background:${ch.color}44">▶</div>
+        <span style="color:${ch.color}">View Full ${ch.playlist.title}</span>
+      </a>
+    </div>` : `<div class="vid-box">
       <div class="vid-title">🎬 HEALING PLAYLIST · ${ch.name.toUpperCase()}</div>
       <a class="vid-link" href="${ch.playlist.url}" target="_blank" rel="noopener">
         <div class="vid-thumb" style="background:${ch.color}44">▶</div>
@@ -2038,12 +2239,11 @@ function buildResultCards(partial) {
     // Resources (courses, apps, books)
     const resHtml = buildResourcesHtml(ch.id, key);
 
-    // Individual GPT prompt for this chakra
+    // Individual Oracle prompt for this chakra
     const chPrompt = ch.shadowWork && ch.shadowWork[key] ? ch.shadowWork[key][0] : '';
     if (chPrompt) _chPrompts[i] = 'You are a shadow work guide specialising in Ayurvedic psychology and chakra healing. Begin a focused session with me on this specific issue: ' + chPrompt;
-    const chGptRow = chPrompt ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="gpt-btn gpt-btn-claude" style="font-size:.72em;padding:8px 14px" onclick="openChPrompt(${i},'claude')">🟠 Claude · This Center</button>
-      <button class="gpt-btn gpt-btn-gpt"    style="font-size:.72em;padding:8px 14px" onclick="openChPrompt(${i},'gpt')">🟢 ChatGPT · This Center</button>
+    const chGptRow = chPrompt ? `<div style="margin-top:10px">
+      <button class="oracle-link-btn" style="font-size:.75em;padding:9px 16px" onclick="openChPrompt(${i})">🔮 Open Oracle for This Center</button>
     </div>` : '';
 
     card.innerHTML = `
@@ -2078,30 +2278,74 @@ function buildResultCards(partial) {
   c.appendChild(allVids);
 }
 
-function escQ(s) { return s.replace(/'/g,"\\'").replace(/\n/g,' '); }
+// =============================================
+// SURPRISE GIFT (for trusted users — 5+ open centers)
+// =============================================
+function buildSurpriseGift() {
+  const openCount = CHAKRAS.filter((ch, i) => {
+    const key = mainAnswers[i];
+    if (!key) return false;
+    const arc = ARC[key];
+    const ls = lsAnswers[i];
+    return arc && arc.h && (ls === 'open' || ls === 'neutral');
+  }).length;
 
-function copyPrompt(el, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    el.classList.add('copied');
-    const span = el.querySelector('.sw-copy');
-    if (span) span.textContent = '✓ Copied!';
-    setTimeout(() => {
-      el.classList.remove('copied');
-      if (span) span.textContent = '📋 click to copy';
-    }, 2000);
-  }).catch(() => {
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    const span = el.querySelector('.sw-copy');
-    if (span) { span.textContent = '✓ Copied!'; setTimeout(()=>span.textContent='📋 click to copy',2000); }
-  });
+  if (openCount < 5) return; // Only for trusted / highly open users
+
+  const gift = document.createElement('div');
+  gift.className = 'gift-reveal-box';
+  gift.innerHTML = `
+    <div class="gift-lock" id="gift-lock" onclick="revealGift()">
+      <span class="gift-lock-emoji">🎁</span>
+      <div class="gift-lock-text">You have unlocked a special gift</div>
+      <div class="gift-lock-sub">Your energy field is remarkably open.<br>Tap to reveal your reward.</div>
+    </div>
+    <div class="gift-content" id="gift-content" style="display:none">
+      <div class="gift-title">🌟 YOU ARE ALREADY HEALING</div>
+      <div class="gift-body">
+        <p>With <strong>${openCount} of 7</strong> energy centres flowing freely, you carry something rare.</p>
+        <p>You are not here to be fixed. You are here to <em>expand</em>.</p>
+        <p>Your gift: a personalised <strong>integration session</strong> — not shadow work, but <em>soul work</em>. Open your oracle below and let it witness what you've already become.</p>
+        <div style="margin-top:22px">
+          <button class="oracle-link-btn" style="font-size:.92em;padding:14px 28px" onclick="openGiftOracle()">✨ Open Your Integration Oracle</button>
+        </div>
+      </div>
+    </div>`;
+
+  const closingWisdom = document.querySelector('#screen-results .closing-wisdom');
+  if (closingWisdom) closingWisdom.parentNode.insertBefore(gift, closingWisdom);
 }
+
+function revealGift() {
+  const lock = document.getElementById('gift-lock');
+  const content = document.getElementById('gift-content');
+  if (lock) lock.style.display = 'none';
+  if (content) content.style.display = 'block';
+}
+
+function openGiftOracle() {
+  const openChakras = CHAKRAS.filter((ch, i) => {
+    const key = mainAnswers[i];
+    return key && ARC[key] && ARC[key].h && (lsAnswers[i] === 'open' || lsAnswers[i] === 'neutral');
+  }).map(ch => ch.name);
+
+  const prompt = `You are a radiant integration guide who works with people who are already in significant energetic flow. You do NOT use shadow work language — instead you work with expansion, embodiment, and deepening gifts.
+
+My chakra reading shows ${openChakras.length} of 7 energy centres as flowing and open: ${openChakras.join(', ')}.
+
+I am not broken. I am not starting from zero. I am here to expand.
+
+Please begin an integration session with me. Help me:
+1. Understand the unique gifts and responsibilities that come with having these centres open
+2. Explore how I can deepen and share these gifts in my life, relationships, and work
+3. Identify what my open centres want to create or contribute in the world
+4. Connect what I've already healed to a greater purpose
+
+Begin now — speak to who I am becoming, not who I was healing from.`;
+
+  window.open('https://claude.ai/new?q=' + encodeURIComponent(prompt), '_blank');
+}
+
 
 window.addEventListener('load', init);
 </script>

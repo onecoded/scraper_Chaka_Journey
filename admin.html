@@ -96,6 +96,20 @@ td{padding:11px 14px;vertical-align:middle}
 .empty-state{text-align:center;padding:60px 20px;color:#554477;font-style:italic}
 .empty-state .es-icon{font-size:2.5em;margin-bottom:12px}
 
+/* ── VIDEO MANAGEMENT ── */
+.vid-mgmt-panel{background:rgba(0,80,180,.06);border:1px solid rgba(0,120,255,.15);border-radius:14px;padding:24px;margin-bottom:30px}
+.vid-mgmt-title{font-size:.72em;letter-spacing:3px;text-transform:uppercase;color:#44aaff;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.vid-mgmt-sub{font-size:.8em;color:#7799bb;margin-bottom:18px;font-style:italic}
+.vid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.vid-row{background:rgba(0,0,0,.25);border:1px solid rgba(0,120,255,.12);border-radius:10px;padding:14px}
+.vid-chakra-label{font-size:.75em;font-weight:bold;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.vid-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 10px;color:#e8e0f0;font-family:monospace;font-size:.82em;outline:none;margin-bottom:4px;transition:border-color .2s}
+.vid-input:focus{border-color:rgba(0,150,255,.5)}
+.vid-input-label{font-size:.68em;color:#556677;margin-bottom:4px;letter-spacing:.5px}
+.vid-save-btn{background:linear-gradient(135deg,#004499,#0066cc);border:none;border-radius:8px;color:#fff;padding:9px 22px;font-family:inherit;font-size:.8em;cursor:pointer;letter-spacing:1px;margin-top:6px;transition:all .25s}
+.vid-save-btn:hover{box-shadow:0 0 20px rgba(0,100,255,.4)}
+.vid-preview-link{font-size:.7em;color:#4488aa;margin-top:4px;display:block;word-break:break-all}
+
 /* ── TOAST ── */
 #toast{position:fixed;bottom:30px;right:30px;background:rgba(40,10,80,.95);border:1px solid rgba(140,80,255,.4);border-radius:12px;padding:12px 22px;color:#cc99ff;font-size:.85em;letter-spacing:1px;opacity:0;transform:translateY(12px);transition:all .3s;pointer-events:none;z-index:300}
 #toast.show{opacity:1;transform:translateY(0)}
@@ -132,6 +146,17 @@ td{padding:11px 14px;vertical-align:middle}
       <div class="stat-card stat-trusted"><div class="sc-num" id="stat-trusted">0</div><div class="sc-label">🌟 Trusted</div></div>
       <div class="stat-card stat-trusting"><div class="sc-num" id="stat-trusting">0</div><div class="sc-label">🌱 Trusting</div></div>
       <div class="stat-card stat-untrusted"><div class="sc-num" id="stat-untrusted">0</div><div class="sc-label">🌑 Don't Trust Yet</div></div>
+    </div>
+
+    <!-- Video Management -->
+    <div class="vid-mgmt-panel">
+      <div class="vid-mgmt-title">🎬 Healing Video Management</div>
+      <div class="vid-mgmt-sub">Override the default YouTube video IDs shown in each chakra card. Enter a YouTube video ID (e.g. <code style="color:#88ccff">dQw4w9WgXcQ</code>) — leave blank to use the curated defaults.</div>
+      <div class="vid-grid" id="vid-grid"></div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="vid-save-btn" onclick="saveVideoIds()">💾 Save Video Overrides</button>
+        <button class="vid-save-btn" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15)" onclick="resetVideoIds()">↩ Reset to Defaults</button>
+      </div>
     </div>
 
     <!-- Filter Bar -->
