@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "GroupText",
+    "slug": "group-text-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#007AFF"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.grouptext.app",
+      "infoPlist": {
+        "NSContactsUsageDescription": "GroupText needs access to your contacts to let you select recipients for messages."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#007AFF"
+      },
+      "permissions": [
+        "READ_CONTACTS",
+        "SEND_SMS"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Allow GroupText to access your contacts."
+        }
+      ]
+    ]
+  }
+}
