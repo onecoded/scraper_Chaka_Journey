@@ -377,48 +377,87 @@ def _clean_domain(raw: str) -> str:
     s = s.replace("www.", "")
     return s
 
-def enrich_emails_hunter(deal: dict) -> dict:
+def enrich_emails_apollo(deal: dict) -> dict:
     """
-    Use Hunter.io domain-search to find email + owner for a lead with a website.
+    Use Apollo.io people search to find owner email + phone for a lead with a website.
+    Apollo is much higher quality + cheaper than Hunter for this use case.
     Returns dict of fields to update.
     """
-    hunter_key = os.getenv("HUNTER_API_KEY", "")
-    if not hunter_key or hunter_key in ("", "REPLACE_ME", "your-hunter-api-key"):
+    apollo_key = os.getenv("APOLLO_API_KEY", "")
+    if not apollo_key or apollo_key in ("", "REPLACE_ME", "your-apollo-api-key"):
         return {}
     raw_domain = deal.get("company_domain", "")
-    if not raw_domain or "yelp.com" in raw_domain or "manta.com" in raw_domain:
-        return {}  # Skip directory URLs — Hunter won't find anything
+    if not raw_domain:
+        return {}
+    if any(d in raw_domain.lower() for d in ("yelp.com", "manta.com", "yellowpages.com", "bbb.org", "file://")):
+        return {}  # Skip directory URLs and local files
     domain = _clean_domain(raw_domain)
     if not domain or "." not in domain:
         return {}
     import requests as _req
+    # Search for senior people at the company domain
     try:
-        resp = _req.get(
-            "https://api.hunter.io/v2/domain-search",
-            params={"domain": domain, "api_key": hunter_key, "limit": 5},
-            timeout=12,
+        resp = _req.post(
+            "https://api.apollo.io/v1/mixed_people/search",
+            headers={"X-Api-Key": apollo_key, "Content-Type": "application/json"},
+            json={
+                "q_organization_domains_list": [domain],
+                "person_seniorities": ["c_suite", "owner", "founder", "vp"],
+                "page": 1, "per_page": 5,
+            },
+            timeout=15,
         )
         data = resp.json()
     except Exception:
         return {}
-    if data.get("errors"):
+    people = data.get("people") or []
+    if not people:
         return {}
-    d = data.get("data", {})
-    emails = d.get("emails", []) or []
-    if not emails:
-        return {}
-    # Prioritize: owner > ceo > founder > president > generic > first
-    priority = {"owner":0, "ceo":1, "founder":2, "president":3, "executive":4}
-    emails.sort(key=lambda e: priority.get((e.get("position") or "").lower().split()[0] if e.get("position") else "z", 99))
-    pick = emails[0]
-    out = {"owner_email": pick.get("value","")}
-    if pick.get("first_name") and pick.get("last_name"):
-        out["owner_name"] = f"{pick['first_name']} {pick['last_name']}".strip()
-    if pick.get("phone_number") and not deal.get("owner_phone"):
-        out["owner_phone"] = pick["phone_number"]
-    if d.get("organization") and not deal.get("company_name"):
-        out["company_name"] = d["organization"]
+    # Prefer one with a verified email
+    people.sort(key=lambda p: 0 if p.get("email_status") == "verified" else 1)
+    pick = people[0]
+    out = {}
+    if pick.get("email"):
+        out["owner_email"] = pick["email"]
+    name = pick.get("name") or f"{pick.get('first_name','')} {pick.get('last_name','')}".strip()
+    if name and not deal.get("owner_name"):
+        out["owner_name"] = name
+    if pick.get("phone_numbers") and not deal.get("owner_phone"):
+        ph = pick["phone_numbers"][0].get("sanitized_number") or pick["phone_numbers"][0].get("raw_number")
+        if ph:
+            out["owner_phone"] = ph
+    if pick.get("linkedin_url"):
+        out["owner_linkedin"] = pick["linkedin_url"]
     return out
+
+
+def enrich_via_clay_webhook(deal: dict) -> dict:
+    """
+    Push a lead to Clay.com via webhook. Clay handles enrichment async
+    and writes back to our DB (requires Clay table + webhook return).
+    For now this is a fire-and-forget push — Clay will write back later
+    via a separate inbound webhook handler we'll add.
+    """
+    clay_webhook = os.getenv("CLAY_WEBHOOK_URL", "")
+    if not clay_webhook:
+        return {}
+    import requests as _req
+    try:
+        _req.post(
+            clay_webhook,
+            json={
+                "deal_id":      deal.get("id"),
+                "company_name": deal.get("company_name"),
+                "domain":       _clean_domain(deal.get("company_domain","")),
+                "city":         deal.get("city",""),
+                "state":        deal.get("state",""),
+                "industry":     deal.get("industry",""),
+            },
+            timeout=8,
+        )
+        return {"clay_pushed": "yes"}
+    except Exception:
+        return {}
 
 
 def top_n_leads(leads: list, buyer: dict, n: int = 3) -> list:
@@ -1131,27 +1170,27 @@ with tab1:
                         if not _nm or _nm in ("—","-","Unknown","None") or _d.get("match_score",0)==0:
                             delete_deal(_d["id"]); _rm += 1
                 st.success(f"Removed {_rm} junk leads."); st.rerun()
-            if _m3.button("✉ Find Emails (Hunter)", key="db_hunter", type="primary", use_container_width=True,
-                          help="Use Hunter.io to find owner email for every lead with a website"):
-                _hk = os.getenv("HUNTER_API_KEY","")
-                if not _hk or _hk == "REPLACE_ME":
-                    st.error("Add HUNTER_API_KEY in Settings.")
+            if _m3.button("✉ Find Emails (Apollo)", key="db_apollo", type="primary", use_container_width=True,
+                          help="Use Apollo.io people search to find verified owner email for every lead with a real website"):
+                _ak = os.getenv("APOLLO_API_KEY","")
+                if not _ak or _ak in ("REPLACE_ME","your-apollo-api-key"):
+                    st.error("Add APOLLO_API_KEY in Settings.")
                 else:
                     _need = [d for d in get_all_deals()
                              if (d.get("company_domain") or "").strip()
                              and not (d.get("owner_email") or "").strip()
-                             and "yelp.com" not in (d.get("company_domain") or "").lower()
-                             and "manta.com" not in (d.get("company_domain") or "").lower()][:200]
+                             and not any(skip in (d.get("company_domain") or "").lower()
+                                         for skip in ("yelp.com","manta.com","yellowpages.com","bbb.org","file://"))][:300]
                     if not _need:
-                        st.warning("No leads need enrichment (all leads with a website already have an email, or only have yelp/manta URLs).")
+                        st.warning("No leads need Apollo enrichment.")
                     else:
                         _ph = st.progress(0); _ec = 0
                         for _i, _dl in enumerate(_need):
-                            _upd = enrich_emails_hunter(_dl)
+                            _upd = enrich_emails_apollo(_dl)
                             if _upd:
                                 update_deal(_dl["id"], _upd); _ec += 1
                             _ph.progress((_i+1)/len(_need))
-                        st.success(f"Found emails for {_ec}/{len(_need)} leads."); st.rerun()
+                        st.success(f"Apollo enriched {_ec}/{len(_need)} leads with verified contacts."); st.rerun()
             if _m4.button("✨ Enrich (SerpAPI)", key="db_enrich", use_container_width=True,
                           help="Fill in missing owner names + revenue via Google Search"):
                 _sk = os.getenv("SERPAPI_KEY","")
