@@ -1,4 +1,83 @@
+# ============================================================
+# LEAD GEN TEST 1 — .gitignore
+# Conservative: block secrets, DBs, and bulk data by default
+# ============================================================
+
+# Python cache
 __pycache__/
 *.py[cod]
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Virtual envs
 venv/
+env/
+.venv/
+
+# Secrets — NEVER commit
 .env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!.env.*.example
+
+# OAuth tokens, credentials
+*.credentials.json
+client_secret*.json
+token.json
+credentials.json
+
+# Local data: scraped DBs, tmp files, exports
+.tmp/
+tmp/
+.cache/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+debug_*.html
+output/
+
+# Sensitive business docs — keep them local only
+data/Agreement_Package_SEALED.pdf
+data/ClosingClaims_Complete_Legal_Package_SEALED.pdf
+data/IA_Agreement_*.docx
+data/TPA_Full_Claims_Handling_Agreement.docx
+data/Carrier_Service_Agreement_*.docx
+data/Ladder_Assist_Contractor_Agreement.docx
+data/Drone_Inspection_Service_Agreement.docx
+data/Master_Billing_Vendor_Compliance.xlsx
+data/Adjuster_Deployment_Fee_Schedule.xlsx
+data/Invoice_Template_*.docx
+data/Firm_Capabilities_Deck_*.pptx
+data/*.skill
+
+# Excel / Office temp files
+~$*.xlsx
+~$*.docx
+~$*.pptx
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# Claude local settings
+.claude/settings.local.json
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Local images, screenshots, videos
+*.mp4
+*.mov
+screenshots/

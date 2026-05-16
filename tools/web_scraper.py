@@ -127,16 +127,17 @@ def scrape_yelp(industry: str, location: str, limit: int = 20) -> list:
 
     results = []
     for biz in businesses:
+        yelp_url = biz.get("url", "")
         results.append({
             "company_name": biz.get("name", ""),
-            "company_domain": "",
+            "company_domain": yelp_url,
             "company_linkedin": "",
             "industry": industry,
             "address": " ".join(biz.get("location", {}).get("display_address", [])),
             "city": biz.get("location", {}).get("city", ""),
             "state": biz.get("location", {}).get("state", ""),
             "phone": biz.get("phone", ""),
-            "yelp_url": biz.get("url", ""),
+            "yelp_url": yelp_url,
             "yelp_rating": biz.get("rating", ""),
             "yelp_review_count": biz.get("review_count", ""),
             "employee_count": "",
@@ -199,7 +200,7 @@ def scrape_manta(industry: str, state: str, city: str = "", page: int = 1) -> li
             if name:
                 results.append({
                     "company_name": name,
-                    "company_domain": "",
+                    "company_domain": link,
                     "company_linkedin": "",
                     "industry": industry,
                     "address": city_txt,
@@ -414,61 +415,318 @@ def _extract_domain(url: str) -> str:
     return match.group(1) if match else ""
 
 
+def _empty_lead(name: str, industry: str, state: str, source: str, listing_type: str = "on-market") -> dict:
+    return {
+        "company_name": name, "industry": industry, "state": state.upper()[:2],
+        "city": "", "asking_price": "", "revenue_estimate": "", "ebitda_estimate": "",
+        "owner_name": "", "owner_email": "", "phone": "", "company_domain": "",
+        "founded_year": "", "source": source, "listing_type": listing_type, "status": "new",
+    }
+
+
+# ── BIZBUYSELL ─────────────────────────────────────────────────────────────────
+
+def scrape_bizbuysell(industry: str, states: list, min_price: int = 0,
+                      max_price: int = 0, max_results: int = 30) -> list:
+    """Scrape BizBuySell.com — the largest business-for-sale marketplace."""
+    results = []
+    seen = set()
+    for state in states[:4]:
+        url = f"https://www.bizbuysell.com/businesses-for-sale/?q={requests.utils.quote(industry)}&state={state.lower()}"
+        if min_price: url += f"&asking_price_min={int(min_price)}"
+        if max_price: url += f"&asking_price_max={int(max_price)}"
+        print(f"  [BBS] {url}")
+        try:
+            resp = requests.get(url, headers=_get_headers(), timeout=20)
+            if resp.status_code in (403, 429): continue
+            soup = BeautifulSoup(resp.text, "lxml")
+            for card in soup.select("div.listing-card, article.listing, div[data-listing-id], div.result"):
+                name_el = card.select_one("h2 a, h3 a, .listing-name a, a.listing-title, .title a")
+                if not name_el: continue
+                name = name_el.get_text(strip=True)
+                if not name or name in seen: continue
+                seen.add(name)
+                lead = _empty_lead(name, industry, state, "bizbuysell", "on-market")
+                p = card.select_one(".price, .asking-price, [class*='price']")
+                if p: lead["asking_price"] = p.get_text(strip=True)
+                r = card.select_one(".revenue, .gross-revenue, [class*='revenue']")
+                if r: lead["revenue_estimate"] = r.get_text(strip=True)
+                cf = card.select_one(".cash-flow, .ebitda, [class*='cash']")
+                if cf: lead["ebitda_estimate"] = cf.get_text(strip=True)
+                loc = card.select_one(".location, .city-state, [class*='location']")
+                if loc:
+                    parts = loc.get_text(strip=True).split(",")
+                    lead["city"] = parts[0].strip()
+                results.append(lead)
+                if len(results) >= max_results: return results
+        except Exception as e:
+            print(f"  [BBS] Error: {e}")
+        _sleep()
+    print(f"  [BBS] Found {len(results)} listings")
+    return results
+
+
+# ── BIZQUEST ───────────────────────────────────────────────────────────────────
+
+def scrape_bizquest(industry: str, states: list, max_results: int = 20) -> list:
+    """Scrape BizQuest.com — strong for manufacturing and services."""
+    results = []
+    seen = set()
+    for state in states[:3]:
+        url = f"https://www.bizquest.com/buy-a-business/?industry={requests.utils.quote(industry)}&state={state.upper()}"
+        print(f"  [BQ] {url}")
+        try:
+            resp = requests.get(url, headers=_get_headers(), timeout=20)
+            if resp.status_code in (403, 429): continue
+            soup = BeautifulSoup(resp.text, "lxml")
+            for card in soup.select("div.listing, article.listing-item, li.listing-result"):
+                name_el = card.select_one("h2 a, h3 a, .listing-name, .title")
+                if not name_el: continue
+                name = name_el.get_text(strip=True)
+                if not name or name in seen: continue
+                seen.add(name)
+                lead = _empty_lead(name, industry, state, "bizquest", "on-market")
+                p = card.select_one(".price, .asking")
+                if p: lead["asking_price"] = p.get_text(strip=True)
+                r = card.select_one(".revenue, .gross")
+                if r: lead["revenue_estimate"] = r.get_text(strip=True)
+                loc = card.select_one(".location, .city")
+                if loc: lead["city"] = loc.get_text(strip=True).split(",")[0].strip()
+                results.append(lead)
+                if len(results) >= max_results: return results
+        except Exception as e:
+            print(f"  [BQ] Error: {e}")
+        _sleep()
+    print(f"  [BQ] Found {len(results)} listings")
+    return results
+
+
+# ── BUSINESSESFORSALE.COM ─────────────────────────────────────────────────────
+
+def scrape_businesses_for_sale(industry: str, states: list, max_results: int = 20) -> list:
+    """Scrape BusinessesForSale.com — good international + US inventory."""
+    results = []
+    seen = set()
+    for state in states[:3]:
+        slug = industry.lower().replace(" ", "-").replace("/", "-")
+        url = f"https://www.businessesforsale.com/us/{state.lower()}/businesses-for-sale?q={requests.utils.quote(industry)}"
+        print(f"  [BFS] {url}")
+        try:
+            resp = requests.get(url, headers=_get_headers(), timeout=20)
+            if resp.status_code in (403, 429): continue
+            soup = BeautifulSoup(resp.text, "lxml")
+            for card in soup.select("div.listing-item, article, li[class*='listing']"):
+                name_el = card.select_one("h2, h3, .listing-title, .title")
+                if not name_el: continue
+                name = name_el.get_text(strip=True)
+                if not name or name in seen: continue
+                seen.add(name)
+                lead = _empty_lead(name, industry, state, "businesses_for_sale", "on-market")
+                p = card.select_one(".price, .asking-price")
+                if p: lead["asking_price"] = p.get_text(strip=True)
+                r = card.select_one(".revenue, .turnover, .sales")
+                if r: lead["revenue_estimate"] = r.get_text(strip=True)
+                results.append(lead)
+                if len(results) >= max_results: return results
+        except Exception as e:
+            print(f"  [BFS] Error: {e}")
+        _sleep()
+    print(f"  [BFS] Found {len(results)} listings")
+    return results
+
+
+# ── CRAIGSLIST ────────────────────────────────────────────────────────────────
+
+_CL_CITIES = {
+    "FL": ["miami","orlando","tampa","jacksonville","sarasota"],
+    "TX": ["dallas","houston","austin","sanantonio","elpaso"],
+    "CA": ["sfbay","losangeles","sandiego","sacramento","fresno"],
+    "NY": ["newyork","longisland","buffalo","albany"],
+    "GA": ["atlanta","savannah"],
+    "NC": ["charlotte","raleigh"],
+    "OH": ["cleveland","columbus","cincinnati","akroncanton"],
+    "IL": ["chicago","peoria"],
+    "AZ": ["phoenix","tucson","flagstaff"],
+    "CO": ["denver","cosprings"],
+    "WA": ["seattle","spokane"],
+    "OR": ["portland","eugene"],
+    "NV": ["lasvegas","reno"],
+    "MN": ["minneapolis"],
+    "MO": ["stlouis","kansascity"],
+    "TN": ["nashville","memphis","knoxville"],
+    "VA": ["norfolk","richmond"],
+    "PA": ["philadelphia","pittsburgh"],
+    "MI": ["detroit","grandrapids","lansing"],
+    "MA": ["boston","worcester"],
+    "NJ": ["newjersey"],
+    "SC": ["charleston","columbia","greenville"],
+    "AL": ["birmingham","mobile"],
+    "LA": ["neworleans","batonrouge"],
+    "IN": ["indianapolis","fortwayne"],
+    "WI": ["milwaukee","madison"],
+    "KY": ["louisville","lexington"],
+    "OK": ["oklahoma","tulsa"],
+}
+
+def scrape_craigslist(industry: str, states: list, max_results: int = 25) -> list:
+    """Scrape Craigslist business-for-sale section (bfs)."""
+    results = []
+    seen = set()
+    for state in states[:3]:
+        cities = _CL_CITIES.get(state.upper(), ["atlanta"])
+        for city in cities[:2]:
+            url = f"https://{city}.craigslist.org/search/bfs?query={requests.utils.quote(industry)}&sort=date"
+            print(f"  [CL] {url}")
+            try:
+                resp = requests.get(url, headers=_get_headers(), timeout=15)
+                if resp.status_code in (403, 404, 410, 429): continue
+                soup = BeautifulSoup(resp.text, "lxml")
+                for item in soup.select("li.cl-static-search-result, div.result-row, li[data-pid]"):
+                    title_el = item.select_one("div.title, a.result-title, .titlestring, a[data-id]")
+                    if not title_el: continue
+                    title = title_el.get_text(strip=True)
+                    if not title or title in seen: continue
+                    seen.add(title)
+                    lead = _empty_lead(title, industry, state, "craigslist", "on-market")
+                    lead["city"] = city.title()
+                    p = item.select_one(".price, span.result-price")
+                    if p: lead["asking_price"] = p.get_text(strip=True)
+                    results.append(lead)
+                    if len(results) >= max_results: return results
+            except Exception as e:
+                print(f"  [CL] Error {city}: {e}")
+            _sleep()
+    print(f"  [CL] Found {len(results)} listings")
+    return results
+
+
+# ── FACEBOOK MARKETPLACE (public search) ─────────────────────────────────────
+
+def scrape_facebook_marketplace(industry: str, states: list, max_results: int = 15) -> list:
+    """
+    Facebook Marketplace business listings via public search.
+    Note: FB aggressively blocks scrapers — returns what it can.
+    """
+    results = []
+    seen = set()
+    for state in states[:2]:
+        query = f"{industry} business for sale {state}"
+        url = f"https://www.facebook.com/marketplace/search/?query={requests.utils.quote(query)}&category=vehicles"
+        # FB blocks most automated requests; use a lighter approach via public search
+        search_url = f"https://www.facebook.com/marketplace/search?query={requests.utils.quote(query)}"
+        try:
+            resp = requests.get(search_url, headers={**_get_headers(),
+                "Accept": "text/html", "Referer": "https://www.facebook.com/"}, timeout=15)
+            if resp.status_code in (400, 403, 429): continue
+            soup = BeautifulSoup(resp.text, "lxml")
+            for item in soup.select("div[data-testid='marketplace_feed_item'], div.x9f619"):
+                name_el = item.select_one("span.x1lliihq, div[class*='title'], span")
+                if not name_el: continue
+                name = name_el.get_text(strip=True)
+                if not name or len(name) < 5 or name in seen: continue
+                seen.add(name)
+                lead = _empty_lead(name, industry, state, "facebook_marketplace", "on-market")
+                p = item.select_one("[class*='price'], span[class*='x193iq5w']")
+                if p: lead["asking_price"] = p.get_text(strip=True)
+                results.append(lead)
+                if len(results) >= max_results: return results
+        except Exception as e:
+            print(f"  [FB] Error: {e}")
+        _sleep()
+    print(f"  [FB] Found {len(results)} listings (FB blocks most scraping)")
+    return results
+
+
+# ── ACQUIRE.COM (tech/software businesses) ────────────────────────────────────
+
+def scrape_acquire(industry: str, max_results: int = 15) -> list:
+    """Scrape Acquire.com for SaaS/tech business listings."""
+    if not any(k in industry.lower() for k in ["tech","software","saas","app","digital","it","platform"]):
+        return []
+    results = []
+    url = f"https://acquire.com/search?q={requests.utils.quote(industry)}"
+    print(f"  [ACQ] {url}")
+    try:
+        resp = requests.get(url, headers=_get_headers(), timeout=15)
+        if resp.status_code in (403, 429): return []
+        soup = BeautifulSoup(resp.text, "lxml")
+        for card in soup.select("div.listing-card, article, div[class*='business']"):
+            name_el = card.select_one("h2, h3, .name, .title")
+            if not name_el: continue
+            name = name_el.get_text(strip=True)
+            if not name: continue
+            lead = _empty_lead(name, industry, "US", "acquire_com", "on-market")
+            p = card.select_one(".price, .asking, .arr, [class*='revenue']")
+            if p: lead["asking_price"] = p.get_text(strip=True)
+            results.append(lead)
+            if len(results) >= max_results: break
+    except Exception as e:
+        print(f"  [ACQ] Error: {e}")
+    print(f"  [ACQ] Found {len(results)} listings")
+    return results
+
+
+# ── COMBINED SCRAPE ────────────────────────────────────────────────────────────
+
 def scrape_all_sources(buyer: dict, max_per_source: int = 15) -> list:
     """
-    Run all available scrapers for a buyer and combine results.
+    Run all scrapers for a buyer and combine results.
+    Applies industry + state expansion from buyer mandate.
     Deduplicates by company name.
     """
     all_leads = []
     seen_names = set()
 
-    industries = buyer.get("industries", [])[:2]
-    states = buyer.get("states", [])
-    geographies = buyer.get("geographies", [])
+    industries = buyer.get("industries", [])[:3]
+    states = list(buyer.get("states") or [])
+    geographies = buyer.get("geographies") or []
 
-    # Determine locations to search
-    from apollo_search import STATE_MAP
-    search_states = list(states)
-    for geo in geographies:
-        if geo.lower() in STATE_MAP:
-            search_states.extend(STATE_MAP[geo.lower()])
-    search_states = list(set(search_states))[:5]  # Cap at 5 states
+    # Expand geographies to states
+    try:
+        from apollo_search import STATE_MAP
+        for geo in geographies:
+            if geo.lower() in STATE_MAP:
+                states.extend(STATE_MAP[geo.lower()])
+    except Exception:
+        pass
+    states = list(dict.fromkeys(s.upper()[:2] for s in states if s))[:6]
+    if not states:
+        states = ["TX", "FL", "CA", "OH", "GA"]  # broad default
 
-    locations = search_states if search_states else ["United States"]
+    b_min = float(buyer.get("deal_size_min") or 0)
+    b_max = float(buyer.get("deal_size_max") or 0)
+
+    def _add(leads, tag):
+        added = 0
+        for lead in leads:
+            key = (lead.get("company_name") or "").lower().strip()
+            if key and key not in seen_names:
+                seen_names.add(key)
+                lead.setdefault("buyer_id",   buyer["id"])
+                lead.setdefault("buyer_name", buyer["name"])
+                all_leads.append(lead)
+                added += 1
+        print(f"    [{tag}] +{added} unique")
 
     for industry in industries:
-        for loc in locations[:3]:
-            # Yelp
-            yelp_results = scrape_yelp(industry, loc, limit=max_per_source)
-            for lead in yelp_results:
-                key = lead["company_name"].lower().strip()
-                if key and key not in seen_names:
-                    seen_names.add(key)
-                    lead["buyer_id"] = buyer["id"]
-                    lead["buyer_name"] = buyer["name"]
-                    all_leads.append(lead)
+        print(f"\n  [SCRAPER] Industry: {industry} | States: {states}")
 
-            # Yellow Pages
-            yp_results = scrape_yellow_pages(f"{industry} company", loc)
-            for lead in yp_results:
-                key = lead["company_name"].lower().strip()
-                if key and key not in seen_names:
-                    seen_names.add(key)
-                    lead["buyer_id"] = buyer["id"]
-                    lead["buyer_name"] = buyer["name"]
-                    all_leads.append(lead)
+        # ── LISTED (for-sale) sources ─────────────────────────────────────────
+        _add(scrape_bizbuysell(industry, states, int(b_min), int(b_max), max_per_source), "BizBuySell")
+        _add(scrape_bizquest(industry, states, max_per_source), "BizQuest")
+        _add(scrape_businesses_for_sale(industry, states, max_per_source), "BizForSale")
+        _add(scrape_craigslist(industry, states, max_per_source), "Craigslist")
+        _add(scrape_facebook_marketplace(industry, states, 10), "Facebook")
+        if any(k in industry.lower() for k in ["tech","software","saas","app","digital"]):
+            _add(scrape_acquire(industry, 10), "Acquire")
 
-            # Manta
-            manta_results = scrape_manta(industry, loc if len(loc) == 2 else "TX")
-            for lead in manta_results:
-                key = lead["company_name"].lower().strip()
-                if key and key not in seen_names:
-                    seen_names.add(key)
-                    lead["buyer_id"] = buyer["id"]
-                    lead["buyer_name"] = buyer["name"]
-                    all_leads.append(lead)
+        # ── OFF-MARKET sources (business directories) ─────────────────────────
+        for loc in states[:3]:
+            _add(scrape_yelp(industry, loc, limit=max_per_source), "Yelp")
+            _add(scrape_yellow_pages(f"{industry} company", loc), "YellowPages")
+            _add(scrape_manta(industry, loc), "Manta")
 
-    print(f"\n  [SCRAPER] Total unique leads found: {len(all_leads)}")
+    print(f"\n  [SCRAPER] Total unique leads: {len(all_leads)}")
     return all_leads
 
 
@@ -476,8 +734,6 @@ if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from buyers_db import BUYERS
-
-    # Test with Baruk Capital (Home Services, TX/FL)
     buyer = next(b for b in BUYERS if b["id"] == "baruk_capital")
     leads = scrape_all_sources(buyer, max_per_source=5)
     print(json.dumps(leads[:3], indent=2))

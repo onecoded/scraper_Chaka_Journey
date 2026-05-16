@@ -55,14 +55,25 @@ CREATE TABLE IF NOT EXISTS posts (
     idea_id         INTEGER REFERENCES ideas(id),
     created_at      TEXT DEFAULT (datetime('now')),
     status          TEXT DEFAULT 'draft',
+    brand           TEXT,
+    title           TEXT,
+    hook            TEXT,
+    tone            TEXT,
+    platforms       TEXT DEFAULT '[]',
     caption_instagram TEXT,
     caption_facebook  TEXT,
+    caption_tiktok    TEXT,
+    caption_youtube   TEXT,
     email_subject   TEXT,
     article_html    TEXT,
     hashtags        TEXT,
     image_path      TEXT,
     audio_path      TEXT,
     video_path      TEXT,
+    video_clip_path TEXT,
+    series_name     TEXT,
+    series_part     INTEGER,
+    series_total    INTEGER,
     error_log       TEXT DEFAULT '[]'
 );
 
@@ -113,12 +124,32 @@ CREATE TABLE IF NOT EXISTS trends_cache (
 """
 
 
+_POSTS_NEW_COLS = [
+    ("brand",           "TEXT"),
+    ("title",           "TEXT"),
+    ("hook",            "TEXT"),
+    ("tone",            "TEXT"),
+    ("platforms",       "TEXT DEFAULT '[]'"),
+    ("caption_tiktok",  "TEXT"),
+    ("caption_youtube", "TEXT"),
+    ("video_clip_path", "TEXT"),
+    ("series_name",     "TEXT"),
+    ("series_part",     "INTEGER"),
+    ("series_total",    "INTEGER"),
+]
+
+
 def init_db() -> None:
-    """Create all tables if they don't already exist."""
+    """Create all tables if they don't already exist, and migrate missing columns."""
     ensure_dirs()
     conn = get_connection()
     try:
         conn.executescript(DDL)
+        # Migrate: add any new columns that don't exist yet
+        existing = {row[1] for row in conn.execute("PRAGMA table_info(posts)").fetchall()}
+        for col, coltype in _POSTS_NEW_COLS:
+            if col not in existing:
+                conn.execute(f"ALTER TABLE posts ADD COLUMN {col} {coltype}")
         conn.commit()
     finally:
         conn.close()
@@ -191,6 +222,122 @@ def update_idea_status(idea_id: int, status: str) -> None:
             (status, approved_at, idea_id)
         )
         conn.commit()
+    finally:
+        conn.close()
+
+
+# ── DRAFTS ────────────────────────────────────────────────────────────────────
+
+_DRAFT_COLS = [
+    "id", "idea_id", "created_at", "status", "brand", "title", "hook", "tone",
+    "platforms", "caption_instagram", "caption_facebook", "caption_tiktok",
+    "caption_youtube", "email_subject", "article_html", "hashtags",
+    "image_path", "audio_path", "video_path", "video_clip_path",
+    "series_name", "series_part", "series_total", "error_log",
+]
+
+
+def _row_to_draft(row) -> dict:
+    if row is None:
+        return None
+    d = dict(row)
+    for f in ("platforms", "error_log"):
+        raw = d.get(f)
+        if isinstance(raw, str):
+            try:
+                d[f] = json.loads(raw)
+            except Exception:
+                d[f] = []
+    return d
+
+
+def insert_draft(**fields) -> int:
+    """Insert a new draft post. Accepts any post column as a kwarg. Returns new ID."""
+    if isinstance(fields.get("platforms"), list):
+        fields["platforms"] = json.dumps(fields["platforms"])
+    fields.setdefault("status", "pending")
+    cols = [k for k in fields if k in _DRAFT_COLS and k != "id"]
+    placeholders = ", ".join("?" * len(cols))
+    col_names = ", ".join(cols)
+    values = [fields[c] for c in cols]
+    conn = get_connection()
+    try:
+        cur = conn.execute(
+            f"INSERT INTO posts ({col_names}) VALUES ({placeholders})", values
+        )
+        conn.commit()
+        return cur.lastrowid
+    finally:
+        conn.close()
+
+
+def get_draft(draft_id: int) -> Optional[dict]:
+    """Fetch one draft by ID. Returns dict or None."""
+    conn = get_connection()
+    try:
+        row = conn.execute("SELECT * FROM posts WHERE id=?", (draft_id,)).fetchone()
+        return _row_to_draft(row)
+    finally:
+        conn.close()
+
+
+def list_drafts(status: str = None, brand: str = None, limit: int = 50) -> list:
+    """List drafts, optionally filtered by status and/or brand. Newest first."""
+    conn = get_connection()
+    try:
+        where, params = [], []
+        if status:
+            where.append("status=?"); params.append(status)
+        if brand:
+            where.append("brand=?"); params.append(brand)
+        clause = ("WHERE " + " AND ".join(where)) if where else ""
+        params.append(limit)
+        rows = conn.execute(
+            f"SELECT * FROM posts {clause} ORDER BY id DESC LIMIT ?", params
+        ).fetchall()
+        return [_row_to_draft(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def update_draft(draft_id: int, **fields) -> None:
+    """Update arbitrary columns on a draft by ID."""
+    if isinstance(fields.get("platforms"), list):
+        fields["platforms"] = json.dumps(fields["platforms"])
+    valid = {k: v for k, v in fields.items() if k in _DRAFT_COLS and k not in ("id", "created_at")}
+    if not valid:
+        return
+    set_clause = ", ".join(f"{k}=?" for k in valid)
+    values = list(valid.values()) + [draft_id]
+    conn = get_connection()
+    try:
+        conn.execute(f"UPDATE posts SET {set_clause} WHERE id=?", values)
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def approve_draft(draft_id: int) -> None:
+    update_draft(draft_id, status="approved")
+
+
+def reject_draft(draft_id: int) -> None:
+    update_draft(draft_id, status="rejected")
+
+
+def mark_draft_published(draft_id: int) -> None:
+    update_draft(draft_id, status="posted")
+
+
+def list_scheduled(limit: int = 50) -> list:
+    """Return drafts with status='scheduled', soonest first."""
+    conn = get_connection()
+    try:
+        rows = conn.execute(
+            "SELECT * FROM posts WHERE status='scheduled' ORDER BY id ASC LIMIT ?",
+            (limit,)
+        ).fetchall()
+        return [_row_to_draft(r) for r in rows]
     finally:
         conn.close()
 
@@ -513,6 +660,18 @@ def set_cached_trends(source: str, keyword: str, data: list) -> None:
 
 
 # ── DB STATS ──────────────────────────────────────────────────────────────────
+
+def count_drafts_by_status() -> dict:
+    """Return draft counts keyed by status string (draft, scheduled, posted, failed)."""
+    conn = get_connection()
+    try:
+        rows = conn.execute(
+            "SELECT status, COUNT(*) FROM posts GROUP BY status"
+        ).fetchall()
+        return {row[0]: row[1] for row in rows}
+    finally:
+        conn.close()
+
 
 def get_stats() -> dict:
     """Return a dict of key counts for --check-config output."""
