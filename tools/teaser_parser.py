@@ -97,6 +97,15 @@ def parse_msc_txt(path: Path) -> list:
                 broker_email = mc.group(2).strip()
                 break
 
+        # If no MSC contact line, fall back to any email/phone in the block
+        block_text = "\n".join(lines)
+        if not broker_email or not broker_phone:
+            _c = _extract_contacts(block_text)
+            if not broker_email and _c["emails"]:
+                broker_email = _c["emails"][0]
+            if not broker_phone and _c["phones"]:
+                broker_phone = _c["phones"][0]
+
         note = ""
         for line in lines:
             ls = line.strip()
@@ -118,7 +127,7 @@ def parse_msc_txt(path: Path) -> list:
             "source":       "msc_txt",
             "source_file":  path.name,
             "source_path":  str(path),
-            "source_url":   "file:///" + str(path).replace("\\","/"),
+            "web_url":      "",  # MSC text file has no external URL
             "note":         note,
         })
 
@@ -182,63 +191,143 @@ def parse_xlsx_listings(path: Path) -> list:
             "source":        "xlsx",
             "source_file":   path.name,
             "source_path":   str(path),
-            "source_url":    "file:///" + str(path).replace("\\","/"),
+            "web_url":       _col(row, "url","link","website","listing"),
             "note":          _col(row, "note","comment","status","flag"),
         })
     return results
 
 
+_PHONE_PATTERN = re.compile(
+    r"(?<!\d)(?:\+?1[-.\s]?)?\(?([2-9]\d{2})\)?[-.\s]?([2-9]\d{2})[-.\s]?(\d{4})(?!\d)"
+)
+_EMAIL_PATTERN = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
+_URL_PATTERN   = re.compile(r"https?://[^\s)>\"',]+", re.I)
+
+# Brokers / marketplaces — match these and treat as contact URL fallback
+_BROKER_DOMAINS = {
+    "axial.net": "Axial",
+    "msc-bd.com": "Madison Street Capital",
+    "madisonstreetcapital.com": "Madison Street Capital",
+    "mariner-capital.com": "Mariner Capital",
+    "marinercapital.com": "Mariner Capital",
+    "hedgestone.com": "Hedgestone",
+    "synergybb.com": "Synergy Business Brokers",
+    "businessbroker.net": "BusinessBroker.net",
+    "bizbuysell.com": "BizBuySell",
+    "bizquest.com": "BizQuest",
+    "loopnet.com": "LoopNet",
+    "transworld.com": "Transworld",
+    "mergersandacquisitions.net": "M&A Source",
+    "privsource.com": "PrivSource",
+}
+
+def _extract_contacts(text: str) -> dict:
+    """
+    Aggressive contact extraction from arbitrary text.
+    Returns dict with: emails (list), phones (list), urls (list), broker_url
+    """
+    if not text:
+        return {"emails": [], "phones": [], "urls": [], "broker_url": ""}
+    # Emails — filter out generic noreply/no-reply
+    raw_emails = _EMAIL_PATTERN.findall(text)
+    emails = []
+    for e in raw_emails:
+        el = e.lower()
+        if "noreply" in el or "no-reply" in el or "example.com" in el or "test@" in el:
+            continue
+        if el not in [x.lower() for x in emails]:
+            emails.append(e)
+    # Phones — format consistently
+    phones = []
+    for m in _PHONE_PATTERN.finditer(text):
+        formatted = f"({m.group(1)}) {m.group(2)}-{m.group(3)}"
+        if formatted not in phones:
+            phones.append(formatted)
+    # URLs
+    urls = []
+    for u in _URL_PATTERN.findall(text):
+        u = u.rstrip(".,;)")
+        if u not in urls:
+            urls.append(u)
+    # Broker URL — first one matching known broker/marketplace domains
+    broker_url = ""
+    for u in urls:
+        for domain in _BROKER_DOMAINS:
+            if domain in u.lower():
+                broker_url = u
+                break
+        if broker_url:
+            break
+    return {"emails": emails, "phones": phones, "urls": urls, "broker_url": broker_url}
+
+
 def scan_pdf_teasers() -> list:
     """
-    Scan PDF teasers. Uses pdfplumber if available.
-    Skips 'No Contact Teasers' subfolder.
+    Scan ALL pages of every PDF teaser for emails, phones, URLs.
+    Returns one deal per PDF with all extractable contact info.
     """
     try:
         import pdfplumber
-        has_plumber = True
     except ImportError:
-        has_plumber = False
+        print("[TEASERS] pdfplumber not installed — PDF teasers skipped")
+        return []
 
     results = []
-    for pdf_path in TEASERS_DIR.rglob("*.pdf"):
-        # Skip explicitly no-contact teasers
-        if "No Contact" in str(pdf_path):
-            continue
+    pdf_paths = list(TEASERS_DIR.rglob("*.pdf"))
+    print(f"[TEASERS] Scanning {len(pdf_paths)} PDF teasers (all pages)…")
 
+    for pdf_path in pdf_paths:
         title = pdf_path.stem.replace("_", " ").replace("-", " ").strip()
+        text = ""
+        try:
+            with pdfplumber.open(pdf_path) as pdf:
+                # Read ALL pages for contact extraction
+                text = "\n".join((p.extract_text() or "") for p in pdf.pages)
+        except Exception as ex:
+            print(f"[TEASERS] could not read {pdf_path.name}: {ex}")
+
+        contacts = _extract_contacts(text)
+
+        # Financial extraction
+        rm = re.search(r"revenue[:\s]+(\$[\d.,]+\s*[MmKk]?)", text, re.I) if text else None
+        em = re.search(r"ebitda[:\s]+(\$[\d.,]+\s*[MmKk]?)", text, re.I) if text else None
+        gm = re.search(r"(?:location|geography|based in|headquartered)[:\s]+([A-Za-z ,]{3,60})", text, re.I) if text else None
+        im = re.search(r"(?:industry|sector|business type)[:\s]+([A-Za-z /&,\-]{3,60})", text, re.I) if text else None
+
+        revenue = _parse_dollars(rm.group(1)) if rm else 0.0
+        ebitda  = _parse_dollars(em.group(1)) if em else 0.0
+
+        # Pick best email + phone + URL
+        broker_email = contacts["emails"][0] if contacts["emails"] else ""
+        broker_phone = contacts["phones"][0] if contacts["phones"] else ""
+        # Prefer broker URL (Axial/MSC etc) over arbitrary URL — fallback to source path
+        web_url = contacts["broker_url"] or (contacts["urls"][0] if contacts["urls"] else "")
+
         deal = {
             "project_name": title,
             "title": title,
-            "industry": "", "geography": "",
-            "revenue": 0.0, "ebitda": 0.0,
-            "revenue_raw": "", "ebitda_raw": "",
-            "broker_name": "", "broker_email": "", "broker_phone": "",
-            "source": "pdf", "source_file": pdf_path.name,
-            "source_path": str(pdf_path),
-            "source_url": "file:///" + str(pdf_path).replace("\\","/"),
-            "pdf_path": str(pdf_path), "note": "",
+            "industry":    (im.group(1).strip()[:60] if im else ""),
+            "geography":   (gm.group(1).strip()[:60] if gm else ""),
+            "revenue":     revenue,
+            "ebitda":      ebitda,
+            "revenue_raw": (_fmt_dollars(revenue) if revenue else (rm.group(1) if rm else "")),
+            "ebitda_raw":  (_fmt_dollars(ebitda)  if ebitda  else (em.group(1) if em else "")),
+            "broker_name":  "",
+            "broker_email": broker_email,
+            "broker_phone": broker_phone,
+            "source":       "pdf",
+            "source_file":  pdf_path.name,
+            "source_path":  str(pdf_path),
+            "web_url":      web_url,
+            "pdf_path":     str(pdf_path),
+            "all_emails":   contacts["emails"],
+            "all_phones":   contacts["phones"],
+            "all_urls":     contacts["urls"],
+            "note":         "",
         }
-
-        if has_plumber:
-            try:
-                with pdfplumber.open(pdf_path) as pdf:
-                    text = "".join(p.extract_text() or "" for p in pdf.pages[:3])
-
-                rm = re.search(r"revenue[:\s]+(\$[\d.,]+\s*[MmKk]?)", text, re.I)
-                em = re.search(r"ebitda[:\s]+(\$[\d.,]+\s*[MmKk]?)", text, re.I)
-                gm = re.search(r"(?:location|geography|based in|headquartered)[:\s]+([A-Za-z ,]+)", text, re.I)
-                im = re.search(r"(?:industry|sector|business type)[:\s]+([A-Za-z /&,-]+)", text, re.I)
-                xm = re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text)
-
-                if rm: deal["revenue"] = _parse_dollars(rm.group(1)); deal["revenue_raw"] = rm.group(1)
-                if em: deal["ebitda"]  = _parse_dollars(em.group(1)); deal["ebitda_raw"]  = em.group(1)
-                if gm: deal["geography"] = gm.group(1).strip()[:60]
-                if im: deal["industry"]  = im.group(1).strip()[:60]
-                if xm: deal["broker_email"] = xm.group(0)
-            except Exception:
-                pass
-
         results.append(deal)
+
+    print(f"[TEASERS] Parsed {len(results)} PDF teasers")
     return results
 
 

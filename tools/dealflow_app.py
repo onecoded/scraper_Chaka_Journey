@@ -966,10 +966,11 @@ with tab1:
 
     st.markdown(
         '<div style="background:#0d1421;border-left:3px solid #4A90D9;padding:8px 14px;'
-        'border-radius:0 6px 6px 0;margin-bottom:8px;font-size:0.85rem;color:#aab">'
-        '📋 <strong style="color:#e8eaf0">Existing Leads</strong> — every lead already in your database. '
-        'For new scraping, use <strong style="color:#4A90D9">🚀 Scrape New</strong>. '
-        'For buyer-with-agreement × off-market-seller matches from your BIZBROKER folder, use '
+        'border-radius:0 6px 6px 0;margin-bottom:6px;font-size:0.85rem;color:#aab">'
+        '📋 <strong style="color:#e8eaf0">Sellers</strong> in your database. Each card shows the '
+        '<span style="color:#F39C12">SELLER (target business)</span> with its '
+        '<span style="color:#9B59B6">MATCHED BUYER</span>. Buyers with agreements are managed in '
+        '<strong style="color:#0077b5">👥 Buyers & Settings</strong>. To make new matches use '
         '<strong style="color:#F1C40F">📁 Pre-Pipeline</strong>.'
         '</div>',
         unsafe_allow_html=True
@@ -1386,7 +1387,20 @@ with tab1:
             eml_e  = (f'<a href="mailto:{_e(o_email)}" style="color:#4A90D9;font-size:0.8rem">{_e(o_email)}</a>'
                       if o_email else _dim("no email"))
             phn_e  = f'<span style="color:#aaa;font-size:0.8rem">{_e(phone)}</span>' if phone else _dim("no phone")
-            if domain_val:
+            # Detect local file paths (Windows C:\ or file:/// or POSIX /home/)
+            _is_local_path = (
+                domain_val.startswith("file:///")
+                or (len(domain_val) >= 3 and domain_val[1:3] == ":\\")
+                or domain_val.startswith("/") and "://" not in domain_val
+            )
+            if domain_val and _is_local_path:
+                # Show as copyable path text — browsers block file:// from web pages
+                _path_only = domain_val.replace("file:///","").replace("/","\\") if domain_val.startswith("file:///") else domain_val
+                _short = _path_only.split("\\")[-1] if "\\" in _path_only else _path_only.split("/")[-1]
+                dom_e = (f'<span title="{_e(_path_only)}" '
+                         f'style="color:#F39C12;font-size:0.75rem">📄 {_e(_short[:50])}</span>'
+                         f' <span style="color:#444;font-size:0.7rem">(local file — copy path from tooltip)</span>')
+            elif domain_val:
                 _dom_href = domain_val if domain_val.startswith("http") else "https://" + domain_val
                 _dom_label = domain_val if len(domain_val) <= 40 else domain_val[:37] + "…"
                 dom_e = (f'<a href="{_e(_dom_href)}" target="_blank" '
@@ -1409,11 +1423,13 @@ with tab1:
                 f'<div style="border-left:4px solid {border_c};border-radius:0 8px 8px 0;'
                 f'padding:10px 14px;margin-bottom:6px;background:{bg_c};border:1px solid {border_c}33">'
 
-                # title row
+                # title row with explicit SELLER ↔ BUYER labels
                 f'<div style="display:flex;justify-content:space-between;align-items:center;'
-                f'flex-wrap:wrap;gap:6px;margin-bottom:5px">'
-                f'<span style="font-size:1.05rem;font-weight:800;color:#f0f0f0">'
-                f'{INTEREST_EMOJI.get(ilevel,"●")} {co_e}</span>'
+                f'flex-wrap:wrap;gap:6px;margin-bottom:4px">'
+                f'<span style="display:flex;flex-direction:column;gap:1px">'
+                f'<span style="font-size:0.62rem;color:#F39C12;letter-spacing:1.2px;font-weight:700">📦 SELLER (target)</span>'
+                f'<span style="font-size:1.02rem;font-weight:800;color:#f0f0f0">{INTEREST_EMOJI.get(ilevel,"●")} {co_e}</span>'
+                f'</span>'
                 f'<span style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">'
                 f'{type_pill}{perfect_html}'
                 f'<span class="badge" style="background:{sc_}">{score}/100</span>'
@@ -1421,11 +1437,12 @@ with tab1:
                 f'<span style="color:{dq_color};font-size:0.75rem" title="Data quality (5=best)">{dq_stars}</span>'
                 f'</span></div>'
 
-                # sub-row
-                f'<div style="font-size:0.75rem;color:#555;margin-bottom:10px;'
-                f'display:flex;justify-content:space-between">'
-                f'<span>&#8594; <strong style="color:#888">{byr_e}</strong> &nbsp;·&nbsp; {add_e}</span>'
-                f'<span style="color:{overdue_col}">Last contact: {day_e}{"  ⚠" if overdue else ""}</span>'
+                # buyer match row
+                f'<div style="background:#1a0d24;border-left:2px solid #9B59B6;padding:4px 10px;'
+                f'margin-bottom:8px;border-radius:0 4px 4px 0">'
+                f'<span style="font-size:0.62rem;color:#9B59B6;letter-spacing:1.2px;font-weight:700">🤝 MATCHED BUYER</span> &nbsp; '
+                f'<strong style="color:#d4b3e8;font-size:0.88rem">{byr_e}</strong>'
+                f'<span style="float:right;color:{overdue_col};font-size:0.72rem">Last contact: {day_e}{"  ⚠" if overdue else ""}</span>'
                 f'</div>'
 
                 # 3-column grid
