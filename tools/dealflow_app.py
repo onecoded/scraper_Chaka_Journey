@@ -1006,17 +1006,45 @@ with tab1:
     st.markdown(
         '<div style="background:#0d1421;border-left:3px solid #4A90D9;padding:8px 14px;'
         'border-radius:0 6px 6px 0;margin-bottom:6px;font-size:0.85rem;color:#aab">'
-        '📋 <strong style="color:#e8eaf0">Sellers</strong> in your database. Each card shows the '
-        '<span style="color:#F39C12">SELLER (target business)</span> with its '
-        '<span style="color:#9B59B6">MATCHED BUYER</span>. Buyers with agreements are managed in '
-        '<strong style="color:#0077b5">👥 Buyers & Settings</strong>. To make new matches use '
-        '<strong style="color:#F1C40F">📁 Pre-Pipeline</strong>.'
+        '<span style="color:#F39C12;font-weight:700">📦 Sellers</span> are off-market businesses scraped or imported. '
+        '<span style="color:#9B59B6;font-weight:700">🤝 Matches</span> are seller×buyer pairs ready to work. '
+        '<span style="color:#27AE60;font-weight:700">✉ Already Reached Out</span> are matches we have outreach drafted/sent on. '
+        'Manage <strong style="color:#0077b5">👥 Buyers</strong> in Settings tab.'
         '</div>',
         unsafe_allow_html=True
     )
 
     all_buyers = get_all_buyers()
     _bnames1   = ["All Buyers"] + [b["name"] for b in all_buyers]
+
+    # ── seller / match / all toggle ──────────────────────────────────────
+    # Stats for each bucket
+    _all_for_view = get_all_deals()
+    _seller_count = sum(1 for d in _all_for_view if not (d.get("buyer_id") or "").strip())
+    _match_count  = sum(1 for d in _all_for_view if (d.get("buyer_id") or "").strip())
+    _contacted_ct = sum(1 for d in _all_for_view if (d.get("last_contacted") or "").strip() and (d.get("buyer_id") or "").strip())
+
+    _vtoggle = st.radio(
+        "View",
+        [
+            f"📦 Sellers Only ({_seller_count})",
+            f"🤝 Matches Only ({_match_count})",
+            f"✉ Already Reached Out ({_contacted_ct})",
+            f"📊 All ({len(_all_for_view)})",
+        ],
+        horizontal=True,
+        key="ls_view_toggle",
+        label_visibility="collapsed",
+        index=0,
+    )
+    if _vtoggle.startswith("📦"):
+        f_view_mode = "sellers"
+    elif _vtoggle.startswith("🤝"):
+        f_view_mode = "matches"
+    elif _vtoggle.startswith("✉"):
+        f_view_mode = "reached_out"
+    else:
+        f_view_mode = "all"
 
     # ── search box ────────────────────────────────────────────────────────
     f_search = st.text_input(
@@ -1245,6 +1273,16 @@ with tab1:
     # Apply minimum score filter
     deals = [d for d in deals if d.get("match_score", 0) >= f_min_score]
 
+    # Seller / Match / Reached-Out view mode
+    if f_view_mode == "sellers":
+        deals = [d for d in deals if not (d.get("buyer_id") or "").strip()]
+    elif f_view_mode == "matches":
+        deals = [d for d in deals if (d.get("buyer_id") or "").strip()]
+    elif f_view_mode == "reached_out":
+        deals = [d for d in deals
+                 if (d.get("buyer_id") or "").strip()
+                 and (d.get("last_contacted") or "").strip()]
+
     # Free-text search filter
     if f_search and f_search.strip():
         _q = f_search.strip().lower()
@@ -1458,6 +1496,23 @@ with tab1:
             stage_lbl    = _e(STAGE_LABELS.get(stage, stage))
             overdue_col  = "#E74C3C" if overdue else "#555"
 
+            # Build buyer-row block as a separate string
+            if buyer_name and buyer_name not in ("", "—", "Unknown"):
+                _buyer_block = (
+                    f'<div style="background:#1a0d24;border-left:2px solid #9B59B6;padding:4px 10px;'
+                    f'margin-bottom:8px;border-radius:0 4px 4px 0">'
+                    f'<span style="font-size:0.62rem;color:#9B59B6;letter-spacing:1.2px;font-weight:700">🤝 MATCHED BUYER</span> &nbsp; '
+                    f'<strong style="color:#d4b3e8;font-size:0.88rem">{byr_e}</strong>'
+                    f'<span style="float:right;color:{overdue_col};font-size:0.72rem">Last contact: {day_e}{"  ⚠" if overdue else ""}</span>'
+                    f'</div>'
+                )
+            else:
+                _buyer_block = (
+                    f'<div style="background:#241a0d;border-left:2px solid #F39C12;padding:4px 10px;'
+                    f'margin-bottom:8px;border-radius:0 4px 4px 0;font-size:0.72rem;color:#F39C12">'
+                    f'⚠ No buyer matched yet · go to <strong>📁 Pre-Pipeline</strong> to match this seller</div>'
+                )
+
             card_html = (
                 f'<div style="border-left:4px solid {border_c};border-radius:0 8px 8px 0;'
                 f'padding:10px 14px;margin-bottom:6px;background:{bg_c};border:1px solid {border_c}33">'
@@ -1476,13 +1531,8 @@ with tab1:
                 f'<span style="color:{dq_color};font-size:0.75rem" title="Data quality (5=best)">{dq_stars}</span>'
                 f'</span></div>'
 
-                # buyer match row
-                f'<div style="background:#1a0d24;border-left:2px solid #9B59B6;padding:4px 10px;'
-                f'margin-bottom:8px;border-radius:0 4px 4px 0">'
-                f'<span style="font-size:0.62rem;color:#9B59B6;letter-spacing:1.2px;font-weight:700">🤝 MATCHED BUYER</span> &nbsp; '
-                f'<strong style="color:#d4b3e8;font-size:0.88rem">{byr_e}</strong>'
-                f'<span style="float:right;color:{overdue_col};font-size:0.72rem">Last contact: {day_e}{"  ⚠" if overdue else ""}</span>'
-                f'</div>'
+                # buyer match row (seller-only or matched, set above as _buyer_block)
+                f'{_buyer_block}'
 
                 # 3-column grid
                 f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:0.83rem">'
