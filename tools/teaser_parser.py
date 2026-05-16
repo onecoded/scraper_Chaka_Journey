@@ -117,6 +117,8 @@ def parse_msc_txt(path: Path) -> list:
             "broker_phone": broker_phone,
             "source":       "msc_txt",
             "source_file":  path.name,
+            "source_path":  str(path),
+            "source_url":   "file:///" + str(path).replace("\\","/"),
             "note":         note,
         })
 
@@ -179,6 +181,8 @@ def parse_xlsx_listings(path: Path) -> list:
             "broker_phone":  _col(row, "phone","tel"),
             "source":        "xlsx",
             "source_file":   path.name,
+            "source_path":   str(path),
+            "source_url":    "file:///" + str(path).replace("\\","/"),
             "note":          _col(row, "note","comment","status","flag"),
         })
     return results
@@ -210,6 +214,8 @@ def scan_pdf_teasers() -> list:
             "revenue_raw": "", "ebitda_raw": "",
             "broker_name": "", "broker_email": "", "broker_phone": "",
             "source": "pdf", "source_file": pdf_path.name,
+            "source_path": str(pdf_path),
+            "source_url": "file:///" + str(pdf_path).replace("\\","/"),
             "pdf_path": str(pdf_path), "note": "",
         }
 

@@ -2656,6 +2656,12 @@ with tab7:
                     with _t7_col2:
                         _add_key = f"t7_add_{_proj[:20]}_{_b.get('id','')}"
                         if st.button("➕ Pipeline", key=_add_key, help="Add this match to Deal Flow"):
+                            # Contact-fallback chain: prefer buyer website,
+                            # then broker email/phone, then deal source file URL
+                            _domain = (
+                                _b.get("website","")
+                                or _deal.get("source_url","")
+                            )
                             _new_deal = {
                                 "company_name":    _proj,
                                 "industry":        _deal.get("industry",""),
@@ -2665,7 +2671,8 @@ with tab7:
                                 "ebitda_estimate": _deal.get("ebitda_raw",""),
                                 "owner_email":     _deal.get("broker_email",""),
                                 "owner_name":      _deal.get("broker_name",""),
-                                "company_domain":  _b.get("website",""),
+                                "owner_phone":     _deal.get("broker_phone",""),
+                                "company_domain":  _domain,
                                 "buyer_id":        _b.get("id",""),
                                 "buyer_name":      _b.get("firm",""),
                                 "match_score":     _bs,
@@ -2674,7 +2681,10 @@ with tab7:
                                 "source":          f"teaser:{_deal.get('source_file','')}",
                                 "response_notes":  _deal.get("note",""),
                             }
-                            if not deal_exists(_proj, _b.get("id","")):
+                            # Refuse if no contact info at all
+                            if not (_new_deal["owner_email"] or _new_deal["owner_phone"] or _new_deal["company_domain"]):
+                                st.error(f"Cannot add — no contact info available for {_proj}.")
+                            elif not deal_exists(_proj, _b.get("id","")):
                                 add_deal(_new_deal)
                                 st.success(f"Added {_proj} × {_b.get('firm','')} to pipeline!")
                                 st.rerun()
