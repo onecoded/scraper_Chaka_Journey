@@ -2005,10 +2005,113 @@ with tab3:
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab4:
-    st.subheader("Automation")
-    st.caption("Auto-draft emails for new matches, review seller intake submissions, and manage broker tasks.")
+    st.markdown(
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">'
+        '<span style="font-size:1.4rem">🔮</span>'
+        '<span style="font-size:1.3rem;font-weight:800;color:#e8eaf0">The Palantír — Automation</span>'
+        '</div>'
+        '<div style="color:#666;font-size:0.82rem;margin-bottom:12px">'
+        'Auto-draft deal outreach. Recruit new buyers into the Fellowship. Review seller intakes.'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
-    auto1, auto2, auto3 = st.tabs(["Auto-Draft Emails", "Seller Intakes", "Task Queue"])
+    auto1, auto_rec, auto2, auto3 = st.tabs([
+        "📧 Auto-Draft Deal Emails",
+        "👑 Recruit New Buyers",
+        "📥 Seller Intakes",
+        "📋 Task Queue",
+    ])
+
+    with auto_rec:
+        st.markdown("#### 👑 Recruit New Buyers into the Fellowship")
+        st.caption(
+            "Generate personalized teaser emails to PE firms, family offices, and individual buyers. "
+            "Emails reference your active deals (anonymized) and drop the buyer agreement link. "
+            "Replies → sign Buyer Agreement → portal access."
+        )
+
+        # Quick stats
+        _rec_all_buyers = get_all_buyers()
+        _rec_no_agreement = [b for b in _rec_all_buyers if not b.get("agreement_signed")]
+        _ms1, _ms2 = st.columns(2)
+        _ms1.metric("👑 Buyers in Fellowship", len(_rec_all_buyers))
+        _ms2.metric("⏳ Without signed agreement", len(_rec_no_agreement))
+
+        st.markdown("##### ✍ Compose Recruitment Email")
+        _rc1, _rc2 = st.columns(2)
+        with _rc1:
+            _prospect_name = st.text_input("Prospect Name *", key="rec_name",
+                                            placeholder="e.g. Sarah Chen")
+            _prospect_firm = st.text_input("Firm / Company", key="rec_firm",
+                                            placeholder="e.g. Audax Private Equity")
+            _prospect_email = st.text_input("Email *", key="rec_email",
+                                             placeholder="sarah@firm.com")
+        with _rc2:
+            _prospect_focus = st.text_input("Acquisition Focus", key="rec_focus",
+                                             placeholder="e.g. industrial services, healthcare, $5M-$20M EBITDA")
+            _prospect_geo = st.text_input("Geographic Focus", key="rec_geo",
+                                           placeholder="e.g. Southeast, National")
+            _custom_hook = st.text_area("Optional: personalization hook", key="rec_hook",
+                                         placeholder="e.g. 'Just saw your Pipe View America exit announcement'",
+                                         height=70)
+
+        _gen_col1, _gen_col2 = st.columns([1, 3])
+        if _gen_col1.button("✨ Generate Email", type="primary", key="rec_gen",
+                             use_container_width=True, disabled=not _prospect_name):
+            try:
+                import buyer_outreach as _bo
+                _prospect = {
+                    "name":       _prospect_name,
+                    "firm":       _prospect_firm,
+                    "email":      _prospect_email,
+                    "industries": [i.strip() for i in (_prospect_focus or "").split(",") if i.strip()],
+                    "geography":  _prospect_geo,
+                    "hook":       _custom_hook,
+                }
+                with st.spinner("Forging email…"):
+                    _drafted = _bo.generate_buyer_recruitment_email(_prospect, get_all_deals())
+                st.session_state["rec_drafted_subject"] = _drafted["subject"]
+                st.session_state["rec_drafted_body"]    = _drafted["body"]
+                st.success("✅ Email drafted below.")
+            except Exception as _ex:
+                st.error(f"Generation failed: {_ex}")
+
+        if "rec_drafted_subject" in st.session_state:
+            st.markdown("##### 📧 Drafted Email")
+            _sub_v = st.text_input("Subject", value=st.session_state["rec_drafted_subject"], key="rec_sub_edit")
+            _body_v = st.text_area("Body", value=st.session_state["rec_drafted_body"], height=300, key="rec_body_edit")
+
+            _sc1, _sc2, _sc3 = st.columns(3)
+            if _sc1.button("📨 Create Gmail Draft", type="primary", key="rec_draft",
+                            use_container_width=True, disabled=not _prospect_email):
+                ok, msg = create_gmail_draft(_prospect_email, _sub_v, _body_v)
+                if ok:
+                    st.success(f"Gmail draft created for {_prospect_email} — open Gmail to send.")
+                else:
+                    st.error(f"Gmail: {msg}")
+            if _sc2.button("📋 Copy to Clipboard", key="rec_copy", use_container_width=True):
+                _full = f"To: {_prospect_email}\nSubject: {_sub_v}\n\n{_body_v}"
+                st.code(_full, language=None)
+                st.caption("Select the text above and copy.")
+            if _sc3.button("🔄 Regenerate", key="rec_regen", use_container_width=True):
+                st.session_state.pop("rec_drafted_subject", None)
+                st.session_state.pop("rec_drafted_body", None)
+                st.rerun()
+
+        st.markdown("---")
+        st.markdown("##### 🔗 Direct Links")
+        _l1, _l2 = st.columns(2)
+        _l1.markdown(
+            "**Buyer Form (Google):**  \n"
+            "[forms.gle/Ka7VuFtryfkmvpp48](https://forms.gle/Ka7VuFtryfkmvpp48)"
+        )
+        _l2.markdown(
+            "**Buyer Portal (live deals):**  \n"
+            "`http://localhost:8601/Buyer_Portal?token=<buyer_id>`"
+        )
+
+    auto1, auto2, auto3 = auto1, auto2, auto3  # keep names
 
     with auto1:
         st.markdown("#### Auto-Draft Emails for Uncontacted Leads")
