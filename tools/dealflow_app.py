@@ -902,14 +902,14 @@ st.divider()
 
 # ── tabs ──────────────────────────────────────────────────────────────────────
 
-tab1, tab2, tab6, tab7, tab3, tab4, tab5 = st.tabs([
-    "📋  The Mines (Sellers + Matches)",
+tab7, tab1, tab2, tab6, tab3, tab4, tab5 = st.tabs([
+    "⚒  The Forge",
+    "📋  The Mines",
     "🎯  The Pipeline",
-    "🚀  Scout the Realms",
-    "⚒  The Forge (Match Buyers × Sellers)",
-    "📜  Ravens (Outreach)",
-    "🔮  Palantír (Automation)",
-    "👑  The Fellowship (Buyers + Settings)",
+    "🚀  Scout",
+    "📜  Ravens",
+    "🔮  Palantír",
+    "👑  Fellowship",
 ])
 
 
@@ -1047,9 +1047,9 @@ with tab1:
     _vtoggle = st.radio(
         "View",
         [
+            f"🤝 Matches ({_match_count})",
+            f"✉ Reached Out ({_contacted_ct})",
             f"📦 Sellers Only ({_seller_count})",
-            f"🤝 Matches Only ({_match_count})",
-            f"✉ Already Reached Out ({_contacted_ct})",
             f"📊 All ({len(_all_for_view)})",
         ],
         horizontal=True,
@@ -1086,23 +1086,19 @@ with tab1:
         "💼 Services":             ["services","consulting","staffing","accounting","finance"],
     }
 
-    # ── filter bar — row 1 ────────────────────────────────────────────────
-    fc1, fc2, fc3, fc4 = st.columns([3, 2, 2, 2])
-    f_buyer    = fc1.selectbox("Buyer", _bnames1, key="ls_buyer")
+    # ── single-row filter bar — fluid, no sliders ──────────────────────────
+    fc1, fc2, fc3, fc4, fc5, fc6 = st.columns([3, 2, 2, 2, 2, 2])
+    f_buyer    = fc1.selectbox("Buyer",    _bnames1, key="ls_buyer")
     f_interest = fc2.selectbox("Interest", ["All","Hot","Warm","Cold"], key="ls_interest")
-    f_type     = fc3.selectbox("Type", ["All","On-Market","Off-Market"], key="ls_type")
-    f_stage    = fc4.selectbox("Stage", ["All"] + [STAGE_LABELS[s] for s in DEAL_STAGES], key="ls_stage")
+    f_type     = fc3.selectbox("Type",     ["All","On-Market","Off-Market"], key="ls_type")
+    f_stage    = fc4.selectbox("Stage",    ["All"] + [STAGE_LABELS[s] for s in DEAL_STAGES], key="ls_stage")
+    f_cluster  = fc5.selectbox("Industry", list(CLUSTERS.keys()), key="ls_cluster")
+    f_sort     = fc6.selectbox("Sort",     ["Interest + Newest","Highest Score","Newest Listed","Overdue Contact"], key="ls_sort")
 
-    # ── filter bar — row 2 ────────────────────────────────────────────────
-    sc1, sc2, sc3, sc4, sc5 = st.columns([3, 2, 3, 2, 1])
-    f_cluster   = sc1.selectbox("Industry", list(CLUSTERS.keys()), key="ls_cluster")
-    f_sort      = sc2.selectbox("Sort", ["Interest + Newest","Highest Score","Newest Listed","Overdue Contact"], key="ls_sort")
-    f_min_score = sc3.slider("Min Score", 0, 100, 40, 5, key="ls_min_score_filter")
-    f_contact   = sc4.selectbox("Contact Quality",
-                                ["Phone or Web", "Phone + Web", "Email + Phone + Web", "Any"],
-                                key="ls_contact",
-                                help="Filter by contact info. Default = Phone or Web (shows ~74% of leads).")
-    f_perfect   = sc5.checkbox("🎯", key="ls_perfect", help="Perfect matches only (score ≥ 80)")
+    # Hidden filter values (no longer in UI but logic still uses them)
+    f_min_score = 0
+    f_contact   = "Any"
+    f_perfect   = False
 
     # ── tools expander ────────────────────────────────────────────────────
     with st.expander("⚙️  Tools — Import · Scrape · Add Lead · Maintenance", expanded=False):
@@ -2429,11 +2425,40 @@ with tab5:
         bc2_status[4].metric("⚒ Clay",      "✅" if os.getenv("CLAY_API_KEY","") and os.getenv("CLAY_WEBHOOK_URL","") else "❌")
 
         st.markdown("---")
-        st.markdown("#### Seller Intake Form")
-        st.info(
-            "**To share with sellers:** Run this app and navigate to **Seller Intake** in the left sidebar.\n\n"
-            "**For a public URL:** Deploy to [Streamlit Cloud](https://streamlit.io/cloud) (free) — "
-            "connect your GitHub repo and share the URL."
+        st.markdown("#### 📜 Portal Forms")
+        st.caption("Share these public Google Forms to onboard new sellers and buyers — submissions feed into your pipeline.")
+        _pf1, _pf2 = st.columns(2)
+        with _pf1:
+            st.markdown(
+                '<div style="background:#241a0d;border-left:3px solid #F39C12;padding:10px 14px;border-radius:0 6px 6px 0">'
+                '<div style="font-weight:700;color:#F39C12;font-size:0.9rem;margin-bottom:4px">📦 SELLER FORM</div>'
+                '<div style="font-size:0.78rem;color:#aab;margin-bottom:8px">For business owners who want to sell. Captures financials, industry, ask price.</div>'
+                '<a href="https://forms.gle/pVNQwEBsnWJQMymm7" target="_blank" '
+                'style="display:inline-block;background:#F39C12;color:#0d0d0d;padding:6px 14px;'
+                'border-radius:6px;text-decoration:none;font-weight:700;font-size:0.82rem">'
+                '🔗 Open Seller Form</a>'
+                '</div>',
+                unsafe_allow_html=True
+            )
+            st.code("https://forms.gle/pVNQwEBsnWJQMymm7", language=None)
+        with _pf2:
+            st.markdown(
+                '<div style="background:#1a0d24;border-left:3px solid #9B59B6;padding:10px 14px;border-radius:0 6px 6px 0">'
+                '<div style="font-weight:700;color:#d4b3e8;font-size:0.9rem;margin-bottom:4px">👑 BUYER FORM</div>'
+                '<div style="font-size:0.78rem;color:#aab;margin-bottom:8px">For PE / family office / individuals who want to buy. Captures mandate, EBITDA range, geo.</div>'
+                '<a href="https://forms.gle/Ka7VuFtryfkmvpp48" target="_blank" '
+                'style="display:inline-block;background:#9B59B6;color:#fff;padding:6px 14px;'
+                'border-radius:6px;text-decoration:none;font-weight:700;font-size:0.82rem">'
+                '🔗 Open Buyer Form</a>'
+                '</div>',
+                unsafe_allow_html=True
+            )
+            st.code("https://forms.gle/Ka7VuFtryfkmvpp48", language=None)
+
+        st.caption(
+            "💡 To wire form submissions directly into Mithril, set up a Google Sheets sync: "
+            "1) Link both forms to one Google Sheet, 2) share the Sheet ID in the GOOGLE_SHEET_ID env var, "
+            "3) Mithril will auto-poll for new entries."
         )
 
         st.markdown("---")
@@ -2676,182 +2701,197 @@ with tab6:
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab7:
-    st.subheader("📁 Teaser Matches")
-    st.caption(
-        "Deals from BIZBROKER/TEASERS auto-matched to buyers with signed agreements. "
-        "Only shows pairs where the buyer has a contact link or email."
+    st.markdown(
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+        '<span style="font-size:1.4rem;font-weight:800;color:#e8eaf0">⚒ The Forge</span>'
+        '<span style="color:#666;font-size:0.82rem">Pick a seller on the <span style="color:#F39C12">left</span>, '
+        'see best-matched buyers gravitate to the <span style="color:#9B59B6">right</span>. '
+        'When you find a fit, forge the match into the Pipeline.</span>'
+        '</div>',
+        unsafe_allow_html=True
     )
 
-    # Load teasers
-    _t7_load = st.button("🔄 Load / Refresh Teasers", key="t7_load")
-    if _t7_load or "t7_matches" not in st.session_state:
-        with st.spinner("Scanning TEASERS folder…"):
+    # Load all sellers (deals without buyer_id) and buyers
+    _forge_all_deals  = get_all_deals()
+    _forge_sellers    = [d for d in _forge_all_deals if (d.get("company_name") or "").strip()
+                         and (d.get("company_name") or "").strip() not in ("—","-","Unknown","None")]
+    _forge_buyers     = get_all_buyers()
+
+    # Optional: also pull live teaser parses
+    if st.button("🔄 Refresh from BIZBROKER/TEASERS", key="forge_refresh"):
+        with st.spinner("Re-scanning TEASERS folder…"):
             try:
                 import teaser_parser as _tp
-                _t7_deals   = _tp.scan_all_teasers()
-                _t7_matches = _tp.match_teasers(_t7_deals)
-                st.session_state["t7_matches"] = _t7_matches
-                st.session_state["t7_deals"]   = _t7_deals
+                _t_deals = _tp.scan_all_teasers()
+                _t_matches = _tp.match_teasers(_t_deals)
+                st.session_state["forge_teaser_matches"] = _t_matches
+                st.success(f"Loaded {len(_t_deals)} teaser deals · {len(_t_matches)} buyer matches")
             except Exception as _ex:
-                st.error(f"Could not load teasers: {_ex}")
-                _t7_matches = []
-                st.session_state["t7_matches"] = []
-                st.session_state["t7_deals"]   = []
+                st.error(f"Could not load: {_ex}")
 
-    _t7_matches = st.session_state.get("t7_matches", [])
-    _t7_deals   = st.session_state.get("t7_deals", [])
+    # Filter row
+    _ff1, _ff2, _ff3 = st.columns([2, 2, 3])
+    _seller_filter = _ff1.selectbox("Filter sellers by", ["All","Off-Market","On-Market","Teaser"], key="forge_seller_type")
+    _min_match     = _ff2.selectbox("Min match %", ["Any","50%+","70%+","90%+"], key="forge_min_match", index=1)
+    _search_forge  = _ff3.text_input("🔎 Search company / industry / state", key="forge_search")
 
-    if not _t7_deals:
-        st.info("No teasers loaded yet. Click **Load / Refresh Teasers** above.")
-    else:
-        _t7m1, _t7m2, _t7m3 = st.columns(3)
-        _t7m1.metric("Deals loaded", len(_t7_deals))
-        _t7m2.metric("Buyer matches", len(_t7_matches))
-        _t7m3.metric("Unique deals matched", len({m["deal"]["project_name"] for m in _t7_matches}))
+    # Apply seller filter
+    _forge_filtered_sellers = list(_forge_sellers)
+    if _seller_filter == "Off-Market":
+        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if s.get("listing_type") != "on-market"]
+    elif _seller_filter == "On-Market":
+        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if s.get("listing_type") == "on-market"]
+    elif _seller_filter == "Teaser":
+        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if (s.get("source") or "").startswith("teaser:")]
 
-        st.markdown("---")
+    if _search_forge and _search_forge.strip():
+        _q = _search_forge.lower().strip()
+        _forge_filtered_sellers = [s for s in _forge_filtered_sellers
+                                   if _q in (s.get("company_name") or "").lower()
+                                   or _q in (s.get("industry") or "").lower()
+                                   or _q in (s.get("state") or "").lower()
+                                   or _q in (s.get("city") or "").lower()]
 
-        # Filter
-        _t7_f1, _t7_f2 = st.columns(2)
-        _t7_minscore = _t7_f1.slider("Min match score", 0, 80, 30, key="t7_min")
-        _t7_industry = _t7_f2.text_input("Filter by industry", placeholder="e.g. construction", key="t7_ind")
+    _min_pct = {"Any":0, "50%+":50, "70%+":70, "90%+":90}[_min_match]
 
-        _t7_filtered = [
-            m for m in _t7_matches
-            if m["match_score"] >= _t7_minscore
-            and (_t7_industry.lower() in (m["deal"].get("industry") or "").lower()
-                 if _t7_industry else True)
-        ]
+    # Sort sellers by score desc to show best at top
+    _forge_filtered_sellers.sort(key=lambda x: x.get("match_score", 0), reverse=True)
 
-        if not _t7_filtered:
-            st.info("No matches meet the current filter criteria.")
-        else:
-            # Group by deal
-            from collections import defaultdict as _dd
-            _by_deal = _dd(list)
-            for m in _t7_filtered:
-                _by_deal[m["deal"]["project_name"]].append(m)
+    # Selected seller from session
+    _sel_seller_id = st.session_state.get("forge_selected_seller_id")
+    _sel_seller    = next((s for s in _forge_filtered_sellers if s.get("id") == _sel_seller_id), None)
+    if not _sel_seller and _forge_filtered_sellers:
+        _sel_seller = _forge_filtered_sellers[0]
+        st.session_state["forge_selected_seller_id"] = _sel_seller.get("id")
 
-            for _proj, _deal_matches in sorted(_by_deal.items(),
-                key=lambda kv: max(m["match_score"] for m in kv[1]), reverse=True):
-                _deal  = _deal_matches[0]["deal"]
-                _dscore = max(m["match_score"] for m in _deal_matches)
-                _dc     = "#F1C40F" if _dscore >= 80 else "#27AE60" if _dscore >= 60 else "#4A90D9"
+    # ── two-column playground ──────────────────────────────────────────────
+    _fc_left, _fc_right = st.columns(2)
 
-                # Deal header card
-                _d_ind  = _e(_deal.get("industry",""))
-                _d_geo  = _e(_deal.get("geography",""))
-                _d_rev  = _e(_deal.get("revenue_raw","") or "")
-                _d_ebit = _e(_deal.get("ebitda_raw","") or "")
-                _d_brok = _e(_deal.get("broker_name",""))
-                _d_mail = _deal.get("broker_email","")
-                _d_note = _e(_deal.get("note",""))
-                _d_src  = _e(_deal.get("source_file",""))
-                _d_name = _e(_proj)
+    # LEFT: Sellers
+    with _fc_left:
+        st.markdown(
+            f'<div style="background:#241a0d;border-left:3px solid #F39C12;padding:6px 12px;'
+            f'border-radius:0 6px 6px 0;margin-bottom:6px">'
+            f'<span style="color:#F39C12;font-weight:800;font-size:0.95rem">📦 SELLERS</span> '
+            f'<span style="color:#666;font-size:0.78rem">· {len(_forge_filtered_sellers)} listings — click one to match</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+        # Render top 30 sellers as compact pickable cards
+        for _s in _forge_filtered_sellers[:30]:
+            _sname = (_s.get("company_name") or "").strip()
+            if not _sname or _sname in ("—","Unknown"):
+                continue
+            _sid    = _s.get("id")
+            _sind   = (_s.get("industry") or "").strip()[:50]
+            _sloc   = ", ".join(filter(None, [_s.get("city",""), _s.get("state","")]))
+            _srev   = (_s.get("revenue_estimate") or "").strip()
+            _sebit  = (_s.get("ebitda_estimate") or "").strip()
+            _ssc    = _s.get("match_score", 0)
+            _is_selected = _sid == _sel_seller_id
+            _border = "#F39C12" if _is_selected else "#1a1d24"
+            _bg     = "#1a1308" if _is_selected else "#0a0c10"
 
-                _broker_html = ""
-                if _d_mail:
-                    _broker_html = (f'<a href="mailto:{_e(_d_mail)}" style="color:#4A90D9;font-size:0.78rem">'
-                                    f'✉ {_e(_d_mail)}</a>')
-                elif _d_brok:
-                    _broker_html = f'<span style="color:#888;font-size:0.78rem">{_e(_d_brok)}</span>'
-
+            _scol1, _scol2 = st.columns([8, 2])
+            with _scol1:
                 st.markdown(
-                    f'<div style="border-left:4px solid {_dc};border-radius:0 10px 10px 0;'
-                    f'padding:12px 18px;margin:14px 0 4px 0;background:#14160e">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center">'
-                    f'<span style="font-size:1.05rem;font-weight:800;color:#f0f0f0">{_d_name}</span>'
-                    f'<span style="background:{_dc}22;color:{_dc};font-size:0.78rem;'
-                    f'padding:3px 12px;border-radius:12px">{_dscore}/100 best match</span>'
-                    f'</div>'
-                    f'<div style="color:#888;font-size:0.8rem;margin-top:4px">'
-                    f'{_d_ind}{"  ·  " + _d_geo if _d_geo else ""}{"  ·  Rev " + _d_rev if _d_rev else ""}'
-                    f'{"  ·  EBITDA " + _d_ebit if _d_ebit else ""}'
-                    f'</div>'
-                    + (f'<div style="margin-top:6px">{_broker_html}</div>' if _broker_html else "")
-                    + (f'<div style="color:#E74C3C;font-size:0.74rem;margin-top:4px">{_d_note}</div>' if _d_note else "")
-                    + (f'<div style="color:#3a3a3a;font-size:0.7rem;margin-top:2px">Source: {_d_src}</div>' if _d_src else "")
+                    f'<div style="border-left:2px solid {_border};padding:6px 10px;margin:2px 0;'
+                    f'background:{_bg};border-radius:0 4px 4px 0">'
+                    f'<div style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_sname)}</div>'
+                    f'<div style="color:#666;font-size:0.72rem">{_e(_sind)} · {_e(_sloc)}</div>'
+                    + (f'<div style="color:#888;font-size:0.7rem">Rev {_e(_srev)} · EBITDA {_e(_sebit)}</div>' if _srev or _sebit else "")
                     + '</div>',
                     unsafe_allow_html=True
                 )
+            with _scol2:
+                if st.button("Pick", key=f"fpick_s_{_sid}", use_container_width=True,
+                             type="primary" if _is_selected else "secondary"):
+                    st.session_state["forge_selected_seller_id"] = _sid
+                    st.rerun()
 
-                # Buyer match rows
-                for m in sorted(_deal_matches, key=lambda x: x["match_score"], reverse=True):
-                    _b      = m["buyer"]
-                    _bs     = m["match_score"]
-                    _bc     = "#27AE60" if _bs >= 70 else "#F39C12" if _bs >= 50 else "#8E44AD"
-                    _bname  = _e(_b.get("firm",""))
-                    _bcon   = _e(_b.get("contact_name",""))
-                    _bmail  = _b.get("email","")
-                    _bweb   = _b.get("website","")
-                    _bph    = _e(_b.get("phone",""))
-                    _binds  = _e(", ".join((_b.get("industries") or [])[:3]))
-                    _bgeos  = _e(", ".join((_b.get("geography") or [])[:2]))
-                    _bemin  = _b.get("ebitda_min",0) or 0
-                    _bemax  = _b.get("ebitda_max",0) or 0
-                    _bebitda_str = ""
-                    if _bemin or _bemax:
-                        _bebitda_str = f'EBITDA ${_bemin/1e6:.1f}M – ${_bemax/1e6:.1f}M'
+    # RIGHT: Buyers, sorted by match score against selected seller
+    with _fc_right:
+        if not _sel_seller:
+            st.info("👈 Pick a seller on the left to see matching buyers.")
+        else:
+            # Score each buyer vs selected seller
+            _ranked_buyers = []
+            for _b in _forge_buyers:
+                _bscore = score_lead(_sel_seller, _b)
+                _ranked_buyers.append((_bscore, _b))
+            _ranked_buyers.sort(key=lambda x: x[0], reverse=True)
+            _ranked_buyers = [(s,b) for s,b in _ranked_buyers if s >= _min_pct]
 
-                    _bmail_html = (f'<a href="mailto:{_e(_bmail)}" '
-                                   f'style="color:#4A90D9;font-size:0.77rem">✉ {_e(_bmail)}</a> '
-                                   if _bmail else "")
-                    _bweb_html  = (f'<a href="{_e(_bweb)}" target="_blank" '
-                                   f'style="color:#27AE60;font-size:0.77rem">🌐 {_e(_bweb[:40])}</a>'
-                                   if _bweb else "")
+            st.markdown(
+                f'<div style="background:#1a0d24;border-left:3px solid #9B59B6;padding:6px 12px;'
+                f'border-radius:0 6px 6px 0;margin-bottom:6px">'
+                f'<span style="color:#d4b3e8;font-weight:800;font-size:0.95rem">👑 BUYERS</span> '
+                f'<span style="color:#666;font-size:0.78rem">· ranked vs <strong style="color:#F39C12">{_e(_sel_seller.get("company_name",""))}</strong></span>'
+                f'</div>',
+                unsafe_allow_html=True
+            )
 
-                    _t7_col1, _t7_col2 = st.columns([5, 1])
-                    with _t7_col1:
-                        st.markdown(
-                            f'<div style="border-left:2px solid {_bc}55;margin-left:16px;'
-                            f'padding:7px 14px;background:#0d0f14;border-radius:0 6px 6px 0;margin-bottom:3px">'
-                            f'<strong style="color:#ddd;font-size:0.9rem">{_bname}</strong>'
-                            + (f' <span style="color:#666;font-size:0.78rem">({_bcon})</span>' if _bcon else "")
-                            + f' <span style="background:{_bc}22;color:{_bc};font-size:0.7rem;'
-                            f'padding:1px 8px;border-radius:8px">{_bs}/100</span>'
-                            f'<div style="color:#666;font-size:0.75rem;margin-top:2px">'
-                            f'{_binds}  ·  {_bgeos}'
-                            + (f'  ·  {_bebitda_str}' if _bebitda_str else "")
-                            + (f'  ·  📞 {_bph}' if _bph else "")
-                            + f'</div>'
-                            f'<div style="margin-top:4px">{_bmail_html}{_bweb_html}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    with _t7_col2:
-                        _add_key = f"t7_add_{_proj[:20]}_{_b.get('id','')}"
-                        if st.button("➕ Pipeline", key=_add_key, help="Add this match to Deal Flow"):
-                            # Contact-fallback chain: prefer buyer website,
-                            # then broker email/phone, then deal source file URL
-                            _domain = (
-                                _b.get("website","")
-                                or _deal.get("source_url","")
-                            )
-                            _new_deal = {
-                                "company_name":    _proj,
-                                "industry":        _deal.get("industry",""),
-                                "state":           "",
-                                "city":            _deal.get("geography","")[:50],
-                                "revenue_estimate":_deal.get("revenue_raw",""),
-                                "ebitda_estimate": _deal.get("ebitda_raw",""),
-                                "owner_email":     _deal.get("broker_email",""),
-                                "owner_name":      _deal.get("broker_name",""),
-                                "owner_phone":     _deal.get("broker_phone",""),
-                                "company_domain":  _domain,
-                                "buyer_id":        _b.get("id",""),
-                                "buyer_name":      _b.get("firm",""),
-                                "match_score":     _bs,
-                                "interest_level":  "warm" if _bs >= 60 else "cold",
-                                "listing_type":    "on-market",
-                                "source":          f"teaser:{_deal.get('source_file','')}",
-                                "response_notes":  _deal.get("note",""),
+            for _bscore, _b in _ranked_buyers[:30]:
+                _bname   = _b.get("name","") or _b.get("firm","")
+                _binds   = ", ".join((_b.get("industries") or [])[:3])
+                _bstates = ", ".join((list(_b.get("states") or {}) if isinstance(_b.get("states"), dict) else (_b.get("states") or []))[:3])
+                _b_email = _b.get("email","")
+                _b_phone = _b.get("phone","")
+                _b_web   = _b.get("website","")
+                _bclr    = "#27AE60" if _bscore >= 70 else "#F39C12" if _bscore >= 45 else "#666"
+                _is_perfect = _bscore >= 90
+                _perfect_html = ' <span style="color:#F1C40F;font-size:0.7rem;font-weight:800">🎯 PERFECT</span>' if _is_perfect else ""
+
+                _bcol1, _bcol2 = st.columns([8, 2])
+                with _bcol1:
+                    st.markdown(
+                        f'<div style="border-left:2px solid {_bclr};padding:6px 10px;margin:2px 0;'
+                        f'background:#0d0a14;border-radius:0 4px 4px 0">'
+                        f'<div style="display:flex;justify-content:space-between;align-items:center">'
+                        f'<span style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_bname)}{_perfect_html}</span>'
+                        f'<span style="background:{_bclr}22;color:{_bclr};font-size:0.7rem;'
+                        f'padding:2px 8px;border-radius:8px;font-weight:700">{_bscore}/100</span>'
+                        f'</div>'
+                        f'<div style="color:#666;font-size:0.72rem">{_e(_binds)}</div>'
+                        + (f'<div style="color:#888;font-size:0.7rem">{_e(_bstates)}</div>' if _bstates else "")
+                        + '<div style="font-size:0.7rem;margin-top:3px">'
+                        + (f'<a href="mailto:{_e(_b_email)}" style="color:#4A90D9">✉</a> ' if _b_email else "")
+                        + (f'<a href="tel:{_e(_b_phone)}" style="color:#4A90D9">📞</a> ' if _b_phone else "")
+                        + (f'<a href="{_e(_b_web)}" target="_blank" style="color:#27AE60">🌐</a>' if _b_web else "")
+                        + '</div>'
+                        + '</div>',
+                        unsafe_allow_html=True
+                    )
+                with _bcol2:
+                    _btn_label = "🎯 Forge" if _is_perfect else "➕ Add"
+                    if st.button(_btn_label, key=f"fmatch_{_sel_seller.get('id')}_{_b.get('id','')}", use_container_width=True,
+                                 type="primary" if _is_perfect else "secondary"):
+                        # Add match to pipeline — refuse duplicates
+                        _proj_name = _sel_seller.get("company_name","")
+                        if deal_exists(_proj_name, _b.get("id","")):
+                            st.info(f"⚒ Already forged: {_proj_name} × {_bname}")
+                        else:
+                            _new_match = {
+                                "company_name":     _proj_name,
+                                "industry":         _sel_seller.get("industry",""),
+                                "state":            _sel_seller.get("state",""),
+                                "city":             _sel_seller.get("city",""),
+                                "revenue_estimate": _sel_seller.get("revenue_estimate",""),
+                                "ebitda_estimate":  _sel_seller.get("ebitda_estimate",""),
+                                "asking_price":     _sel_seller.get("asking_price",""),
+                                "owner_email":      _sel_seller.get("owner_email",""),
+                                "owner_name":       _sel_seller.get("owner_name",""),
+                                "owner_phone":      _sel_seller.get("owner_phone",""),
+                                "company_domain":   _sel_seller.get("company_domain",""),
+                                "buyer_id":         _b.get("id",""),
+                                "buyer_name":       _bname,
+                                "match_score":      _bscore,
+                                "interest_level":   "hot" if _bscore >= 90 else "warm" if _bscore >= 60 else "cold",
+                                "listing_type":     _sel_seller.get("listing_type","off-market"),
+                                "deal_stage":       "identified",
+                                "status":           "identified",
+                                "source":           f"forge:{_sel_seller.get('source','')}",
                             }
-                            # Refuse if no contact info at all
-                            if not (_new_deal["owner_email"] or _new_deal["owner_phone"] or _new_deal["company_domain"]):
-                                st.error(f"Cannot add — no contact info available for {_proj}.")
-                            elif not deal_exists(_proj, _b.get("id","")):
-                                add_deal(_new_deal)
-                                st.success(f"Added {_proj} × {_b.get('firm','')} to pipeline!")
-                                st.rerun()
-                            else:
-                                st.info("Already in pipeline.")
+                            add_deal(_new_match)
+                            st.success(f"⚒ Forged {_proj_name} × {_bname} into the Pipeline!")
+                            st.rerun()
