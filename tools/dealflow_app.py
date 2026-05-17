@@ -798,8 +798,8 @@ def enrich_and_rescore_all() -> tuple[int, int]:
 # ── page config ───────────────────────────────────────────────────────────────
 
 st.set_page_config(
-    page_title="Valar Advisory — Deal Flow",
-    page_icon="V",
+    page_title="Mithril — Deal Flow",
+    page_icon="💎",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -866,8 +866,28 @@ _full_contact = sum(
     and (d.get("company_domain") or "").strip()
 )
 
-st.markdown(f"## 🏢 Valar Advisory — Deal Flow Platform")
-st.caption(f"Off-Market Business Acquisition Pipeline  |  {BROKER_NAME} · {BROKER_COMPANY} · {BROKER_PHONE}")
+st.markdown(
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:2px">'
+    '<span style="font-size:2.2rem">💎</span>'
+    '<div>'
+    '<div style="font-size:1.75rem;font-weight:800;letter-spacing:-0.5px;'
+    'background:linear-gradient(90deg,#c9d6e8 0%,#7fa8d0 50%,#4a90d9 100%);'
+    '-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">'
+    'Mithril <span style="color:#888;font-weight:400">— Deal Flow Forge</span>'
+    '</div>'
+    f'<div style="color:#666;font-size:0.78rem;letter-spacing:0.5px">'
+    f'⛏ Off-market deal sourcing for {BROKER_COMPANY} · {BROKER_NAME} · {BROKER_PHONE}'
+    '</div>'
+    '</div></div>',
+    unsafe_allow_html=True
+)
+st.markdown(
+    '<div style="color:#4a5060;font-size:0.72rem;font-style:italic;margin:6px 0 12px 0;letter-spacing:0.3px">'
+    '"All that is gold does not glitter, not all those who wander are lost — but every great deal leaves a trail." '
+    '— Mithril, the rarest of finds'
+    '</div>',
+    unsafe_allow_html=True
+)
 
 s1, s2, s3, s4, s5, s6, s7 = st.columns(7)
 s1.metric("📋 Leads",        stats["total"],              help="Total leads & matches in DB")
@@ -883,13 +903,13 @@ st.divider()
 # ── tabs ──────────────────────────────────────────────────────────────────────
 
 tab1, tab2, tab6, tab7, tab3, tab4, tab5 = st.tabs([
-    "📋  Existing Leads",
-    "🎯  Deal Pipeline",
-    "🚀  Scrape New",
-    "📁  Pre-Pipeline (Buyers × Sellers)",
-    "📢  Outreach",
-    "🤖  Automation",
-    "👥  Buyers & Settings",
+    "📋  The Mines (Sellers + Matches)",
+    "🎯  The Pipeline",
+    "🚀  Scout the Realms",
+    "⚒  The Forge (Match Buyers × Sellers)",
+    "📜  Ravens (Outreach)",
+    "🔮  Palantír (Automation)",
+    "👑  The Fellowship (Buyers + Settings)",
 ])
 
 
@@ -1235,7 +1255,7 @@ with tab1:
 
             if _m5.button("☠ Delete No-Contact", key="db_purge_nocontact", type="primary", use_container_width=True,
                           help="Permanently delete every lead with no email AND no phone AND no website"):
-                with st.spinner("Deleting leads with zero contact info…"):
+                with st.spinner("Casting unworthy leads into Mount Doom…"):
                     _rm = 0
                     for _d in get_all_deals():
                         _has_em = bool((_d.get("owner_email") or "").strip())
@@ -1243,7 +1263,31 @@ with tab1:
                         _has_wb = bool((_d.get("company_domain") or "").strip())
                         if not (_has_em or _has_ph or _has_wb):
                             delete_deal(_d["id"]); _rm += 1
-                st.success(f"☠ Deleted {_rm} contactless leads. Worthless leads be gone."); st.rerun()
+                st.success(f"☠ Cast {_rm} leads into the fire. Mithril remains."); st.rerun()
+
+            # Second row of maintenance buttons
+            st.markdown("")
+            _mb1, _mb2 = st.columns(2)
+            if _mb1.button("⚒ Push to Clay (Enrichment Waterfall)", key="db_clay_push", use_container_width=True,
+                           help="Send leads with a website to Clay.com for multi-source enrichment"):
+                _ck = os.getenv("CLAY_WEBHOOK_URL","")
+                if not _ck or "your-webhook-id" in _ck:
+                    st.error("Add CLAY_WEBHOOK_URL in Settings — sign up at clay.com first.")
+                else:
+                    _need = [d for d in get_all_deals()
+                             if (d.get("company_domain") or "").strip()
+                             and not any(skip in (d.get("company_domain") or "").lower()
+                                         for skip in ("yelp.com","manta.com","yellowpages.com","file://"))
+                             and not (d.get("owner_email") or "").strip()][:200]
+                    if not _need:
+                        st.warning("No leads need Clay enrichment.")
+                    else:
+                        _cp = st.progress(0); _csent = 0
+                        for _i, _dl in enumerate(_need):
+                            _r = enrich_via_clay_webhook(_dl)
+                            if _r: _csent += 1
+                            _cp.progress((_i+1)/len(_need))
+                        st.success(f"⚒ Sent {_csent}/{len(_need)} leads to Clay. Enriched data will write back via webhook.")
 
     # ── build deal list ──
     buyer_id_filter = None
@@ -2342,32 +2386,47 @@ with tab5:
             s_smtp_user = gf1.text_input("Gmail Address",    value=cur.get("SMTP_USER",""))
             s_smtp_pass = gf2.text_input("App Password",     value=cur.get("SMTP_PASSWORD",""), type="password",
                                          help="Gmail App Password (16 chars) — not your real password")
-            st.markdown("**API Keys**")
+            st.markdown("**API Keys** — the rings of power that bind the forge together")
             ak1, ak2 = st.columns(2)
-            s_anthropic = ak1.text_input("Anthropic API Key", value=cur.get("ANTHROPIC_API_KEY",""), type="password")
-            s_apollo    = ak2.text_input("Apollo API Key",    value=cur.get("APOLLO_API_KEY",""), type="password")
-            s_serpapi   = ak1.text_input("SerpAPI Key",       value=cur.get("SERPAPI_KEY",""), type="password")
+            s_anthropic = ak1.text_input("🔮 Anthropic API Key", value=cur.get("ANTHROPIC_API_KEY",""), type="password",
+                                          help="Claude API for AI email generation")
+            s_apollo    = ak2.text_input("⚔ Apollo.io API Key",    value=cur.get("APOLLO_API_KEY",""), type="password",
+                                          help="Apollo.io for contact + email enrichment (replaces Hunter)")
+            s_serpapi   = ak1.text_input("🔍 SerpAPI Key",       value=cur.get("SERPAPI_KEY",""), type="password",
+                                          help="Google Search enrichment for owner names + revenue")
+            s_yelp      = ak2.text_input("📍 Yelp Fusion API",    value=cur.get("YELP_API_KEY",""), type="password",
+                                          help="Yelp Fusion API for local business scraping")
+            s_clay_key  = ak1.text_input("⚒ Clay API Key",        value=cur.get("CLAY_API_KEY",""), type="password",
+                                          help="Clay.com API key — paste here after signup at clay.com")
+            s_clay_url  = ak2.text_input("⚒ Clay Webhook URL",    value=cur.get("CLAY_WEBHOOK_URL",""),
+                                          placeholder="https://api.clay.com/v1/connect/webhook/...",
+                                          help="Clay table webhook URL — push scraped leads to Clay for enrichment")
 
             if st.form_submit_button("💾 Save Settings", type="primary"):
                 _save_env_keys({
-                    "BROKER_NAME":      s_name,
-                    "BROKER_TITLE":     s_title,
-                    "BROKER_COMPANY":   s_company,
-                    "BROKER_PHONE":     s_phone,
-                    "BROKER_EMAIL":     s_email,
-                    "BROKER_LINKEDIN":  s_li,
-                    "SMTP_USER":        s_smtp_user,
-                    "SMTP_PASSWORD":    s_smtp_pass,
-                    "ANTHROPIC_API_KEY":s_anthropic,
-                    "APOLLO_API_KEY":   s_apollo,
-                    "SERPAPI_KEY":      s_serpapi,
+                    "BROKER_NAME":       s_name,
+                    "BROKER_TITLE":      s_title,
+                    "BROKER_COMPANY":    s_company,
+                    "BROKER_PHONE":      s_phone,
+                    "BROKER_EMAIL":      s_email,
+                    "BROKER_LINKEDIN":   s_li,
+                    "SMTP_USER":         s_smtp_user,
+                    "SMTP_PASSWORD":     s_smtp_pass,
+                    "ANTHROPIC_API_KEY": s_anthropic,
+                    "APOLLO_API_KEY":    s_apollo,
+                    "SERPAPI_KEY":       s_serpapi,
+                    "YELP_API_KEY":      s_yelp,
+                    "CLAY_API_KEY":      s_clay_key,
+                    "CLAY_WEBHOOK_URL":  s_clay_url,
                 })
-                st.success("Saved to .env — restart the app to apply API key changes.")
+                st.success("⚒ Saved to .env — restart the forge to apply API key changes.")
 
-        bc2_status = st.columns(3)
-        bc2_status[0].metric("SMTP",      "✅ Set" if SMTP_USER else "❌ Missing")
-        bc2_status[1].metric("Anthropic", "✅ Set" if os.getenv("ANTHROPIC_API_KEY","").startswith("sk-") else "❌ Missing")
-        bc2_status[2].metric("Apollo",    "✅ Set" if os.getenv("APOLLO_API_KEY","") not in ("","your-apollo-api-key") else "❌ Missing")
+        bc2_status = st.columns(5)
+        bc2_status[0].metric("📧 SMTP",      "✅" if SMTP_USER else "❌")
+        bc2_status[1].metric("🔮 Anthropic", "✅" if os.getenv("ANTHROPIC_API_KEY","").startswith("sk-") else "❌")
+        bc2_status[2].metric("⚔ Apollo",    "✅" if os.getenv("APOLLO_API_KEY","") not in ("","your-apollo-api-key") else "❌")
+        bc2_status[3].metric("🔍 SerpAPI",   "✅" if os.getenv("SERPAPI_KEY","") not in ("","your-serpapi-key") else "❌")
+        bc2_status[4].metric("⚒ Clay",      "✅" if os.getenv("CLAY_API_KEY","") and os.getenv("CLAY_WEBHOOK_URL","") else "❌")
 
         st.markdown("---")
         st.markdown("#### Seller Intake Form")
