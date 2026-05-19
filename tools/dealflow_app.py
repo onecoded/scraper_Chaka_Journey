@@ -806,11 +806,34 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-  .block-container { padding-top: 1.2rem; }
-  .stTabs [data-baseweb="tab-list"] { gap: 6px; }
+  /* Global responsive container */
+  .block-container {
+      padding-top: 0.8rem !important;
+      padding-bottom: 1.5rem !important;
+      max-width: 100% !important;
+  }
+  /* Header chrome — pull down so logo doesn't get clipped under Streamlit toolbar */
+  header[data-testid="stHeader"] { background: transparent; }
+  /* Tabs spacing */
+  .stTabs [data-baseweb="tab-list"] { gap: 4px; flex-wrap: wrap; }
   .stTabs [data-baseweb="tab"] {
-      padding: 8px 20px; border-radius: 6px 6px 0 0;
-      font-weight: 600; font-size: 0.93rem;
+      padding: 7px 14px; border-radius: 6px 6px 0 0;
+      font-weight: 600; font-size: 0.88rem;
+      white-space: nowrap;
+  }
+  /* Multi-line button labels for seller pick rows */
+  .stButton > button {
+      white-space: pre-line;
+      text-align: left;
+      line-height: 1.25;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      min-height: unset;
+  }
+  /* Mobile: stack tabs vertically */
+  @media (max-width: 768px) {
+      .stTabs [data-baseweb="tab"] { font-size: 0.78rem; padding: 5px 9px; }
+      .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
   }
   .lead-card {
       border-left: 5px solid #4A90D9;
@@ -867,36 +890,44 @@ _full_contact = sum(
 )
 
 st.markdown(
-    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:2px">'
-    '<span style="font-size:2.2rem">💎</span>'
-    '<div>'
-    '<div style="font-size:1.75rem;font-weight:800;letter-spacing:-0.5px;'
-    'background:linear-gradient(90deg,#c9d6e8 0%,#7fa8d0 50%,#4a90d9 100%);'
-    '-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">'
-    'Mithril <span style="color:#888;font-weight:400">— Deal Flow Forge</span>'
+    '<div style="display:flex;align-items:center;gap:16px;padding:12px 0 4px 0;line-height:1.2">'
+    '<span style="font-size:2.4rem;line-height:1;display:inline-block">💎</span>'
+    '<div style="flex:1;min-width:0">'
+    '<div style="font-size:1.7rem;font-weight:800;color:#e8eaf0;letter-spacing:-0.3px;line-height:1.15">'
+    'Mithril <span style="color:#7fa8d0;font-weight:600">— Deal Flow Forge</span>'
     '</div>'
-    f'<div style="color:#666;font-size:0.78rem;letter-spacing:0.5px">'
-    f'⛏ Off-market deal sourcing for {BROKER_COMPANY} · {BROKER_NAME} · {BROKER_PHONE}'
+    f'<div style="color:#778;font-size:0.82rem;margin-top:2px">'
+    f'⛏ Off-market deal sourcing · {BROKER_COMPANY} · {BROKER_NAME} · {BROKER_PHONE}'
+    '</div>'
+    '<div style="color:#4a5060;font-size:0.72rem;font-style:italic;margin-top:4px">'
+    '"All that is gold does not glitter — but every great deal leaves a trail."'
     '</div>'
     '</div></div>',
     unsafe_allow_html=True
 )
+
 st.markdown(
-    '<div style="color:#4a5060;font-size:0.72rem;font-style:italic;margin:6px 0 12px 0;letter-spacing:0.3px">'
-    '"All that is gold does not glitter, not all those who wander are lost — but every great deal leaves a trail." '
-    '— Mithril, the rarest of finds'
-    '</div>',
+    f'<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:stretch;'
+    f'margin:10px 0 4px 0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif">'
+    + "".join(
+        f'<div style="flex:1;min-width:90px;background:#0d1421;border:1px solid #1a2230;'
+        f'border-radius:8px;padding:10px 14px">'
+        f'<div style="color:#778;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px">{lbl}</div>'
+        f'<div style="color:#e8eaf0;font-size:1.4rem;font-weight:800;line-height:1.1">{val}</div>'
+        f'</div>'
+        for lbl, val in [
+            ("📋 Leads",       stats["total"]),
+            ("✅ Contactable", _full_contact),
+            ("🔥 Hot",         stats["hot"]),
+            ("📝 NDA",         stats["nda_signed"]),
+            ("📄 LOI",         stats["under_contract"]),
+            ("✅ Closed",      stats["closed"]),
+            ("🆕 Intakes",     stats.get("new_intakes",0)),
+        ]
+    )
+    + '</div>',
     unsafe_allow_html=True
 )
-
-s1, s2, s3, s4, s5, s6, s7 = st.columns(7)
-s1.metric("📋 Leads",        stats["total"],              help="Total leads & matches in DB")
-s2.metric("✅ Contactable",  _full_contact,               help="Leads with email + phone + website")
-s3.metric("🔥 Hot",          stats["hot"],                help="Leads marked Hot")
-s4.metric("📝 NDA Signed",   stats["nda_signed"],         help="Deals with NDA executed")
-s5.metric("📄 Under LOI",    stats["under_contract"],     help="Under Contract / LOI")
-s6.metric("✅ Closed",       stats["closed"],             help="Closed deals")
-s7.metric("🆕 Intakes",      stats.get("new_intakes",0),  help="New seller intakes")
 
 st.divider()
 
@@ -2880,37 +2911,37 @@ with tab7:
             f'</div>',
             unsafe_allow_html=True
         )
-        # Render top 30 sellers as compact pickable cards
+        # Render top 30 sellers as full-width pickable rows (button = whole card)
         for _s in _forge_filtered_sellers[:30]:
             _sname = (_s.get("company_name") or "").strip()
             if not _sname or _sname in ("—","Unknown"):
                 continue
             _sid    = _s.get("id")
-            _sind   = (_s.get("industry") or "").strip()[:50]
+            _sind   = (_s.get("industry") or "").strip()[:60]
             _sloc   = ", ".join(filter(None, [_s.get("city",""), _s.get("state","")]))
             _srev   = (_s.get("revenue_estimate") or "").strip()
             _sebit  = (_s.get("ebitda_estimate") or "").strip()
-            _ssc    = _s.get("match_score", 0)
             _is_selected = _sid == _sel_seller_id
-            _border = "#F39C12" if _is_selected else "#1a1d24"
-            _bg     = "#1a1308" if _is_selected else "#0a0c10"
 
-            _scol1, _scol2 = st.columns([8, 2])
-            with _scol1:
-                st.markdown(
-                    f'<div style="border-left:2px solid {_border};padding:6px 10px;margin:2px 0;'
-                    f'background:{_bg};border-radius:0 4px 4px 0">'
-                    f'<div style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_sname)}</div>'
-                    f'<div style="color:#666;font-size:0.72rem">{_e(_sind)} · {_e(_sloc)}</div>'
-                    + (f'<div style="color:#888;font-size:0.7rem">Rev {_e(_srev)} · EBITDA {_e(_sebit)}</div>' if _srev or _sebit else "")
-                    + '</div>',
-                    unsafe_allow_html=True
-                )
-            with _scol2:
-                if st.button("Pick", key=f"fpick_s_{_sid}", use_container_width=True,
-                             type="primary" if _is_selected else "secondary"):
-                    st.session_state["forge_selected_seller_id"] = _sid
-                    st.rerun()
+            # Compact one-line label for the button
+            _detail = []
+            if _sind:  _detail.append(_sind[:40])
+            if _sloc:  _detail.append(_sloc)
+            if _srev:  _detail.append(f"Rev {_srev}")
+            if _sebit: _detail.append(f"EBITDA {_sebit}")
+            _detail_str = " · ".join(_detail)
+
+            _prefix = "✦ " if _is_selected else ""
+            _label  = f"{_prefix}{_sname}\n{_detail_str}" if _detail_str else f"{_prefix}{_sname}"
+
+            if st.button(
+                _label,
+                key=f"fpick_s_{_sid}",
+                use_container_width=True,
+                type="primary" if _is_selected else "secondary",
+            ):
+                st.session_state["forge_selected_seller_id"] = _sid
+                st.rerun()
 
     # RIGHT: Buyers, ranked by combined Grade (match × capacity × recency)
     with _fc_right:
@@ -3015,35 +3046,35 @@ with tab7:
                 _rec_pts_v = _g["rec_pts"]
                 _grade_tooltip = f"match {_match} + cap {_cap_pts_v} + rec {_rec_pts_v}"
 
-                _bcol1, _bcol2 = st.columns([8, 2])
-                with _bcol1:
-                    st.markdown(
-                        f'<div style="border-left:3px solid {_bclr};padding:7px 11px;margin:2px 0;'
-                        f'background:#0d0a14;border-radius:0 4px 4px 0">'
-                        f'<div style="display:flex;justify-content:space-between;align-items:center">'
-                        f'<span style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_bname)}{_perfect_html}</span>'
-                        f'<span style="background:{_bclr}22;color:{_bclr};font-size:0.7rem;'
-                        f'padding:2px 8px;border-radius:8px;font-weight:800" title="{_grade_tooltip}">Grade {_bscore}</span>'
-                        f'</div>'
-                        f'<div style="color:#666;font-size:0.72rem">{_e(_binds)}</div>'
-                        + (f'<div style="color:#888;font-size:0.7rem">{_e(_bstates)}</div>' if _bstates else "")
-                        + f'<div style="display:flex;gap:8px;font-size:0.66rem;color:#666;margin-top:3px">'
-                        + f'<span title="Active deals already on this buyer">{_cap_label}</span>'
-                        + f'<span title="Last time we contacted them">{_rec_label}</span>'
-                        + f'<span style="color:#444">· fit {_match}</span>'
-                        + '</div>'
-                        + '<div style="font-size:0.7rem;margin-top:3px">'
-                        + (f'<a href="mailto:{_e(_b_email)}" style="color:#4A90D9">✉</a> ' if _b_email else "")
-                        + (f'<a href="tel:{_e(_b_phone)}" style="color:#4A90D9">📞</a> ' if _b_phone else "")
-                        + (f'<a href="{_e(_b_web)}" target="_blank" style="color:#27AE60">🌐</a>' if _b_web else "")
-                        + '</div>'
-                        + '</div>',
-                        unsafe_allow_html=True
-                    )
-                with _bcol2:
-                    _btn_label = "🎯 Forge" if _is_perfect else "➕ Add"
-                    if st.button(_btn_label, key=f"fmatch_{_sel_seller.get('id')}_{_b.get('id','')}", use_container_width=True,
-                                 type="primary" if _is_perfect else "secondary"):
+                # Render the buyer info card (visual only, no interaction)
+                st.markdown(
+                    f'<div style="border-left:3px solid {_bclr};padding:7px 11px;margin:2px 0 0 0;'
+                    f'background:#0d0a14;border-radius:0 4px 4px 0">'
+                    f'<div style="display:flex;justify-content:space-between;align-items:center">'
+                    f'<span style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_bname)}{_perfect_html}</span>'
+                    f'<span style="background:{_bclr}22;color:{_bclr};font-size:0.7rem;'
+                    f'padding:2px 8px;border-radius:8px;font-weight:800" title="{_grade_tooltip}">Grade {_bscore}</span>'
+                    f'</div>'
+                    f'<div style="color:#666;font-size:0.72rem">{_e(_binds)}</div>'
+                    + (f'<div style="color:#888;font-size:0.7rem">{_e(_bstates)}</div>' if _bstates else "")
+                    + f'<div style="display:flex;gap:8px;font-size:0.66rem;color:#666;margin-top:3px;flex-wrap:wrap">'
+                    + f'<span>{_cap_label}</span><span>·</span>'
+                    + f'<span>{_rec_label}</span><span>·</span>'
+                    + f'<span style="color:#444">fit {_match}</span>'
+                    + '</div>'
+                    + '<div style="font-size:0.85rem;margin-top:4px">'
+                    + (f'<a href="mailto:{_e(_b_email)}" style="color:#4A90D9;margin-right:8px" title="Email">✉</a>' if _b_email else "")
+                    + (f'<a href="tel:{_e(_b_phone)}" style="color:#4A90D9;margin-right:8px" title="Call">📞</a>' if _b_phone else "")
+                    + (f'<a href="{_e(_b_web)}" target="_blank" style="color:#27AE60" title="Website">🌐</a>' if _b_web else "")
+                    + '</div>'
+                    + '</div>',
+                    unsafe_allow_html=True
+                )
+                # Full-width action button below the card
+                _btn_label = "🎯 Forge into Pipeline" if _is_perfect else f"➕ Add {_bname} to Pipeline"
+                if st.button(_btn_label, key=f"fmatch_{_sel_seller.get('id')}_{_b.get('id','')}",
+                             use_container_width=True,
+                             type="primary" if _is_perfect else "secondary"):
                         # Add match to pipeline — refuse duplicates
                         _proj_name = _sel_seller.get("company_name","")
                         if deal_exists(_proj_name, _b.get("id","")):
