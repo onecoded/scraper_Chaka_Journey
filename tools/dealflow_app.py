@@ -2831,276 +2831,238 @@ with tab6:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 7 — MANUAL TEASERS  (BIZBROKER/TEASERS matched to buyers)
+# TAB 7 — THE FORGE  (one dropdown per seller, 100% match buyers inside)
 # ══════════════════════════════════════════════════════════════════════════════
 
 with tab7:
     st.markdown(
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-        '<span style="font-size:1.4rem;font-weight:800;color:#e8eaf0">⚒ The Forge</span>'
-        '<span style="color:#666;font-size:0.82rem">Pick a seller on the <span style="color:#F39C12">left</span>, '
-        'see best-matched buyers gravitate to the <span style="color:#9B59B6">right</span>. '
-        'When you find a fit, forge the match into the Pipeline.</span>'
+        '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">'
+        '<div>'
+        '<div style="font-size:1.4rem;font-weight:800;color:#e8eaf0;line-height:1.1">⚒ The Forge</div>'
+        '<div style="color:#666;font-size:0.78rem;margin-top:2px">One dropdown per seller — open to see 100% Grade buyer matches</div>'
+        '</div>'
+        '<div style="color:#444;font-size:0.7rem">Grade = match (60) + capacity (30) + recency (10)</div>'
         '</div>',
         unsafe_allow_html=True
     )
 
-    # Load all sellers (deals without buyer_id) and buyers
-    _forge_all_deals  = get_all_deals()
-    _forge_sellers    = [d for d in _forge_all_deals if (d.get("company_name") or "").strip()
-                         and (d.get("company_name") or "").strip() not in ("—","-","Unknown","None")]
-    _forge_buyers     = get_all_buyers()
+    # Filters — top row
+    _ff1, _ff2, _ff3, _ff4 = st.columns([2, 2, 2, 3])
+    _grade_threshold = _ff1.selectbox(
+        "Match level", ["💎 100% (Grade 90+)", "🥇 Strong (Grade 75+)", "🥈 Decent (Grade 55+)"],
+        key="forge_grade_threshold", index=0
+    )
+    _seller_type = _ff2.selectbox(
+        "Seller type", ["All", "Off-Market", "On-Market", "Teaser"],
+        key="forge_seller_type"
+    )
+    _max_per = _ff3.selectbox("Buyers per seller", ["3", "5", "10", "All"], key="forge_max_per", index=1)
+    _search = _ff4.text_input("🔎 Search seller (company / industry / state)", key="forge_search")
 
-    # Optional: also pull live teaser parses
-    if st.button("🔄 Refresh from BIZBROKER/TEASERS", key="forge_refresh"):
-        with st.spinner("Re-scanning TEASERS folder…"):
+    _min_grade = {"💎 100% (Grade 90+)": 90, "🥇 Strong (Grade 75+)": 75, "🥈 Decent (Grade 55+)": 55}[_grade_threshold]
+    _max_per_n = {"3": 3, "5": 5, "10": 10, "All": 9999}[_max_per]
+
+    # Refresh button
+    if st.button("🔄 Refresh teasers from BIZBROKER/TEASERS", key="forge_refresh_teasers"):
+        with st.spinner("Re-scanning…"):
             try:
                 import teaser_parser as _tp
                 _t_deals = _tp.scan_all_teasers()
-                _t_matches = _tp.match_teasers(_t_deals)
-                st.session_state["forge_teaser_matches"] = _t_matches
-                st.success(f"Loaded {len(_t_deals)} teaser deals · {len(_t_matches)} buyer matches")
+                st.success(f"Loaded {len(_t_deals)} teaser deals")
             except Exception as _ex:
                 st.error(f"Could not load: {_ex}")
 
-    # Filter row
-    _ff1, _ff2, _ff3 = st.columns([2, 2, 3])
-    _seller_filter = _ff1.selectbox("Filter sellers by", ["All","Off-Market","On-Market","Teaser"], key="forge_seller_type")
-    _min_match     = _ff2.selectbox("Min match %", ["Any","50%+","70%+","90%+"], key="forge_min_match", index=1)
-    _search_forge  = _ff3.text_input("🔎 Search company / industry / state", key="forge_search")
+    # ── load data once ──────────────────────────────────────────────────
+    _forge_all = get_all_deals()
+    _forge_buyers_list = get_all_buyers()
 
-    # Apply seller filter
-    _forge_filtered_sellers = list(_forge_sellers)
-    if _seller_filter == "Off-Market":
-        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if s.get("listing_type") != "on-market"]
-    elif _seller_filter == "On-Market":
-        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if s.get("listing_type") == "on-market"]
-    elif _seller_filter == "Teaser":
-        _forge_filtered_sellers = [s for s in _forge_filtered_sellers if (s.get("source") or "").startswith("teaser:")]
+    # Filter to sellers (one-row-per-listing — dedupe by company name)
+    _seen_co = set()
+    _forge_sellers_unique = []
+    for d in _forge_all:
+        nm = (d.get("company_name") or "").strip()
+        if not nm or nm in ("—","Unknown","None"):
+            continue
+        if nm.upper() in _seen_co:
+            continue
+        _seen_co.add(nm.upper())
+        _forge_sellers_unique.append(d)
 
-    if _search_forge and _search_forge.strip():
-        _q = _search_forge.lower().strip()
-        _forge_filtered_sellers = [s for s in _forge_filtered_sellers
-                                   if _q in (s.get("company_name") or "").lower()
-                                   or _q in (s.get("industry") or "").lower()
-                                   or _q in (s.get("state") or "").lower()
-                                   or _q in (s.get("city") or "").lower()]
+    # Apply seller-type filter
+    if _seller_type == "Off-Market":
+        _forge_sellers_unique = [s for s in _forge_sellers_unique if s.get("listing_type") != "on-market"]
+    elif _seller_type == "On-Market":
+        _forge_sellers_unique = [s for s in _forge_sellers_unique if s.get("listing_type") == "on-market"]
+    elif _seller_type == "Teaser":
+        _forge_sellers_unique = [s for s in _forge_sellers_unique if (s.get("source") or "").startswith("teaser:")]
 
-    _min_pct = {"Any":0, "50%+":50, "70%+":70, "90%+":90}[_min_match]
+    # Search filter
+    if _search and _search.strip():
+        _q = _search.lower().strip()
+        _forge_sellers_unique = [s for s in _forge_sellers_unique
+                                 if _q in (s.get("company_name") or "").lower()
+                                 or _q in (s.get("industry") or "").lower()
+                                 or _q in (s.get("state") or "").lower()
+                                 or _q in (s.get("city") or "").lower()]
 
-    # Sort sellers by score desc to show best at top
-    _forge_filtered_sellers.sort(key=lambda x: x.get("match_score", 0), reverse=True)
+    # ── grade every (seller, buyer) pair ────────────────────────────────
+    from datetime import datetime as _dt
 
-    # Selected seller from session
-    _sel_seller_id = st.session_state.get("forge_selected_seller_id")
-    _sel_seller    = next((s for s in _forge_filtered_sellers if s.get("id") == _sel_seller_id), None)
-    if not _sel_seller and _forge_filtered_sellers:
-        _sel_seller = _forge_filtered_sellers[0]
-        st.session_state["forge_selected_seller_id"] = _sel_seller.get("id")
+    def _grade_pair(seller, buyer, all_deals):
+        fit = score_lead(seller, buyer)
+        match_pts = round(fit * 0.60)
+        _bid = buyer.get("id","")
+        _active = [d for d in all_deals
+                   if d.get("buyer_id") == _bid
+                   and d.get("deal_stage") not in ("dead","closed","passed")]
+        n = len(_active)
+        if   n == 0: cap = 30
+        elif n <= 2: cap = 25
+        elif n <= 5: cap = 18
+        elif n <= 10: cap = 10
+        else:        cap = 0
+        _lc = [d.get("last_contacted","") for d in all_deals
+               if d.get("buyer_id") == _bid and d.get("last_contacted")]
+        days = 9999
+        if _lc:
+            try:
+                _v = _dt.fromisoformat(max(_lc).split("+")[0].split("Z")[0])
+                days = (_dt.now() - _v).days
+            except Exception:
+                pass
+        if   days >= 30: rec = 10
+        elif days >= 14: rec = 6
+        elif days >= 7:  rec = 3
+        else:            rec = 0
+        return {
+            "grade": min(100, match_pts + cap + rec),
+            "fit": fit, "cap_pts": cap, "rec_pts": rec,
+            "active": n, "days": days,
+        }
 
-    # ── two-column playground ──────────────────────────────────────────────
-    _fc_left, _fc_right = st.columns(2)
+    # Compute matches per seller — keep only sellers with at least one buyer >= threshold
+    _seller_matches = []  # (seller, [(grade_dict, buyer), ...])
+    for _s in _forge_sellers_unique:
+        _pairs = []
+        for _b in _forge_buyers_list:
+            _g = _grade_pair(_s, _b, _forge_all)
+            if _g["grade"] >= _min_grade:
+                _pairs.append((_g, _b))
+        if _pairs:
+            _pairs.sort(key=lambda x: x[0]["grade"], reverse=True)
+            _seller_matches.append((_s, _pairs))
 
-    # LEFT: Sellers
-    with _fc_left:
-        st.markdown(
-            f'<div style="background:#241a0d;border-left:3px solid #F39C12;padding:6px 12px;'
-            f'border-radius:0 6px 6px 0;margin-bottom:6px">'
-            f'<span style="color:#F39C12;font-weight:800;font-size:0.95rem">📦 SELLERS</span> '
-            f'<span style="color:#666;font-size:0.78rem">· {len(_forge_filtered_sellers)} listings — click one to match</span>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-        # Render top 30 sellers as full-width pickable rows (button = whole card)
-        for _s in _forge_filtered_sellers[:30]:
-            _sname = (_s.get("company_name") or "").strip()
-            if not _sname or _sname in ("—","Unknown"):
-                continue
-            _sid    = _s.get("id")
-            _sind   = (_s.get("industry") or "").strip()[:60]
-            _sloc   = ", ".join(filter(None, [_s.get("city",""), _s.get("state","")]))
-            _srev   = (_s.get("revenue_estimate") or "").strip()
-            _sebit  = (_s.get("ebitda_estimate") or "").strip()
-            _is_selected = _sid == _sel_seller_id
+    # Sort sellers by their TOP buyer grade desc
+    _seller_matches.sort(key=lambda x: x[1][0][0]["grade"], reverse=True)
 
-            # Compact one-line label for the button
-            _detail = []
-            if _sind:  _detail.append(_sind[:40])
-            if _sloc:  _detail.append(_sloc)
-            if _srev:  _detail.append(f"Rev {_srev}")
-            if _sebit: _detail.append(f"EBITDA {_sebit}")
-            _detail_str = " · ".join(_detail)
+    # Summary
+    _total_pairs = sum(len(p) for _,p in _seller_matches)
+    st.markdown(
+        f'<div style="background:#0d1421;border-left:3px solid #4A90D9;padding:8px 14px;'
+        f'border-radius:0 6px 6px 0;margin:8px 0;font-size:0.85rem;color:#aab">'
+        f'<strong style="color:#e8eaf0">{len(_seller_matches)} sellers</strong> with matches at this level '
+        f'· <strong style="color:#F1C40F">{_total_pairs} buyer matches total</strong> '
+        f'· Click any seller to expand and forge into the Pipeline.'
+        f'</div>',
+        unsafe_allow_html=True
+    )
 
-            _prefix = "✦ " if _is_selected else ""
-            _label  = f"{_prefix}{_sname}\n{_detail_str}" if _detail_str else f"{_prefix}{_sname}"
+    if not _seller_matches:
+        st.info("No sellers have matches at this level. Try lowering Match level or run Scout for fresh leads.")
+    else:
+        for _s, _pairs in _seller_matches[:50]:
+            _sname = _s.get("company_name","")
+            _sid   = _s.get("id")
+            _sind  = (_s.get("industry") or "").strip()
+            _sloc  = ", ".join(filter(None, [_s.get("city",""), _s.get("state","")]))
+            _srev  = (_s.get("revenue_estimate") or "").strip()
+            _sebit = (_s.get("ebitda_estimate") or "").strip()
+            _top_g = _pairs[0][0]["grade"]
 
-            if st.button(
-                _label,
-                key=f"fpick_s_{_sid}",
-                use_container_width=True,
-                type="primary" if _is_selected else "secondary",
-            ):
-                st.session_state["forge_selected_seller_id"] = _sid
-                st.rerun()
+            # Build expander label with seller + count + top grade
+            _summary = []
+            if _sind:  _summary.append(_sind[:35])
+            if _sloc:  _summary.append(_sloc)
+            if _srev:  _summary.append(f"Rev {_srev}")
+            if _sebit: _summary.append(f"EBITDA {_sebit}")
+            _exp_label = f"💎 {_sname}  ·  {len(_pairs)} match{'es' if len(_pairs)!=1 else ''} (top Grade {_top_g})  ·  {' · '.join(_summary)}"
 
-    # RIGHT: Buyers, ranked by combined Grade (match × capacity × recency)
-    with _fc_right:
-        if not _sel_seller:
-            st.info("👈 Pick a seller on the left to see matching buyers.")
-        else:
-            # ── Buyer Grade = match (60) + capacity (30) + recency (10) ──
-            _all_deals_for_capacity = get_all_deals()
-            def _buyer_grade(buyer):
-                """0-100. Match quality + capacity + recency."""
-                fit = score_lead(_sel_seller, buyer)  # 0-100 strict
-                match_pts = round(fit * 0.60)        # max 60
+            with st.expander(_exp_label, expanded=False):
+                for _g, _b in _pairs[:_max_per_n]:
+                    _bname  = _b.get("name","") or _b.get("firm","")
+                    _bid    = _b.get("id","")
+                    _grade  = _g["grade"]
+                    _fit    = _g["fit"]
+                    _binds  = ", ".join((_b.get("industries") or [])[:3])
+                    _bstates = ", ".join((list(_b.get("states") or {}) if isinstance(_b.get("states"), dict) else (_b.get("states") or []))[:3])
+                    _bemail = _b.get("email","")
+                    _bphone = _b.get("phone","")
+                    _bweb   = _b.get("website","")
+                    _is_perfect = _grade >= 95
+                    _clr = "#F1C40F" if _grade >= 95 else "#27AE60" if _grade >= 80 else "#F39C12" if _grade >= 60 else "#888"
 
-                # Capacity: active (not dead/closed/passed) deals owned by this buyer
-                _bid = buyer.get("id","")
-                _active = [d for d in _all_deals_for_capacity
-                           if d.get("buyer_id") == _bid
-                           and d.get("deal_stage") not in ("dead","closed","passed")]
-                _n = len(_active)
-                if   _n == 0: cap_pts = 30
-                elif _n <= 2: cap_pts = 25
-                elif _n <= 5: cap_pts = 18
-                elif _n <= 10: cap_pts = 10
-                else:         cap_pts = 0
+                    _cap_lbl = f"📊 {_g['active']} active" if _g['active'] else "📊 0 active"
+                    if   _g['days'] >= 9999: _rec_lbl = "⏳ never contacted"
+                    elif _g['days'] >= 30:   _rec_lbl = f"⏳ {_g['days']}d cool"
+                    elif _g['days'] >= 14:   _rec_lbl = f"⏳ {_g['days']}d ago"
+                    else:                    _rec_lbl = f"🔥 {_g['days']}d ago"
 
-                # Recency: when was buyer last contacted on any deal?
-                from datetime import datetime as _dt
-                _last_contacts = [d.get("last_contacted","") for d in _all_deals_for_capacity
-                                  if d.get("buyer_id") == _bid and d.get("last_contacted")]
-                _days = 9999
-                if _last_contacts:
-                    _last = max(_last_contacts)
-                    try:
-                        _dtv = _dt.fromisoformat(_last.split("+")[0].split("Z")[0])
-                        _days = (_dt.now() - _dtv).days
-                    except Exception:
-                        _days = 9999
-                if   _days >= 30: rec_pts = 10  # cool, capacity available
-                elif _days >= 14: rec_pts = 6
-                elif _days >= 7:  rec_pts = 3
-                else:             rec_pts = 0   # contacted very recently
-
-                grade = min(100, match_pts + cap_pts + rec_pts)
-                return {
-                    "grade":     grade,
-                    "match":     fit,
-                    "match_pts": match_pts,
-                    "cap_pts":   cap_pts,
-                    "rec_pts":   rec_pts,
-                    "active":    _n,
-                    "days":      _days,
-                }
-
-            _ranked_buyers = [(_buyer_grade(b), b) for b in _forge_buyers]
-            _ranked_buyers.sort(key=lambda x: x[0]["grade"], reverse=True)
-            _ranked_buyers = [(g,b) for g,b in _ranked_buyers if g["match"] >= _min_pct]
-
-            # Show 100% matches count
-            _perfect_n = sum(1 for g,_ in _ranked_buyers if g["grade"] >= 90)
-            st.markdown(
-                f'<div style="background:#1a0d24;border-left:3px solid #9B59B6;padding:6px 12px;'
-                f'border-radius:0 6px 6px 0;margin-bottom:6px">'
-                f'<span style="color:#d4b3e8;font-weight:800;font-size:0.95rem">👑 BUYERS</span> '
-                f'<span style="color:#666;font-size:0.78rem">· '
-                + (f'<strong style="color:#F1C40F">{_perfect_n} 100% match(es)</strong> · ' if _perfect_n else "")
-                + f'ranked by Grade vs <strong style="color:#F39C12">{_e(_sel_seller.get("company_name",""))}</strong>'
-                + '</span></div>'
-                '<div style="color:#444;font-size:0.68rem;margin-bottom:6px">'
-                'Grade = match (60) + capacity (30, fewer active deals = more) + recency (10, longer since contact = more)'
-                '</div>',
-                unsafe_allow_html=True
-            )
-
-            for _g, _b in _ranked_buyers[:30]:
-                _bscore  = _g["grade"]
-                _match   = _g["match"]
-                _bname   = _b.get("name","") or _b.get("firm","")
-                _binds   = ", ".join((_b.get("industries") or [])[:3])
-                _bstates = ", ".join((list(_b.get("states") or {}) if isinstance(_b.get("states"), dict) else (_b.get("states") or []))[:3])
-                _b_email = _b.get("email","")
-                _b_phone = _b.get("phone","")
-                _b_web   = _b.get("website","")
-
-                # Color tiers based on Grade
-                _bclr = "#F1C40F" if _bscore >= 90 else "#27AE60" if _bscore >= 75 else "#F39C12" if _bscore >= 55 else "#888"
-                _is_perfect = _bscore >= 90
-
-                # Capacity + recency badges
-                _cap_label = f"📊 {_g['active']} active" if _g['active'] else "📊 0 active (ready)"
-                if _g["days"] >= 9999:
-                    _rec_label = "⏳ never contacted"
-                elif _g["days"] >= 30:
-                    _rec_label = f"⏳ {_g['days']}d cool"
-                elif _g["days"] >= 14:
-                    _rec_label = f"⏳ {_g['days']}d ago"
-                else:
-                    _rec_label = f"🔥 {_g['days']}d ago (recent)"
-
-                _perfect_html = ' <span style="color:#F1C40F;font-size:0.7rem;font-weight:800;background:#3a2a08;padding:1px 6px;border-radius:4px">🎯 100%</span>' if _is_perfect else ""
-
-                _cap_pts_v = _g["cap_pts"]
-                _rec_pts_v = _g["rec_pts"]
-                _grade_tooltip = f"match {_match} + cap {_cap_pts_v} + rec {_rec_pts_v}"
-
-                # Render the buyer info card (visual only, no interaction)
-                st.markdown(
-                    f'<div style="border-left:3px solid {_bclr};padding:7px 11px;margin:2px 0 0 0;'
-                    f'background:#0d0a14;border-radius:0 4px 4px 0">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center">'
-                    f'<span style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_bname)}{_perfect_html}</span>'
-                    f'<span style="background:{_bclr}22;color:{_bclr};font-size:0.7rem;'
-                    f'padding:2px 8px;border-radius:8px;font-weight:800" title="{_grade_tooltip}">Grade {_bscore}</span>'
-                    f'</div>'
-                    f'<div style="color:#666;font-size:0.72rem">{_e(_binds)}</div>'
-                    + (f'<div style="color:#888;font-size:0.7rem">{_e(_bstates)}</div>' if _bstates else "")
-                    + f'<div style="display:flex;gap:8px;font-size:0.66rem;color:#666;margin-top:3px;flex-wrap:wrap">'
-                    + f'<span>{_cap_label}</span><span>·</span>'
-                    + f'<span>{_rec_label}</span><span>·</span>'
-                    + f'<span style="color:#444">fit {_match}</span>'
-                    + '</div>'
-                    + '<div style="font-size:0.85rem;margin-top:4px">'
-                    + (f'<a href="mailto:{_e(_b_email)}" style="color:#4A90D9;margin-right:8px" title="Email">✉</a>' if _b_email else "")
-                    + (f'<a href="tel:{_e(_b_phone)}" style="color:#4A90D9;margin-right:8px" title="Call">📞</a>' if _b_phone else "")
-                    + (f'<a href="{_e(_b_web)}" target="_blank" style="color:#27AE60" title="Website">🌐</a>' if _b_web else "")
-                    + '</div>'
-                    + '</div>',
-                    unsafe_allow_html=True
-                )
-                # Full-width action button below the card
-                _btn_label = "🎯 Forge into Pipeline" if _is_perfect else f"➕ Add {_bname} to Pipeline"
-                if st.button(_btn_label, key=f"fmatch_{_sel_seller.get('id')}_{_b.get('id','')}",
-                             use_container_width=True,
-                             type="primary" if _is_perfect else "secondary"):
-                        # Add match to pipeline — refuse duplicates
-                        _proj_name = _sel_seller.get("company_name","")
-                        if deal_exists(_proj_name, _b.get("id","")):
-                            st.info(f"⚒ Already forged: {_proj_name} × {_bname}")
+                    # Buyer card
+                    _bc1, _bc2 = st.columns([7, 3])
+                    with _bc1:
+                        st.markdown(
+                            f'<div style="border-left:3px solid {_clr};padding:8px 12px;margin:4px 0;'
+                            f'background:#0d0a14;border-radius:0 6px 6px 0">'
+                            f'<div style="display:flex;justify-content:space-between;align-items:center">'
+                            f'<strong style="color:#f0f0f0;font-size:0.92rem">{_e(_bname)}</strong>'
+                            f'<span style="background:{_clr}22;color:{_clr};font-size:0.75rem;'
+                            f'padding:2px 10px;border-radius:10px;font-weight:800">Grade {_grade}</span>'
+                            f'</div>'
+                            f'<div style="color:#666;font-size:0.74rem;margin-top:3px">{_e(_binds)}'
+                            + (f' · {_e(_bstates)}' if _bstates else "") + '</div>'
+                            f'<div style="display:flex;gap:10px;font-size:0.68rem;color:#666;margin-top:3px">'
+                            f'<span>{_cap_lbl}</span><span>·</span>'
+                            f'<span>{_rec_lbl}</span><span>·</span>'
+                            f'<span style="color:#444">fit {_fit}</span>'
+                            f'</div>'
+                            f'<div style="font-size:0.95rem;margin-top:5px">'
+                            + (f'<a href="mailto:{_e(_bemail)}" style="color:#4A90D9;margin-right:10px" title="Email">✉</a>' if _bemail else "")
+                            + (f'<a href="tel:{_e(_bphone)}" style="color:#4A90D9;margin-right:10px" title="Call">📞</a>' if _bphone else "")
+                            + (f'<a href="{_e(_bweb)}" target="_blank" style="color:#27AE60" title="Website">🌐</a>' if _bweb else "")
+                            + '</div>'
+                            f'</div>',
+                            unsafe_allow_html=True
+                        )
+                    with _bc2:
+                        # Check if already in pipeline
+                        if deal_exists(_sname, _bid):
+                            st.success("✓ In Pipeline")
                         else:
-                            _new_match = {
-                                "company_name":     _proj_name,
-                                "industry":         _sel_seller.get("industry",""),
-                                "state":            _sel_seller.get("state",""),
-                                "city":             _sel_seller.get("city",""),
-                                "revenue_estimate": _sel_seller.get("revenue_estimate",""),
-                                "ebitda_estimate":  _sel_seller.get("ebitda_estimate",""),
-                                "asking_price":     _sel_seller.get("asking_price",""),
-                                "owner_email":      _sel_seller.get("owner_email",""),
-                                "owner_name":       _sel_seller.get("owner_name",""),
-                                "owner_phone":      _sel_seller.get("owner_phone",""),
-                                "company_domain":   _sel_seller.get("company_domain",""),
-                                "buyer_id":         _b.get("id",""),
-                                "buyer_name":       _bname,
-                                "match_score":      _bscore,
-                                "interest_level":   "hot" if _bscore >= 90 else "warm" if _bscore >= 60 else "cold",
-                                "listing_type":     _sel_seller.get("listing_type","off-market"),
-                                "deal_stage":       "identified",
-                                "status":           "identified",
-                                "source":           f"forge:{_sel_seller.get('source','')}",
-                            }
-                            add_deal(_new_match)
-                            st.success(f"⚒ Forged {_proj_name} × {_bname} into the Pipeline!")
-                            st.rerun()
+                            _label = "🎯 Forge" if _is_perfect else "➕ Add to Pipeline"
+                            if st.button(_label, key=f"forge_add_{_sid}_{_bid}",
+                                         use_container_width=True,
+                                         type="primary" if _is_perfect else "secondary"):
+                                _new = {
+                                    "company_name":     _sname,
+                                    "industry":         _s.get("industry",""),
+                                    "state":            _s.get("state",""),
+                                    "city":             _s.get("city",""),
+                                    "revenue_estimate": _s.get("revenue_estimate",""),
+                                    "ebitda_estimate":  _s.get("ebitda_estimate",""),
+                                    "asking_price":     _s.get("asking_price",""),
+                                    "owner_email":      _s.get("owner_email",""),
+                                    "owner_name":       _s.get("owner_name",""),
+                                    "owner_phone":      _s.get("owner_phone",""),
+                                    "company_domain":   _s.get("company_domain",""),
+                                    "buyer_id":         _bid,
+                                    "buyer_name":       _bname,
+                                    "match_score":      _grade,
+                                    "interest_level":   "hot" if _grade >= 90 else "warm" if _grade >= 60 else "cold",
+                                    "listing_type":     _s.get("listing_type","off-market"),
+                                    "deal_stage":       "identified",
+                                    "status":           "identified",
+                                    "source":           f"forge:{_s.get('source','')}",
+                                }
+                                add_deal(_new)
+                                st.success(f"⚒ Forged {_sname} × {_bname}")
+                                st.rerun()
