@@ -2912,51 +2912,126 @@ with tab7:
                     st.session_state["forge_selected_seller_id"] = _sid
                     st.rerun()
 
-    # RIGHT: Buyers, sorted by match score against selected seller
+    # RIGHT: Buyers, ranked by combined Grade (match × capacity × recency)
     with _fc_right:
         if not _sel_seller:
             st.info("👈 Pick a seller on the left to see matching buyers.")
         else:
-            # Score each buyer vs selected seller
-            _ranked_buyers = []
-            for _b in _forge_buyers:
-                _bscore = score_lead(_sel_seller, _b)
-                _ranked_buyers.append((_bscore, _b))
-            _ranked_buyers.sort(key=lambda x: x[0], reverse=True)
-            _ranked_buyers = [(s,b) for s,b in _ranked_buyers if s >= _min_pct]
+            # ── Buyer Grade = match (60) + capacity (30) + recency (10) ──
+            _all_deals_for_capacity = get_all_deals()
+            def _buyer_grade(buyer):
+                """0-100. Match quality + capacity + recency."""
+                fit = score_lead(_sel_seller, buyer)  # 0-100 strict
+                match_pts = round(fit * 0.60)        # max 60
 
+                # Capacity: active (not dead/closed/passed) deals owned by this buyer
+                _bid = buyer.get("id","")
+                _active = [d for d in _all_deals_for_capacity
+                           if d.get("buyer_id") == _bid
+                           and d.get("deal_stage") not in ("dead","closed","passed")]
+                _n = len(_active)
+                if   _n == 0: cap_pts = 30
+                elif _n <= 2: cap_pts = 25
+                elif _n <= 5: cap_pts = 18
+                elif _n <= 10: cap_pts = 10
+                else:         cap_pts = 0
+
+                # Recency: when was buyer last contacted on any deal?
+                from datetime import datetime as _dt
+                _last_contacts = [d.get("last_contacted","") for d in _all_deals_for_capacity
+                                  if d.get("buyer_id") == _bid and d.get("last_contacted")]
+                _days = 9999
+                if _last_contacts:
+                    _last = max(_last_contacts)
+                    try:
+                        _dtv = _dt.fromisoformat(_last.split("+")[0].split("Z")[0])
+                        _days = (_dt.now() - _dtv).days
+                    except Exception:
+                        _days = 9999
+                if   _days >= 30: rec_pts = 10  # cool, capacity available
+                elif _days >= 14: rec_pts = 6
+                elif _days >= 7:  rec_pts = 3
+                else:             rec_pts = 0   # contacted very recently
+
+                grade = min(100, match_pts + cap_pts + rec_pts)
+                return {
+                    "grade":     grade,
+                    "match":     fit,
+                    "match_pts": match_pts,
+                    "cap_pts":   cap_pts,
+                    "rec_pts":   rec_pts,
+                    "active":    _n,
+                    "days":      _days,
+                }
+
+            _ranked_buyers = [(_buyer_grade(b), b) for b in _forge_buyers]
+            _ranked_buyers.sort(key=lambda x: x[0]["grade"], reverse=True)
+            _ranked_buyers = [(g,b) for g,b in _ranked_buyers if g["match"] >= _min_pct]
+
+            # Show 100% matches count
+            _perfect_n = sum(1 for g,_ in _ranked_buyers if g["grade"] >= 90)
             st.markdown(
                 f'<div style="background:#1a0d24;border-left:3px solid #9B59B6;padding:6px 12px;'
                 f'border-radius:0 6px 6px 0;margin-bottom:6px">'
                 f'<span style="color:#d4b3e8;font-weight:800;font-size:0.95rem">👑 BUYERS</span> '
-                f'<span style="color:#666;font-size:0.78rem">· ranked vs <strong style="color:#F39C12">{_e(_sel_seller.get("company_name",""))}</strong></span>'
-                f'</div>',
+                f'<span style="color:#666;font-size:0.78rem">· '
+                + (f'<strong style="color:#F1C40F">{_perfect_n} 100% match(es)</strong> · ' if _perfect_n else "")
+                + f'ranked by Grade vs <strong style="color:#F39C12">{_e(_sel_seller.get("company_name",""))}</strong>'
+                + '</span></div>'
+                '<div style="color:#444;font-size:0.68rem;margin-bottom:6px">'
+                'Grade = match (60) + capacity (30, fewer active deals = more) + recency (10, longer since contact = more)'
+                '</div>',
                 unsafe_allow_html=True
             )
 
-            for _bscore, _b in _ranked_buyers[:30]:
+            for _g, _b in _ranked_buyers[:30]:
+                _bscore  = _g["grade"]
+                _match   = _g["match"]
                 _bname   = _b.get("name","") or _b.get("firm","")
                 _binds   = ", ".join((_b.get("industries") or [])[:3])
                 _bstates = ", ".join((list(_b.get("states") or {}) if isinstance(_b.get("states"), dict) else (_b.get("states") or []))[:3])
                 _b_email = _b.get("email","")
                 _b_phone = _b.get("phone","")
                 _b_web   = _b.get("website","")
-                _bclr    = "#27AE60" if _bscore >= 70 else "#F39C12" if _bscore >= 45 else "#666"
+
+                # Color tiers based on Grade
+                _bclr = "#F1C40F" if _bscore >= 90 else "#27AE60" if _bscore >= 75 else "#F39C12" if _bscore >= 55 else "#888"
                 _is_perfect = _bscore >= 90
-                _perfect_html = ' <span style="color:#F1C40F;font-size:0.7rem;font-weight:800">🎯 PERFECT</span>' if _is_perfect else ""
+
+                # Capacity + recency badges
+                _cap_label = f"📊 {_g['active']} active" if _g['active'] else "📊 0 active (ready)"
+                if _g["days"] >= 9999:
+                    _rec_label = "⏳ never contacted"
+                elif _g["days"] >= 30:
+                    _rec_label = f"⏳ {_g['days']}d cool"
+                elif _g["days"] >= 14:
+                    _rec_label = f"⏳ {_g['days']}d ago"
+                else:
+                    _rec_label = f"🔥 {_g['days']}d ago (recent)"
+
+                _perfect_html = ' <span style="color:#F1C40F;font-size:0.7rem;font-weight:800;background:#3a2a08;padding:1px 6px;border-radius:4px">🎯 100%</span>' if _is_perfect else ""
+
+                _cap_pts_v = _g["cap_pts"]
+                _rec_pts_v = _g["rec_pts"]
+                _grade_tooltip = f"match {_match} + cap {_cap_pts_v} + rec {_rec_pts_v}"
 
                 _bcol1, _bcol2 = st.columns([8, 2])
                 with _bcol1:
                     st.markdown(
-                        f'<div style="border-left:2px solid {_bclr};padding:6px 10px;margin:2px 0;'
+                        f'<div style="border-left:3px solid {_bclr};padding:7px 11px;margin:2px 0;'
                         f'background:#0d0a14;border-radius:0 4px 4px 0">'
                         f'<div style="display:flex;justify-content:space-between;align-items:center">'
                         f'<span style="font-weight:700;color:#f0f0f0;font-size:0.86rem">{_e(_bname)}{_perfect_html}</span>'
                         f'<span style="background:{_bclr}22;color:{_bclr};font-size:0.7rem;'
-                        f'padding:2px 8px;border-radius:8px;font-weight:700">{_bscore}/100</span>'
+                        f'padding:2px 8px;border-radius:8px;font-weight:800" title="{_grade_tooltip}">Grade {_bscore}</span>'
                         f'</div>'
                         f'<div style="color:#666;font-size:0.72rem">{_e(_binds)}</div>'
                         + (f'<div style="color:#888;font-size:0.7rem">{_e(_bstates)}</div>' if _bstates else "")
+                        + f'<div style="display:flex;gap:8px;font-size:0.66rem;color:#666;margin-top:3px">'
+                        + f'<span title="Active deals already on this buyer">{_cap_label}</span>'
+                        + f'<span title="Last time we contacted them">{_rec_label}</span>'
+                        + f'<span style="color:#444">· fit {_match}</span>'
+                        + '</div>'
                         + '<div style="font-size:0.7rem;margin-top:3px">'
                         + (f'<a href="mailto:{_e(_b_email)}" style="color:#4A90D9">✉</a> ' if _b_email else "")
                         + (f'<a href="tel:{_e(_b_phone)}" style="color:#4A90D9">📞</a> ' if _b_phone else "")
