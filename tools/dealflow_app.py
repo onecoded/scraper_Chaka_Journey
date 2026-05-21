@@ -939,7 +939,7 @@ tab7, tab1, tab2, tab6, tab3, tab4, tab5 = st.tabs([
     "🎯  The Pipeline",
     "🚀  Scout",
     "📜  Ravens",
-    "🤖  Automation",
+    "🔥  The Beacons",
     "👑  Fellowship",
 ])
 
@@ -1401,7 +1401,7 @@ with tab1:
     if new_intakes:
         st.markdown(
             f'<div class="intake-banner">📬 <strong>{len(new_intakes)} new seller intake submissions</strong> — '
-            f'review them in the <strong>Automation</strong> tab.</div>',
+            f'review them in <strong>🔥 The Beacons</strong> tab.</div>',
             unsafe_allow_html=True
         )
 
@@ -2038,11 +2038,13 @@ with tab3:
 with tab4:
     st.markdown(
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">'
-        '<span style="font-size:1.4rem">🤖</span>'
-        '<span style="font-size:1.3rem;font-weight:800;color:#e8eaf0">Automation</span>'
+        '<span style="font-size:1.4rem">🔥</span>'
+        '<span style="font-size:1.3rem;font-weight:800;color:#e8eaf0">The Beacons</span>'
+        '<span style="color:#666;font-size:0.78rem;font-style:italic;margin-left:6px">— signal-fires across the realm</span>'
         '</div>'
         '<div style="color:#666;font-size:0.82rem;margin-bottom:12px">'
-        'Auto-draft deal outreach. Recruit new buyers. Review seller intakes.'
+        'Light the fires: auto-draft deal outreach · recruit new buyers · review seller intakes · '
+        'every signal travels across the network.'
         '</div>',
         unsafe_allow_html=True
     )
