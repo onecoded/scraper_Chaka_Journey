@@ -939,7 +939,7 @@ tab7, tab1, tab2, tab6, tab3, tab4, tab5 = st.tabs([
     "🎯  The Pipeline",
     "🚀  Scout",
     "📜  Ravens",
-    "🔮  Palantír",
+    "🤖  Automation",
     "👑  Fellowship",
 ])
 
@@ -2038,11 +2038,11 @@ with tab3:
 with tab4:
     st.markdown(
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">'
-        '<span style="font-size:1.4rem">🔮</span>'
-        '<span style="font-size:1.3rem;font-weight:800;color:#e8eaf0">The Palantír — Automation</span>'
+        '<span style="font-size:1.4rem">🤖</span>'
+        '<span style="font-size:1.3rem;font-weight:800;color:#e8eaf0">Automation</span>'
         '</div>'
         '<div style="color:#666;font-size:0.82rem;margin-bottom:12px">'
-        'Auto-draft deal outreach. Recruit new buyers into the Fellowship. Review seller intakes.'
+        'Auto-draft deal outreach. Recruit new buyers. Review seller intakes.'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2518,7 +2518,7 @@ with tab5:
                                          help="Gmail App Password (16 chars) — not your real password")
             st.markdown("**API Keys** — the rings of power that bind the forge together")
             ak1, ak2 = st.columns(2)
-            s_anthropic = ak1.text_input("🔮 Anthropic API Key", value=cur.get("ANTHROPIC_API_KEY",""), type="password",
+            s_anthropic = ak1.text_input("🧠 Anthropic API Key", value=cur.get("ANTHROPIC_API_KEY",""), type="password",
                                           help="Claude API for AI email generation")
             s_apollo    = ak2.text_input("⚔ Apollo.io API Key",    value=cur.get("APOLLO_API_KEY",""), type="password",
                                           help="Apollo.io for contact + email enrichment (replaces Hunter)")
@@ -2553,7 +2553,7 @@ with tab5:
 
         bc2_status = st.columns(5)
         bc2_status[0].metric("📧 SMTP",      "✅" if SMTP_USER else "❌")
-        bc2_status[1].metric("🔮 Anthropic", "✅" if os.getenv("ANTHROPIC_API_KEY","").startswith("sk-") else "❌")
+        bc2_status[1].metric("🧠 Anthropic", "✅" if os.getenv("ANTHROPIC_API_KEY","").startswith("sk-") else "❌")
         bc2_status[2].metric("⚔ Apollo",    "✅" if os.getenv("APOLLO_API_KEY","") not in ("","your-apollo-api-key") else "❌")
         bc2_status[3].metric("🔍 SerpAPI",   "✅" if os.getenv("SERPAPI_KEY","") not in ("","your-serpapi-key") else "❌")
         bc2_status[4].metric("⚒ Clay",      "✅" if os.getenv("CLAY_API_KEY","") and os.getenv("CLAY_WEBHOOK_URL","") else "❌")
